@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Pingcoin</string>
+    <string name="coin_select_button">Select</string>
+    <string name="title_home">Select</string>
+    <string name="title_select">Select a coin to test</string>
+    <string name="title_dashboard">Ping</string>
+    <string name="title_notifications">Results</string>
+    <string-array name="coins">
+        <item>1 oz Gold Krugerrand</item>
+        <item>1 oz Gold American Eagle</item>
+        <item>1 oz Gold Maple Leaf</item>
+    </string-array>
+</resources>

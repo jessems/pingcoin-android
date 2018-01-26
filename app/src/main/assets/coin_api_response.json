@@ -1,0 +1,39 @@
+{
+  "coins": [
+    {
+      "c0d2": 4100.0,
+      "c0d3": 9478.0,
+      "c0d4": 16360.0,
+      "cdError": 100.0,
+      "diameter": 36.0,
+      "familyName": "American Eagle",
+      "fullName": "1 oz Gold American Eagle",
+      "materialClass": "Gold",
+      "weight": 31.0,
+      "weightClass": "1 oz"
+    },
+    {
+      "c0d2": 4403.0,
+      "c0d3": 9798.0,
+      "c0d4": 16675.0,
+      "cdError": 100.0,
+      "diameter": 36.0,
+      "familyName": "Krugerrand",
+      "fullName": "1 oz Gold Krugerrand",
+      "materialClass": "Gold",
+      "weight": 31.0,
+      "weightClass": "1 oz"
+    },
+    {
+      "c0d2": 4410.0,
+      "c0d3": 9950.0,
+      "cdError": 100.0,
+      "diameter": 36.0,
+      "familyName": "Maple Leaf",
+      "fullName": "1 oz Gold Maple Leaf",
+      "materialClass": "Gold",
+      "weight": 31.0,
+      "weightClass": "1 oz"
+    }
+  ]
+}
