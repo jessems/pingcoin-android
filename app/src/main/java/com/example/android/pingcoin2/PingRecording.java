@@ -7,4 +7,9 @@ package com.example.android.pingcoin2;
 public class PingRecording {
     public boolean heard = false;
     public short [] audioData = new short[] {};
+
+//    public PingRecording(boolean _heard, short[] _audioData) {
+//        this.heard = _heard;
+//        this.audioData = _audioData;
+//    }
 }

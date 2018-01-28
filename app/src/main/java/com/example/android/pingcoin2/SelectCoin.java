@@ -1,6 +1,7 @@
 package com.example.android.pingcoin2;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
@@ -105,10 +106,15 @@ public class SelectCoin extends AppCompatActivity {
 
         LineChart chart = findViewById(R.id.chart);
 
-//        final AudioClipRecorder pingRecorder = new AudioClipRecorder(pingDetector);
-        final PingRecorder pingRecorder = new PingRecorder(pingDetector);
+        final AudioClipRecorder pingRecorder = new AudioClipRecorder(pingDetector);
+//        final PingRecorder pingRecorder = new PingRecorder(pingDetector);
 
-        final AsyncRecord pingContinuousRecord = new AsyncRecord();
+        // TODO put Async call into the onClick so it can be executed again.
+
+
+//        final AsyncRecord pingContinuousRecord = new AsyncRecord(this);
+        AsyncRecord pingContinuousRecord;
+        final Activity _main_activity = this;
 
         findViewById(R.id.btnStart).setOnClickListener(new View.OnClickListener() {
         @Override
@@ -121,6 +127,7 @@ public class SelectCoin extends AppCompatActivity {
                         PERMISSION_RECORD_AUDIO);
                 return;
             }
+            AsyncRecord outter.pingContinuousRecord = new AsyncRecord(_main_activity);
             // Permission already available
 //            pingRecorder.startRecording();
             pingContinuousRecord.execute();

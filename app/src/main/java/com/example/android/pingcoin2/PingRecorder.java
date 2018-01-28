@@ -29,6 +29,7 @@ public class PingRecorder
     public static final int RECORDER_SAMPLERATE_8000 = 8000;
 
     private static final int DEFAULT_BUFFER_INCREASE_FACTOR = 3;
+    private static int READ_BUFFER_SIZE_IN_BYTES = 512;
 
     private AsyncTask task;
 
@@ -86,7 +87,7 @@ public class PingRecorder
         // Determine the minimum buffer size based on the samplerate and encoding
         int bufferSize = determineMinimumBufferSize(sampleRate, encoding);
         // Record
-        return doRecording(sampleRate, encoding, bufferSize, bufferSize,
+        return doRecording(sampleRate, encoding, bufferSize, READ_BUFFER_SIZE_IN_BYTES,
                 DEFAULT_BUFFER_INCREASE_FACTOR);
     }
 
@@ -155,7 +156,7 @@ public class PingRecorder
         PingRecording pingRecording = new PingRecording();
 
         pingRecording.heard = heard;
-        pingRecording.audioData = readBuffer;
+//        pingRecording.audioData = readBuffer;
 
         if (recordingBufferSize == AudioRecord.ERROR_BAD_VALUE)
         {
@@ -180,6 +181,9 @@ public class PingRecorder
                         increasedRecordingBufferSize);
 
         final short[] readBuffer = new short[readBufferSize];
+        Log.i("PingRecorder", "readbufferSize: " + readBufferSize);
+
+//        pingRecording.audioData = readBuffer;
 
         continueRecording = true;
         Log.d(TAG, "start recording, " + "recording bufferSize: "
@@ -195,6 +199,9 @@ public class PingRecorder
         {
             // Recording gets read into the readBuffer
             int bufferResult = recorder.read(readBuffer, 0, readBufferSize);
+
+            pingRecording.audioData = readBuffer;
+
             //in case external code stopped this while read was happening
             if ((!continueRecording) || ((task != null) && task.isCancelled()))
             {

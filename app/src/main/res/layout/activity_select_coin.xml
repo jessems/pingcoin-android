@@ -30,38 +30,51 @@
         android:id="@+id/message"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginStart="@dimen/activity_horizontal_margin"
-        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:layout_weight="1"
         android:text="@string/title_select"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
+        <Spinner
+            android:id="@+id/coin_selector"
+            android:layout_width="wrap_content"
+            android:layout_height="21dp"
+            android:layout_margin="26dp"
+            android:layout_weight="1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:layout_editor_absoluteY="89dp"/>
 
-    <Spinner
-        android:id="@+id/coin_selector"
-        android:layout_width="wrap_content"
-        android:layout_height="21dp"
-        android:layout_margin="26dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="89dp"/>
+        <Button
+            android:id="@+id/button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:layout_weight="1"
+            android:onClick="onClickSelectCoin"
+            android:text="@string/coin_select_button"
+            tools:layout_editor_absoluteX="148dp"
+            tools:layout_editor_absoluteY="150dp"/>
+
+    </LinearLayout>
+
 
     <!--         android:entries="@array/coins" -->
 
 
     <!--TODO: Figure out a way to link the Text to a @string-->
-    <Button
-        android:id="@+id/button"
-        android:layout_width="wrap_content"
+
+    <com.github.mikephil.charting.charts.LineChart
+        android:id="@+id/chart"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:onClick="onClickSelectCoin"
-        android:text="@string/coin_select_button"
-        tools:layout_editor_absoluteX="148dp"
-        tools:layout_editor_absoluteY="150dp"/>
+        android:layout_weight="1"/>
 
     <Button
         android:text="Start"
@@ -83,11 +96,6 @@
         android:text="TextView"
         tools:layout_editor_absoluteX="163dp"
         tools:layout_editor_absoluteY="246dp"/>
-
-    <com.github.mikephil.charting.charts.LineChart
-        android:id="@+id/chart"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
 
     <ScrollView
         android:layout_width="match_parent"
