@@ -5,6 +5,7 @@ import android.media.AudioRecord;
 import android.media.AudioRecord.OnRecordPositionUpdateListener;
 import android.media.MediaRecorder.AudioSource;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.util.Log;
 
 /**
@@ -57,7 +58,7 @@ public class PingRecorder
     public PingRecording startRecording()
     {
         // Calls the alternate method declaration with default arguments filled in
-        return startRecording(RECORDER_SAMPLERATE_8000,
+        return startRecording(RECORDER_SAMPLERATE_CD,
                 AudioFormat.ENCODING_PCM_16BIT);
     }
 
@@ -223,6 +224,7 @@ public class PingRecorder
 
                 if (heard)
                 {
+                    Log.i("PingRecorder", "Called stopRecording");
                     stopRecording();
                 }
             }
@@ -251,7 +253,7 @@ public class PingRecorder
      */
     public void done()
     {
-        Log.d(TAG, "shut down recorder");
+        Log.d("PingRecorder", "shut down recorder");
         if (recorder != null)
         {
             recorder.stop();

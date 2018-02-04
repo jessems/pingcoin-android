@@ -2,19 +2,30 @@ package com.example.android.pingcoin2;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.view.View;
 
 import com.example.android.fftpack.RealDoubleFFT;
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.IMarker;
+import com.github.mikephil.charting.components.LimitLine;
+import com.github.mikephil.charting.components.MarkerView;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.highlight.Highlight;
+import com.github.mikephil.charting.utils.MPPointF;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
+
+import static java.lang.Math.log10;
 
 
 /**
@@ -23,6 +34,7 @@ import java.util.List;
 
 public class AsyncRecord extends AsyncTask<Void, Void, Void> {
 
+    String TAG = "AsyncRecord";
     private final Activity activity;
 
     private Context mContext;
@@ -32,6 +44,7 @@ public class AsyncRecord extends AsyncTask<Void, Void, Void> {
 //    private RealDoubleFFT transformer = new RealDoubleFFT(512);
     boolean heard;
     short[] audioData = new short[] {};
+    double[] spectrumData = new double[] {};
 
 
     public AsyncRecord(Activity _activity) {
@@ -56,14 +69,18 @@ public class AsyncRecord extends AsyncTask<Void, Void, Void> {
 //        pingRecorder.startRecording();
         Log.e("AsyncRecord", "reached here");
         this.heard = false;
+        PingRecording pingRecording;
         publishProgress();
 
         try {
             //start recording
             Log.e("AsyncRecord", "starting recording");
 //            heard = pingRecorder.startRecording().heard;
-            this.heard = pingRecorder.startRecording().heard;
-            this.audioData = pingRecorder.startRecording().audioData;
+//            this.heard = pingRecorder.startRecording().heard;
+//            this.audioData = pingRecorder.startRecording().audioData;
+            pingRecording = pingRecorder.startRecording();
+            this.heard = pingRecording.heard;
+            this.audioData = pingRecording.audioData;
             publishProgress();
         } catch (IllegalStateException se) {
             Log.e("AsyncRecord", "failed to record, recorder not setup properly", se);
@@ -92,41 +109,95 @@ public class AsyncRecord extends AsyncTask<Void, Void, Void> {
 
         RealDoubleFFT transformer = new RealDoubleFFT(toTransform.length);
 
+        Log.i("AsyncRecord", Arrays.toString(toTransform));
+
         transformer.ft(toTransform);
-//        publishProgress(toTransform);
-
-        float[] floatArray = new float[toTransform.length];
-        for (int i = 0 ; i < toTransform.length; i++)
-        {
-            floatArray[i] = (float) Math.sqrt((float) toTransform[i] * (float) toTransform[i]);
-        }
 
 
-        LineChart chart = (LineChart) this.activity.findViewById(R.id.chart);
+        double [] spectrumAmpOutTmp;
+        int fftlen = toTransform.length;
+        spectrumAmpOutTmp= new double[fftlen/2+1];
+
+        AudioUtil boris = new AudioUtil();
+        boris.fftToAmp(spectrumAmpOutTmp, toTransform);
+
+        this.spectrumData = spectrumAmpOutTmp;
+
+
+
+        Log.i("AsyncRecord", Arrays.toString(spectrumAmpOutTmp));
+
+//        float[] floatArray = new float[]{};
+//        AudioUtil.doubleToFloat(floatArray, spectrumAmpOutTmp);
+
+//        float[] floatArray = new float[spectrumAmpOutTmp.length];
+//        for (int i = 0 ; i < spectrumAmpOutTmp.length; i++)
+//        {
+//            // Normal version
+//            floatArray[i] = (float) (spectrumAmpOutTmp[i]);
 //
-//        List<Entry> entries = new ArrayList<Entry>();
-//        for(int i = 0; i < this.audioData.length; i++) {
-//            entries.add(new Entry(i,this.audioData[i]));
 //        }
+        // Async should end here
+
+        LineChart chart = this.activity.findViewById(R.id.chart);
 
 
-        List<Entry> entries = new ArrayList<Entry>();
-        for(int i = 0; i < floatArray.length; i++) {
-            entries.add(new Entry(i,floatArray[i]));
+
+
+
+        Log.i(TAG, "Generating float array");
+        float[] floatArray = new float[this.spectrumData.length];
+        for (int i = 0 ; i < this.spectrumData.length; i++)
+        {
+            floatArray[i] = (float) this.spectrumData[i];
         }
+        Log.i(TAG, "floatArray: " + Arrays.toString(floatArray));
 
-        LineDataSet dataSet = new LineDataSet(entries, "Label"); // add entries to dataset
-        dataSet.setDrawCircles(false);
-//        dataSet.setDrawFilled(true);
-//        dataSet.setColor(...);
-//        dataSet.setValueTextColor(...); // styling, ...
+        // Plot the spectrum
+        Log.i(TAG, "Plotting the spectrum");
 
-        LineData lineData = new LineData(dataSet);
-        chart.setData(lineData);
-        chart.invalidate(); // refresh
+        SpectrumPlottingUtils.addData(chart, floatArray);
+
+        // Peak detection
+        Log.i(TAG, "Starting peak detection with spectrumData: " + Arrays.toString(this.spectrumData));
+        LinkedList<Integer> peaks = new LinkedList<Integer>();
+        peaks = Peaks.findPeaks(this.spectrumData, 20, 0.0005, 0, false);
+
+        Log.i(TAG, "Peaks :" + (peaks.toString()));
+
+        // Plot detected frequencies
+        Log.i(TAG, "Plotting detected frequencies");
+        SpectrumPlottingUtils.plotDetectedFrequencies(chart, peaks);
+
+        // Refresh the chart
+        Log.i(TAG, "Refreshing the spectrum");
+        chart.invalidate();
 
 
-//        Arrays.asList(this.audioData);
+//        // Expected peaks plotting
+//        Log.i(TAG, "Plotting expected peaks");
+//        SpectrumPlottingUtils.plotNaturalFrequency(chart, "c0d2", SelectCoin.naturalFrequencyC0D2);
+//        SpectrumPlottingUtils.plotNaturalFrequency(chart, "c0d3", SelectCoin.naturalFrequencyC0D3);
+//        SpectrumPlottingUtils.plotNaturalFrequency(chart, "c0d4", SelectCoin.naturalFrequencyC0D4);
+
+
+//        // Configure the spectrum chart
+//        Log.i(TAG, "Configuring the spectrum chart");
+//        SpectrumPlottingUtils.configureSpectrumChart(chart);
+
+
+
+
+
+        // Refresh the chart
+        Log.i(TAG, "Refreshing the chart");
+        chart.invalidate();
+
+        Log.i(TAG, "Finished postExecute in AsyncRecord");
+
+
+
+
 
 
     }

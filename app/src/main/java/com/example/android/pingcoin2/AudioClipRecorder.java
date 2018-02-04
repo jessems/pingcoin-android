@@ -8,6 +8,7 @@ import android.media.AudioRecord;
 import android.media.AudioRecord.OnRecordPositionUpdateListener;
 import android.media.MediaRecorder.AudioSource;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.util.Log;
 import android.view.MenuInflater;
 import android.view.View;
@@ -215,6 +216,13 @@ public class AudioClipRecorder
 
                 if (heard)
                 {
+//                    Handler handler = new Handler();
+//                    handler.postDelayed(new Runnable() {
+//                        public void run() {
+//                            stopRecording();
+//                        }
+//                    }, 5000);
+                    Log.i("AudioClipRecording", "Called stopRecording");
                     stopRecording();
                 }
             }
@@ -240,7 +248,7 @@ public class AudioClipRecorder
      */
     public void done()
     {
-        Log.d(TAG, "shut down recorder");
+        Log.d("AudioClipRecorder", "shut down recorder");
         if (recorder != null)
         {
             recorder.stop();

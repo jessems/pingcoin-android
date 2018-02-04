@@ -26,14 +26,15 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/message"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:text="@string/title_select"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+    <!--<TextView-->
+        <!--android:id="@+id/message"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_weight="1"-->
+        <!--android:text="@string/title_select"-->
+        <!--app:layout_constraintLeft_toLeftOf="parent"-->
+        <!--app:layout_constraintTop_toTopOf="parent"/>-->
+
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -50,17 +51,6 @@
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             tools:layout_editor_absoluteY="89dp"/>
-
-        <Button
-            android:id="@+id/button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:layout_weight="1"
-            android:onClick="onClickSelectCoin"
-            android:text="@string/coin_select_button"
-            tools:layout_editor_absoluteX="148dp"
-            tools:layout_editor_absoluteY="150dp"/>
 
     </LinearLayout>
 
@@ -82,41 +72,35 @@
         android:layout_height="wrap_content"
         android:id="@+id/btnStart"/>
 
-    <Button
-        android:text="Stop"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/btnStop"/>
+    <!--<TextView-->
+        <!--android:id="@+id/coin_details"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_margin="16dp"-->
+        <!--android:text="TextView"-->
+        <!--tools:layout_editor_absoluteX="163dp"-->
+        <!--tools:layout_editor_absoluteY="246dp"/>-->
 
-    <TextView
-        android:id="@+id/coin_details"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:text="TextView"
-        tools:layout_editor_absoluteX="163dp"
-        tools:layout_editor_absoluteY="246dp"/>
-
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <TextView
-            android:id="@+id/coin_parameters"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-    </ScrollView>
+    <!--<ScrollView-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content">-->
+        <!--<TextView-->
+            <!--android:id="@+id/coin_parameters"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"/>-->
+    <!--</ScrollView>-->
 
 
 </android.support.v7.widget.LinearLayoutCompat>
 
-<android.support.design.widget.BottomNavigationView
-        android:id="@+id/navigation"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:layout_alignParentBottom="true"
-        android:background="?android:attr/windowBackground"
-        app:menu="@menu/navigation"/>
+<!--<android.support.design.widget.BottomNavigationView-->
+        <!--android:id="@+id/navigation"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_gravity="bottom"-->
+        <!--android:layout_alignParentBottom="true"-->
+        <!--android:background="?android:attr/windowBackground"-->
+        <!--app:menu="@menu/navigation"/>-->
 
     <!--<android.support.design.widget.BottomNavigationView-->
         <!--android:id="@+id/bottomNavigation"-->
@@ -127,6 +111,8 @@
         <!--app:itemIconTint="@color/icons"-->
         <!--app:itemTextColor="@color/secondary_text"-->
         <!--app:menu="@menu/bottom_menu">-->
+
+
 
 </RelativeLayout>
 <!--</android.support.constraint.ConstraintLayout>-->

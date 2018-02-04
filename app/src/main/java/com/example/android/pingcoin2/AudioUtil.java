@@ -149,4 +149,25 @@ public class AudioUtil
             Log.w(TAG, "Error writing sensor event data");
         }
     }
+
+    public void fftToAmp(double[] dataOut, double[] data) {
+        // data.length should be a even number
+        double scaler = 2.0*2.0 / (data.length * data.length);  // *2 since there are positive and negative frequency part
+        dataOut[0] = data[0]*data[0] * scaler / 4.0;
+        int j = 1;
+        for (int i = 1; i < data.length - 1; i += 2, j++) {
+            dataOut[j] = (data[i]*data[i] + data[i+1]*data[i+1]) * scaler;
+        }
+        dataOut[j] = data[data.length-1]*data[data.length-1] * scaler / 4.0;
+    }
+
+    public static void doubleToFloat(float[] dataOut, double [] data) {
+//        dataOut = new float[data.length];
+        for (int i = 0 ; i < data.length; i++)
+        {
+            // Normal version
+            dataOut[i] = (float) (data[i]);
+
+        }
+    }
 }

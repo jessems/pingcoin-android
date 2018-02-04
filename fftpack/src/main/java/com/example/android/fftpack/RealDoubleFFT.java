@@ -43,21 +43,21 @@ public class RealDoubleFFT extends RealDoubleFFT_Mixed
      * Forward real FFT transform. It computes the discrete transform of a real data sequence.
      *
      * @param x an array which contains the sequence to be transformed. After FFT,
-     * <em>x</em> contains the transform coeffients used to construct <em>n</em> complex FFT coeffients.
-     * <br>
-     * The real part of the first complex FFT coeffients is <em>x</em>[0]; its imaginary part
-     * is 0. If <em>n</em> is even set <em>m</em> = <em>n</em>/2, if <em>n</em> is odd set
-     * <em>m</em> = <em>n</em>/2, then for
-     * <br>
-     * <em>k</em> = 1, ..., <em>m</em>-1 <br>
-     * the real part of <em>k</em>-th complex FFT coeffients is <em>x</em>[2*<em>k</em>-1];
-     * <br>
-     * the imaginary part of <em>k</em>-th complex FFT coeffients is <em>x</em>[2*<em>k</em>-2].
-     * <br>
-     * If <em>n</em> is even,
-     * the real of part of (<em>n</em>/2)-th complex FFT coeffients is <em>x</em>[<em>n</em>]; its imaginary part is 0.
+     * x contains the transform coeffients used to construct n complex FFT coeffients.
+     *
+     * The real part of the first complex FFT coeffients is x[0]; its imaginary part
+     * is 0. If n is even set m = n/2, if n is odd set
+     * m = n/2, then for
+     *
+     * k = 1, ..., m-1
+     * the real part of k-th complex FFT coeffients is x[2*k-1];
+     *
+     * the imaginary part of k-th complex FFT coeffients is x[2*k-2].
+     *
+     * If n is even,
+     * the real of part of (n/2)-th complex FFT coeffients is x[n]; its imaginary part is 0.
      * The remaining complex FFT coeffients can be obtained by the symmetry relation:
-     * the (<em>n</em>-<em>k</em>)-th complex FFT coeffient is the conjugate of <em>n</em>-th complex FFT coeffient.
+     * the (n-k)-th complex FFT coeffient is the conjugate of n-th complex FFT coeffient.
      *
      */
     public void ft(double x[])

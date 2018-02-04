@@ -87,17 +87,7 @@ public class AudioRecordActivity extends AppCompatActivity {
             public void onClick(View v) {
                 startRecording();
                 startButton.setEnabled(false);
-                stopButton.setEnabled(true);
-            }
-        });
-
-        stopButton = (Button) findViewById(R.id.btnStop);
-        stopButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                stopRecording();
-                startButton.setEnabled(true);
-                stopButton.setEnabled(false);
+//                stopButton.setEnabled(true);
             }
         });
     }
@@ -107,7 +97,7 @@ public class AudioRecordActivity extends AppCompatActivity {
         super.onResume();
 
         startButton.setEnabled(true);
-        stopButton.setEnabled(false);
+//        stopButton.setEnabled(false);
     }
 
     @Override
