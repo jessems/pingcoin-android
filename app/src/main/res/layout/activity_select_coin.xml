@@ -66,6 +66,12 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"/>
 
+    <!--<com.github.mikephil.charting.charts.LineChart-->
+        <!--android:id="@+id/timeChart"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="10dp"-->
+        <!--android:layout_weight="1"/>-->
+
     <Button
         android:text="Start"
         android:layout_width="match_parent"

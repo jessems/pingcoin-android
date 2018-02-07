@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.util.Log;
 import android.view.View;
 
+import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.LimitLine;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
@@ -44,10 +45,16 @@ public class SpectrumPlottingUtils {
         LineData lineData = new LineData(dataSet);
         chartView.setData(lineData);
 
+//        Description description = new Description();
+//        description.setText("");
+//        chartView.setDescription(description);
+
+
+
     }
 
     public static void addEmptyData(LineChart chartView) {
-        float[] spectrumData = new float[256];
+        float[] spectrumData = new float[512];
 
         // Create entries List
         List<Entry> entries = new ArrayList<Entry>();
@@ -69,16 +76,24 @@ public class SpectrumPlottingUtils {
     public static void configureSpectrumChart(LineChart chart) {
         addEmptyData(chart);
         YAxis leftAxis = chart.getAxisLeft();
+        leftAxis.setEnabled(false);
 
 
         YAxis rightYAxis = chart.getAxisRight();
         rightYAxis.setEnabled(false);
 
-       chart.getAxisLeft().setDrawGridLines(false);
-       chart.getXAxis().setDrawGridLines(false);
+        chart.getAxisLeft().setDrawGridLines(false);
+        chart.getXAxis().setDrawGridLines(false);
 
         leftAxis.setAxisMinimum(0);
-        leftAxis.setAxisMaximum(0.01f);
+//        leftAxis.setAxisMaximum(0.01f);
+
+        XAxis xAxis = chart.getXAxis();
+        xAxis.setValueFormatter(new XAxisValueFormatter());
+
+        chart.getDescription().setEnabled(false);
+        chart.getLegend().setEnabled(false);
+
     }
 
     public static void plotNaturalFrequency(LineChart chart, String naturalFrequencyLabel, float naturalFrequencyValue) {
@@ -90,16 +105,16 @@ public class SpectrumPlottingUtils {
         // Determine which natural frequency we're plotting
         switch (naturalFrequencyLabel) {
             case "c0d2":
-                cxdx = new LimitLine(naturalFrequencyValue/86, naturalFrequencyLabel);
+                cxdx = new LimitLine(naturalFrequencyValue / (44100/1024), naturalFrequencyLabel);
             case "c0d3":
-                cxdx = new LimitLine(naturalFrequencyValue/86, naturalFrequencyLabel);
+                cxdx = new LimitLine(naturalFrequencyValue / (44100/1024), naturalFrequencyLabel);
             case "c0d4":
-                cxdx = new LimitLine(naturalFrequencyValue/86, naturalFrequencyLabel);
+                cxdx = new LimitLine(naturalFrequencyValue / (44100/1024), naturalFrequencyLabel);
             default:
                 break;
         }
 
-        cxdx.setLineWidth(4f);
+        cxdx.setLineWidth(0.5f);
         cxdx.setLineColor(Color.GRAY);
         cxdx.enableDashedLine(10f, 10f, 0f);
         cxdx.setLabelPosition(LimitLine.LimitLabelPosition.RIGHT_TOP);
@@ -121,8 +136,7 @@ public class SpectrumPlottingUtils {
             }
         }
 
-        LimitLine test = new LimitLine(100);
-        test.getLabel();
+
 
 
 
@@ -130,7 +144,7 @@ public class SpectrumPlottingUtils {
         for (int k = 0; k < detectedFrequencies.size(); k++) {
             Log.i(TAG,"Iterating through detected frequency: " + detectedFrequencies.get(k));
             limitLineList.add(new LimitLine(detectedFrequencies.get(k)));
-            limitLineList.get(limitLineList.size() - 1).setLineWidth(2f);
+            limitLineList.get(limitLineList.size() - 1).setLineWidth(0.5f);
         }
 
 

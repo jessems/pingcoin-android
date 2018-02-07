@@ -8,6 +8,10 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.util.Log;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 /**
  * record an audio clip and pass it to the listener
  *
@@ -30,7 +34,7 @@ public class PingRecorder
     public static final int RECORDER_SAMPLERATE_8000 = 8000;
 
     private static final int DEFAULT_BUFFER_INCREASE_FACTOR = 3;
-    private static int READ_BUFFER_SIZE_IN_BYTES = 512;
+    private static int READ_BUFFER_SIZE_IN_BYTES = 1024;
 
     private AsyncTask task;
 
@@ -43,7 +47,7 @@ public class PingRecorder
         task = null;
     }
 
-    public PingRecorder(AudioClipListener clipListener, AsyncTask task)
+    public PingRecorder(AudioClipListener clipListener, AsyncRecord task)
     {
         // Calls the first constructor
         this(clipListener);
@@ -224,8 +228,15 @@ public class PingRecorder
 
                 if (heard)
                 {
+
                     Log.i("PingRecorder", "Called stopRecording");
+//                    try {
+////                        TimeUnit.MILLISECONDS.sleep(5);
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
                     stopRecording();
+//                    task.doProgress();
                 }
             }
         }

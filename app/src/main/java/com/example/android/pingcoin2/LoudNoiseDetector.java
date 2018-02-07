@@ -29,7 +29,7 @@ public class LoudNoiseDetector implements AudioClipListener
 
     private double volumeThreshold;
 
-    public static final int DEFAULT_LOUDNESS_THRESHOLD = 2000;
+    public static final int DEFAULT_LOUDNESS_THRESHOLD = 5000;
 
     private static final boolean DEBUG = true;
 

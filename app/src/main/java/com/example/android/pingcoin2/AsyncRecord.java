@@ -51,6 +51,9 @@ public class AsyncRecord extends AsyncTask<Void, Void, Void> {
         this.activity = _activity;
     }
 
+    public void doProgress(boolean heard) {
+        publishProgress();
+    }
 
     @Override
     protected Void doInBackground(Void... voids) {
@@ -58,7 +61,9 @@ public class AsyncRecord extends AsyncTask<Void, Void, Void> {
         Log.e("AsyncRecord", "Are we reaching here at least?");
 
         // Instantiate a clapper
-        LoudNoiseDetector pingDetector = new LoudNoiseDetector();
+//        LoudNoiseDetector pingDetector = new LoudNoiseDetector();
+        ConsistentFrequencyDetector pingDetector = new ConsistentFrequencyDetector(5,300, 20);
+
 //        ConsistentFrequencyDetector pingDetector = new ConsistentFrequencyDetector(100, 3000, 200);
 
         // Pass the clapper to a recorder
@@ -101,6 +106,8 @@ public class AsyncRecord extends AsyncTask<Void, Void, Void> {
         Log.e("AsyncRecord", "Reached here in onprogressupdate");
     }
 
+
+
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
@@ -121,25 +128,34 @@ public class AsyncRecord extends AsyncTask<Void, Void, Void> {
         AudioUtil boris = new AudioUtil();
         boris.fftToAmp(spectrumAmpOutTmp, toTransform);
 
-        this.spectrumData = spectrumAmpOutTmp;
+        double[] logSpectrumAmpOutTmp = new double[spectrumAmpOutTmp.length];
 
+        for (int p = 0; p < spectrumAmpOutTmp.length; p++) {
+//            logSpectrumAmpOutTmp[p] = Math.cbrt(spectrumAmpOutTmp[p]);
+            logSpectrumAmpOutTmp[p] = Math.pow(spectrumAmpOutTmp[p], 1/2);
+            logSpectrumAmpOutTmp[p] = spectrumAmpOutTmp[p];
+        }
+
+
+//        this.spectrumData = spectrumAmpOutTmp;
+        this.spectrumData = logSpectrumAmpOutTmp;
 
 
         Log.i("AsyncRecord", Arrays.toString(spectrumAmpOutTmp));
 
-//        float[] floatArray = new float[]{};
-//        AudioUtil.doubleToFloat(floatArray, spectrumAmpOutTmp);
 
-//        float[] floatArray = new float[spectrumAmpOutTmp.length];
-//        for (int i = 0 ; i < spectrumAmpOutTmp.length; i++)
-//        {
-//            // Normal version
-//            floatArray[i] = (float) (spectrumAmpOutTmp[i]);
-//
-//        }
         // Async should end here
 
         LineChart chart = this.activity.findViewById(R.id.chart);
+//        LineChart timeChart = this.activity.findViewById(R.id.timeChart);
+
+        float[] audioFloatArray = new float[this.audioData.length];
+        for (int i = 0 ; i < this.audioData.length; i++)
+        {
+            audioFloatArray[i] = (float) this.audioData[i];
+        }
+
+
 
 
 
@@ -161,7 +177,8 @@ public class AsyncRecord extends AsyncTask<Void, Void, Void> {
         // Peak detection
         Log.i(TAG, "Starting peak detection with spectrumData: " + Arrays.toString(this.spectrumData));
         LinkedList<Integer> peaks = new LinkedList<Integer>();
-        peaks = Peaks.findPeaks(this.spectrumData, 20, 0.0005, 0, false);
+        peaks = Peaks.findPeaks(this.spectrumData, 5, 0.000001, 0, true);
+//        peaks = Peaks.findPeaks(this.spectrumData, 5, 0.01, 0, true);
 
         Log.i(TAG, "Peaks :" + (peaks.toString()));
 
@@ -172,20 +189,6 @@ public class AsyncRecord extends AsyncTask<Void, Void, Void> {
         // Refresh the chart
         Log.i(TAG, "Refreshing the spectrum");
         chart.invalidate();
-
-
-//        // Expected peaks plotting
-//        Log.i(TAG, "Plotting expected peaks");
-//        SpectrumPlottingUtils.plotNaturalFrequency(chart, "c0d2", SelectCoin.naturalFrequencyC0D2);
-//        SpectrumPlottingUtils.plotNaturalFrequency(chart, "c0d3", SelectCoin.naturalFrequencyC0D3);
-//        SpectrumPlottingUtils.plotNaturalFrequency(chart, "c0d4", SelectCoin.naturalFrequencyC0D4);
-
-
-//        // Configure the spectrum chart
-//        Log.i(TAG, "Configuring the spectrum chart");
-//        SpectrumPlottingUtils.configureSpectrumChart(chart);
-
-
 
 
 

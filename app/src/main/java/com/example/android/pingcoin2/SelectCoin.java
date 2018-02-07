@@ -210,6 +210,9 @@ public class SelectCoin extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 Log.i(TAG,parent.getItemAtPosition(position).toString());
 
+                chart.clear();
+                SpectrumPlottingUtils.addEmptyData(chart);
+
                 XAxis bottomAxis = chart.getXAxis();
                 bottomAxis.removeAllLimitLines();
 
