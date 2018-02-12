@@ -32,7 +32,7 @@ import static java.lang.Math.log10;
  * Created by jmscdch on 24/01/18.
  */
 
-public class AsyncRecord extends AsyncTask<Void, Void, Void> {
+public class AsyncRecord extends AsyncTask<Void, PingRecording, Void> {
 
     String TAG = "AsyncRecord";
     private final Activity activity;
@@ -51,8 +51,8 @@ public class AsyncRecord extends AsyncTask<Void, Void, Void> {
         this.activity = _activity;
     }
 
-    public void doProgress(boolean heard) {
-        publishProgress();
+    public void doProgress(PingRecording... progressPingRecording) {
+        publishProgress(progressPingRecording);
     }
 
     @Override
@@ -62,7 +62,7 @@ public class AsyncRecord extends AsyncTask<Void, Void, Void> {
 
         // Instantiate a clapper
 //        LoudNoiseDetector pingDetector = new LoudNoiseDetector();
-        ConsistentFrequencyDetector pingDetector = new ConsistentFrequencyDetector(5,300, 20);
+        ConsistentFrequencyDetector pingDetector = new ConsistentFrequencyDetector(10,300, 100);
 
 //        ConsistentFrequencyDetector pingDetector = new ConsistentFrequencyDetector(100, 3000, 200);
 
@@ -75,7 +75,7 @@ public class AsyncRecord extends AsyncTask<Void, Void, Void> {
         Log.e("AsyncRecord", "reached here");
         this.heard = false;
         PingRecording pingRecording;
-        publishProgress();
+//        publishProgress();
 
         try {
             //start recording
@@ -86,7 +86,7 @@ public class AsyncRecord extends AsyncTask<Void, Void, Void> {
             pingRecording = pingRecorder.startRecording();
             this.heard = pingRecording.heard;
             this.audioData = pingRecording.audioData;
-            publishProgress();
+//            publishProgress();
         } catch (IllegalStateException se) {
             Log.e("AsyncRecord", "failed to record, recorder not setup properly", se);
             this.heard = false;
@@ -99,12 +99,95 @@ public class AsyncRecord extends AsyncTask<Void, Void, Void> {
 
     }
 
-    @Override
-    protected void onProgressUpdate(Void... values) {
-        super.onProgressUpdate(values);
 
-        Log.e("AsyncRecord", "Reached here in onprogressupdate");
+
+
+    @Override
+    protected void onProgressUpdate(PingRecording... pingRecordingProgress) {
+        super.onProgressUpdate(pingRecordingProgress);
+        Log.i(TAG, "Inside onProgressUpdate");
+
+        if (pingRecordingProgress.length == 1) {
+
+            Log.i(TAG, "AUDIODATA LENGTH: " + Integer.toString(pingRecordingProgress[0].audioData.length));
+
+
+            double[] toTransform = ShortArrayToDoubleArray.convertFromShortArrayToDoubleArray(pingRecordingProgress[0].audioData);
+
+
+            RealDoubleFFT transformer = new RealDoubleFFT(toTransform.length);
+
+            Log.i("AsyncRecord", Arrays.toString(toTransform));
+
+            transformer.ft(toTransform);
+
+
+            double[] spectrumAmpOutTmp;
+            int fftlen = toTransform.length;
+            spectrumAmpOutTmp = new double[fftlen / 2 + 1];
+
+            AudioUtil boris = new AudioUtil();
+            boris.fftToAmp(spectrumAmpOutTmp, toTransform);
+
+            double[] logSpectrumAmpOutTmp = new double[spectrumAmpOutTmp.length];
+
+            for (int p = 0; p < spectrumAmpOutTmp.length; p++) {
+//               logSpectrumAmpOutTmp[p] = Math.cbrt(spectrumAmpOutTmp[p]);
+                logSpectrumAmpOutTmp[p] = Math.pow(spectrumAmpOutTmp[p], 1 / 4);
+//                logSpectrumAmpOutTmp[p] = spectrumAmpOutTmp[p];
+            }
+
+//          this.spectrumData = spectrumAmpOutTmp;
+            this.spectrumData = logSpectrumAmpOutTmp;
+
+
+            Log.i("AsyncRecord", Arrays.toString(spectrumAmpOutTmp));
+
+
+            // Async should end here
+
+            LineChart chart = this.activity.findViewById(R.id.chart);
+//          LineChart timeChart = this.activity.findViewById(R.id.timeChart);
+
+            float[] audioFloatArray = new float[this.audioData.length];
+            for (int i = 0; i < this.audioData.length; i++) {
+                audioFloatArray[i] = (float) this.audioData[i];
+            }
+
+
+            Log.i(TAG, "Generating float array");
+            float[] floatArray = new float[this.spectrumData.length];
+            for (int i = 0; i < this.spectrumData.length; i++) {
+                floatArray[i] = (float) this.spectrumData[i];
+            }
+            Log.i(TAG, "floatArray: " + Arrays.toString(floatArray));
+
+            // Plot the spectrum
+            Log.i(TAG, "Plotting the spectrum");
+
+            SpectrumPlottingUtils.addData(chart, floatArray);
+
+            // Peak detection
+            Log.i(TAG, "Starting peak detection with spectrumData: " + Arrays.toString(this.spectrumData));
+            LinkedList<Integer> peaks = new LinkedList<Integer>();
+            peaks = Peaks.findPeaks(this.spectrumData, 5, 0.000001, 0, true);
+//        peaks = Peaks.findPeaks(this.spectrumData, 5, 0.01, 0, true);
+
+            Log.i(TAG, "Peaks :" + (peaks.toString()));
+
+            // Plot detected frequencies
+            Log.i(TAG, "Plotting detected frequencies");
+            SpectrumPlottingUtils.plotDetectedFrequencies(chart, peaks);
+
+            // Refresh the chart
+            Log.i(TAG, "Refreshing the spectrum");
+            chart.invalidate();
+
+        }
+
+
     }
+
 
 
 
@@ -132,8 +215,8 @@ public class AsyncRecord extends AsyncTask<Void, Void, Void> {
 
         for (int p = 0; p < spectrumAmpOutTmp.length; p++) {
 //            logSpectrumAmpOutTmp[p] = Math.cbrt(spectrumAmpOutTmp[p]);
-            logSpectrumAmpOutTmp[p] = Math.pow(spectrumAmpOutTmp[p], 1/2);
-            logSpectrumAmpOutTmp[p] = spectrumAmpOutTmp[p];
+//            logSpectrumAmpOutTmp[p] = Math.pow(spectrumAmpOutTmp[p], 1/4);
+            logSpectrumAmpOutTmp[p] = Math.sqrt(spectrumAmpOutTmp[p]);
         }
 
 
@@ -178,6 +261,8 @@ public class AsyncRecord extends AsyncTask<Void, Void, Void> {
         Log.i(TAG, "Starting peak detection with spectrumData: " + Arrays.toString(this.spectrumData));
         LinkedList<Integer> peaks = new LinkedList<Integer>();
         peaks = Peaks.findPeaks(this.spectrumData, 5, 0.000001, 0, true);
+        peaks = Peaks.findPeaks(this.spectrumData, 5, 0.0001, 0, true);
+
 //        peaks = Peaks.findPeaks(this.spectrumData, 5, 0.01, 0, true);
 
         Log.i(TAG, "Peaks :" + (peaks.toString()));

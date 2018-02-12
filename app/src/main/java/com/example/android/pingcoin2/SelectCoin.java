@@ -65,6 +65,8 @@ public class SelectCoin extends AppCompatActivity {
     static Long naturalFrequencyC0D3 = null;
     static Long naturalFrequencyC0D4 = null;
 
+    private static Context mContext;
+
 
 
     public String loadJSONFromAsset(Context context) {
@@ -123,7 +125,7 @@ public class SelectCoin extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_coin);
-
+        mContext = this;
         VolleyLog.DEBUG = true;
 
 
@@ -133,23 +135,29 @@ public class SelectCoin extends AppCompatActivity {
         SQLiteOpenHelper coinDatabaseHelper = new PingcoinDatabaseHelper(this);
         SQLiteDatabase db = coinDatabaseHelper.getReadableDatabase();
 
-        try {
-
-//            SQLiteDatabase db = coinDatabaseHelper.getReadableDatabase();
-
-            Cursor cursor = db.query("COINS",
-                    new String[] {"_id", "fullName"}, null, null, null, null, null);
-
-            Log.i("SelectCoin", DatabaseUtils.dumpCursorToString(cursor));
-
-
-        } catch(SQLiteException e) {
-            Log.i("SelectCoin", "Did not reach here select coin");
-            Toast toast = Toast.makeText(this, "Database unavailable", Toast.LENGTH_SHORT);
-            toast.show();
-        }
+//        final Cursor cursor = null;
+//        try {
+//
+////            SQLiteDatabase db = coinDatabaseHelper.getReadableDatabase();
+//
+//            cursor = db.query("COINS",
+//                    new String[] {"_id", "fullName"}, null, null, null, null, null);
+//
+//            Log.i("SelectCoin", DatabaseUtils.dumpCursorToString(cursor));
+//
+//
+//        } catch(SQLiteException e) {
+//            Log.i("SelectCoin", "Did not reach here select coin");
+//            Toast toast = Toast.makeText(this, "Database unavailable", Toast.LENGTH_SHORT);
+//            toast.show();
+//        } finally {
+//            if (cursor != null){
+//                cursor.close();
+//            }
+//        }
 
         // Get coins
+
         final Cursor cursor = getAllCoinNames(db);
 
         // Convert coins to arraylist
@@ -435,6 +443,11 @@ public class SelectCoin extends AppCompatActivity {
 //
 //        cursor.close();
     }
+
+    public static Context getContext(){
+        return mContext;
+    }
+
 
     public void onClickSelectCoin(View view){
 //        TextView coinDetails = (TextView) findViewById(R.id.coin_details);

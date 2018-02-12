@@ -10,4 +10,5 @@
         <item>1 oz Gold American Eagle</item>
         <item>1 oz Gold Maple Leaf</item>
     </string-array>
+    <string name="title_activity_add_coin">AddCoinActivity</string>
 </resources>

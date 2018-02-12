@@ -1,5 +1,7 @@
 package com.example.android.pingcoin2;
 
+import android.app.Activity;
+import android.content.Context;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.AudioRecord.OnRecordPositionUpdateListener;
@@ -25,6 +27,8 @@ public class PingRecorder
     private AudioRecord recorder;
     private AudioClipListener clipListener;
 
+    private Context _mainContext;
+
     /**
      * state variable to control starting and stopping recording
      */
@@ -36,15 +40,16 @@ public class PingRecorder
     private static final int DEFAULT_BUFFER_INCREASE_FACTOR = 3;
     private static int READ_BUFFER_SIZE_IN_BYTES = 1024;
 
-    private AsyncTask task;
-
     private boolean heard;
+    public AsyncRecord task;
 
     public PingRecorder(AudioClipListener clipListener)
     {
         this.clipListener = clipListener;
         heard = false;
-        task = null;
+//        task = null;
+        _mainContext = SelectCoin.getContext();  // returns null
+
     }
 
     public PingRecorder(AudioClipListener clipListener, AsyncRecord task)
@@ -235,8 +240,29 @@ public class PingRecorder
 //                    } catch (InterruptedException e) {
 //                        e.printStackTrace();
 //                    }
-                    stopRecording();
-//                    task.doProgress();
+//                    stopRecording();
+                    if (pingRecording.audioData.length > 0) {
+                        Log.i(TAG, "audioData length: " + Integer.toString(pingRecording.audioData.length));
+//                        task.doProgress(pingRecording);
+                        // TODO: Once the clapper threshold is reached, it seems like there are multiple data points for which it is reached.
+                        // It will go through all of them one by one. This is not necessary of course.
+
+                        stopRecording();
+                        try {
+                        TimeUnit.MILLISECONDS.sleep(20);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        AsyncRecord pingContinuousRecord = new AsyncRecord((Activity) _mainContext);
+                        pingContinuousRecord.execute();
+
+                        try {
+                            TimeUnit.MILLISECONDS.sleep(30);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
                 }
             }
         }
