@@ -81,15 +81,15 @@ public class AudioRecordActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_coin);
 
-        startButton = (Button) findViewById(R.id.btnStart);
-        startButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startRecording();
-                startButton.setEnabled(false);
-//                stopButton.setEnabled(true);
-            }
-        });
+//        startButton = (Button) findViewById(R.id.btnStart);
+//        startButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                startRecording();
+//                startButton.setEnabled(false);
+////                stopButton.setEnabled(true);
+//            }
+//        });
     }
 
     @Override

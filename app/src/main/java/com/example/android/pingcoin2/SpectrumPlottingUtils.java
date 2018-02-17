@@ -19,6 +19,8 @@ import java.util.LinkedList;
 import java.util.List;
 import com.github.mikephil.charting.data.LineData;
 
+import static android.graphics.Color.argb;
+
 
 /**
  * Created by jmscdch on 04/02/18.
@@ -36,25 +38,21 @@ public class SpectrumPlottingUtils {
         }
 
         LineDataSet dataSet = new LineDataSet(entries, "Coin Spectrum"); // add entries to dataset
-        dataSet.setColor(android.R.color.black);
-        dataSet.setFillColor(android.R.color.black);
         dataSet.setDrawCircles(false);
         dataSet.setDrawFilled(true);
         dataSet.setDrawValues(false);
 
         LineData lineData = new LineData(dataSet);
+        lineData.setValueTextColor(android.R.color.white);
         chartView.setData(lineData);
 
-//        Description description = new Description();
-//        description.setText("");
-//        chartView.setDescription(description);
 
 
 
     }
 
-    public static void addEmptyData(LineChart chartView) {
-        float[] spectrumData = new float[512];
+    public static void addEmptyData(LineChart chartView, int FFTSize) {
+        float[] spectrumData = new float[FFTSize/4];
 
         // Create entries List
         List<Entry> entries = new ArrayList<Entry>();
@@ -73,8 +71,8 @@ public class SpectrumPlottingUtils {
 
     }
 
-    public static void configureSpectrumChart(LineChart chart) {
-        addEmptyData(chart);
+    public static void configureSpectrumChart(LineChart chart, int FFTSize, int samplingFrequency) {
+        addEmptyData(chart, FFTSize);
         YAxis leftAxis = chart.getAxisLeft();
         leftAxis.setEnabled(false);
 
@@ -83,42 +81,55 @@ public class SpectrumPlottingUtils {
         rightYAxis.setEnabled(false);
 
         chart.getAxisLeft().setDrawGridLines(false);
-        chart.getXAxis().setDrawGridLines(false);
 
         leftAxis.setAxisMinimum(0);
-//        leftAxis.setAxisMaximum(0.01f);
 
         XAxis xAxis = chart.getXAxis();
-        xAxis.setValueFormatter(new XAxisValueFormatter());
+        xAxis.setDrawGridLines(false);
+        xAxis.setValueFormatter(new LargeValueFormatter());
+        xAxis.setAxisLineColor(android.R.color.white);
+        xAxis.setTextColor(Color.WHITE);
+//        xAxis.setTextColor(android.R.color.white);
+
+//        xAxis.setGranularityEnabled(true);
+//        xAxis.setGranularity((5000/samplingFrequency)*FFTSize);
 
         chart.getDescription().setEnabled(false);
         chart.getLegend().setEnabled(false);
 
     }
 
-    public static void plotNaturalFrequency(LineChart chart, String naturalFrequencyLabel, float naturalFrequencyValue) {
+    public static void plotNaturalFrequency(LineChart chart, String naturalFrequencyLabel, float naturalFrequencyValue, int sampleRate, int windowSize) {
         // Initialize the limit line
         LimitLine cxdx = new LimitLine(0);
 
+
         XAxis bottomAxis = chart.getXAxis();
+        float convertedXValue;
 
         // Determine which natural frequency we're plotting
         switch (naturalFrequencyLabel) {
             case "c0d2":
-                cxdx = new LimitLine(naturalFrequencyValue / (44100/1024), naturalFrequencyLabel);
+                convertedXValue = (naturalFrequencyValue/sampleRate)*windowSize/2;
+                cxdx = new LimitLine(convertedXValue, naturalFrequencyLabel);
+                cxdx.setLineWidth(0.02f * convertedXValue);
             case "c0d3":
-                cxdx = new LimitLine(naturalFrequencyValue / (44100/1024), naturalFrequencyLabel);
+                convertedXValue = (naturalFrequencyValue/sampleRate) * windowSize / 2;
+                cxdx = new LimitLine(convertedXValue, naturalFrequencyLabel);
+                cxdx.setLineWidth(0.02f * convertedXValue);
             case "c0d4":
-                cxdx = new LimitLine(naturalFrequencyValue / (44100/1024), naturalFrequencyLabel);
+                convertedXValue = (naturalFrequencyValue/sampleRate)*windowSize/2;
+                cxdx = new LimitLine(convertedXValue, naturalFrequencyLabel);
+                cxdx.setLineWidth(0.02f * convertedXValue);
             default:
                 break;
         }
 
-        cxdx.setLineWidth(0.5f);
-        cxdx.setLineColor(Color.GRAY);
-        cxdx.enableDashedLine(10f, 10f, 0f);
+        cxdx.setLineColor( argb(40, 190, 190, 190));
+//        cxdx.enableDashedLine(10f, 10f, 0f);
         cxdx.setLabelPosition(LimitLine.LimitLabelPosition.RIGHT_TOP);
         cxdx.setTextSize(10f);
+        cxdx.setTextColor(Color.DKGRAY);
 
         bottomAxis.addLimitLine(cxdx);
 

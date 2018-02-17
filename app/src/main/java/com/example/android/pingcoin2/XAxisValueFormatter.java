@@ -9,8 +9,12 @@ import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 
 public class XAxisValueFormatter implements IAxisValueFormatter {
 
-    public XAxisValueFormatter() {
+    private int sampleRate = 44100; // Default
+    private int windowSize = 512; // Default
 
+    public XAxisValueFormatter(int sampleRate) {
+        this.sampleRate = sampleRate;
+        this.windowSize = windowSize;
 
     }
 
@@ -18,10 +22,7 @@ public class XAxisValueFormatter implements IAxisValueFormatter {
     public String getFormattedValue(float value, AxisBase axis) {
         // "value" represents the position of the label on the axis (x or y)
 
-        int bufferSize = 1024;
-        int samplingFrequency = 44100;
-
-        return Float.toString(value * (samplingFrequency/bufferSize));
+        return Float.toString(value * (sampleRate/windowSize));
     }
 
     /** this is only needed if numbers are returned, else return 0 */

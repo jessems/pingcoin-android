@@ -25,6 +25,9 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.android.pingcoin2.PitchProcessor;
+import com.example.android.pingcoin2.PitchProcessor.PitchEstimationAlgorithm;
+
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -133,28 +136,10 @@ public class SelectCoin extends AppCompatActivity {
 
         // Get coins from SQLite db
         SQLiteOpenHelper coinDatabaseHelper = new PingcoinDatabaseHelper(this);
+
+
         SQLiteDatabase db = coinDatabaseHelper.getReadableDatabase();
 
-//        final Cursor cursor = null;
-//        try {
-//
-////            SQLiteDatabase db = coinDatabaseHelper.getReadableDatabase();
-//
-//            cursor = db.query("COINS",
-//                    new String[] {"_id", "fullName"}, null, null, null, null, null);
-//
-//            Log.i("SelectCoin", DatabaseUtils.dumpCursorToString(cursor));
-//
-//
-//        } catch(SQLiteException e) {
-//            Log.i("SelectCoin", "Did not reach here select coin");
-//            Toast toast = Toast.makeText(this, "Database unavailable", Toast.LENGTH_SHORT);
-//            toast.show();
-//        } finally {
-//            if (cursor != null){
-//                cursor.close();
-//            }
-//        }
 
         // Get coins
 
@@ -190,6 +175,7 @@ public class SelectCoin extends AppCompatActivity {
             String itemId = cursor.getString(
                     cursor.getColumnIndexOrThrow(CoinContract.CoinEntry.COLUMN_FULL_NAME));
             Log.i(TAG, itemId + " vs " + selectedCoin);
+
             if (itemId.equals(selectedCoin)) {
                 naturalFrequencyC0D2 = cursor.getLong(
                         cursor.getColumnIndexOrThrow(CoinContract.CoinEntry.COLUMN_C0D2));
@@ -208,9 +194,16 @@ public class SelectCoin extends AppCompatActivity {
 
         final LineChart chart = findViewById(R.id.chart);
 
+
+
+        final int sampleRate = 44100;
+        final int windowSize = 1024;
+
+
+
         // Configure the spectrum chart
         Log.i(TAG, "Configuring the spectrum chart");
-        SpectrumPlottingUtils.configureSpectrumChart(chart);
+        SpectrumPlottingUtils.configureSpectrumChart(chart, windowSize, sampleRate);
 
 
         sItems.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -219,7 +212,7 @@ public class SelectCoin extends AppCompatActivity {
                 Log.i(TAG,parent.getItemAtPosition(position).toString());
 
                 chart.clear();
-                SpectrumPlottingUtils.addEmptyData(chart);
+                SpectrumPlottingUtils.addEmptyData(chart, windowSize);
 
                 XAxis bottomAxis = chart.getXAxis();
                 bottomAxis.removeAllLimitLines();
@@ -241,13 +234,13 @@ public class SelectCoin extends AppCompatActivity {
                         Log.i(TAG, naturalFrequencyC0D4.toString());
 
                         if (naturalFrequencyC0D2.intValue() != 0) {
-                            SpectrumPlottingUtils.plotNaturalFrequency(chart, "c0d2", naturalFrequencyC0D2);
+                            SpectrumPlottingUtils.plotNaturalFrequency(chart, "c0d2", naturalFrequencyC0D2, sampleRate, windowSize);
                         }
                         if (naturalFrequencyC0D3.intValue() != 0) {
-                            SpectrumPlottingUtils.plotNaturalFrequency(chart, "c0d3", naturalFrequencyC0D3);
+                            SpectrumPlottingUtils.plotNaturalFrequency(chart, "c0d3", naturalFrequencyC0D3, sampleRate, windowSize);
                         }
                         if (naturalFrequencyC0D4.intValue() !=0) {
-                            SpectrumPlottingUtils.plotNaturalFrequency(chart, "c0d4", naturalFrequencyC0D4);
+                            SpectrumPlottingUtils.plotNaturalFrequency(chart, "c0d4", naturalFrequencyC0D4, sampleRate, windowSize);
                         }
                         chart.invalidate();
 
@@ -269,60 +262,155 @@ public class SelectCoin extends AppCompatActivity {
         });
 
 
+
+
         // Expected peaks plotting
         Log.i(TAG, "Plotting expected peaks");
-        SpectrumPlottingUtils.plotNaturalFrequency(chart, "c0d2", SelectCoin.naturalFrequencyC0D2);
-        SpectrumPlottingUtils.plotNaturalFrequency(chart, "c0d3", SelectCoin.naturalFrequencyC0D3);
-        SpectrumPlottingUtils.plotNaturalFrequency(chart, "c0d4", SelectCoin.naturalFrequencyC0D4);
+        Log.i(TAG, "C0D2: " + Float.toString(convertHzToBin(SelectCoin.naturalFrequencyC0D2, windowSize, sampleRate)));
+        SpectrumPlottingUtils.plotNaturalFrequency(chart, "c0d2", SelectCoin.naturalFrequencyC0D2, sampleRate, windowSize);
+
+        Log.i(TAG, "C0D3: " + Float.toString(convertHzToBin(SelectCoin.naturalFrequencyC0D3, windowSize, sampleRate)));
+        SpectrumPlottingUtils.plotNaturalFrequency(chart, "c0d3", SelectCoin.naturalFrequencyC0D3, sampleRate, windowSize);
+
+        Log.i(TAG, "C0D4: " + Float.toString(convertHzToBin(SelectCoin.naturalFrequencyC0D4, windowSize, sampleRate)));
+        SpectrumPlottingUtils.plotNaturalFrequency(chart, "c0d4", SelectCoin.naturalFrequencyC0D4, sampleRate, windowSize);
 
 
+        chart.invalidate();
 
 
+        // Experimental Tarsos implementation:
+
+        AudioDispatcher dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(sampleRate,windowSize*2,0);
 
 
+//        dispatcher.addAudioProcessor(new PitchProcessor(PitchEstimationAlgorithm.PING_ONSET_DETECTION, 44100, 1024, new PitchDetectionHandler() {
+//
+//            @Override
+//            public void handlePitch(PitchDetectionResult pitchDetectionResult,
+//                                    AudioEvent audioEvent) {
+//                final float pitchInHz = pitchDetectionResult.getPitch();
+//                final float[] audioBuffer = pitchDetectionResult.getAudioBuffer();
+//                final LineChart chart = findViewById(R.id.chart);
+//                runOnUiThread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        TextView text = (TextView) findViewById(R.id.pitchdetection);
+//                        text.setText("" + pitchInHz);
+////                        SpectrumPlottingUtils.addData(chart, audioBuffer);
+////                        chart.invalidate();
+//                    }
+//                });
+//
+//            }
+//        }));
 
-        LoudNoiseDetector pingDetector = new LoudNoiseDetector();
+
+        dispatcher.addAudioProcessor(new PercussionOnsetDetector(sampleRate, windowSize, new OnsetHandler() {
+            @Override
+            public void handleOnset(final float[] audioSpectrum, double time, double salience) {
+//                Log.i(TAG, Arrays.toString(audioSpectrum));
 
 
-//        final AudioClipRecorder pingRecorder = new AudioClipRecorder(pingDetector);
-//        final PingRecorder pingRecorder = new PingRecorder(pingDetector);
+                // Peak detection
+                double[] audioSpectrumDoubleArray = new double[audioSpectrum.length];
+                for (int i = 0 ; i < audioSpectrum.length; i++)
+                {
+                    audioSpectrumDoubleArray[i] = (double) audioSpectrum[i];
+                }
 
-        // TODO put Async call into the onClick so it can be executed again.
+                LinkedList<Integer> peaks = new LinkedList<Integer>();
+                peaks = Peaks.findPeaks(audioSpectrumDoubleArray, 5, 0.1, 0, true);
 
 
-//        final AsyncRecord pingContinuousRecord = new AsyncRecord(this);
-        AsyncRecord pingContinuousRecord;
-        final Activity _main_activity = this;
+                final LineChart chart = findViewById(R.id.chart);
+                final LinkedList<Integer> finalPeaks = peaks;
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
 
-        findViewById(R.id.btnStart).setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            Log.e("SelectCoin", "Reach here at least?");
+                        // Plot detected frequencies
+                        Log.i(TAG, "Plotting detected frequencies");
+//                        SpectrumPlottingUtils.plotDetectedFrequencies(chart, finalPeaks);
 
-            if (ContextCompat.checkSelfPermission(SelectCoin.this, Manifest.permission.RECORD_AUDIO)
-                    != PackageManager.PERMISSION_GRANTED) {
-                // Request permission
-                ActivityCompat.requestPermissions(SelectCoin.this,
-                        new String[] { Manifest.permission.RECORD_AUDIO },
-                        PERMISSION_RECORD_AUDIO);
-                return;
+                        // Plot spectrum
+                        SpectrumPlottingUtils.addData(chart, audioSpectrum);
+
+                        chart.invalidate();
+
+                    }
+                });
             }
-
-            Log.i(TAG, "Declaring and instantiating AsyncRecord");
-            AsyncRecord pingContinuousRecord = new AsyncRecord(_main_activity);
-            // Permission already available
-//            pingRecorder.startRecording();
-
-            Log.i(TAG, "Executing AsyncRecord instance");
-            pingContinuousRecord.execute();
-            Log.e(TAG, "Async Record executed");
+        }, 60, 2));
 
 
-            Log.i(TAG, "Test " + pingContinuousRecord.spectrumData.toString());
+
+
+
+        new Thread(dispatcher,"Audio Dispatcher").start();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // Below is the old asynctask stuff:
+
+
+
+//        LoudNoiseDetector pingDetector = new LoudNoiseDetector();
+//
+//
+////        final AudioClipRecorder pingRecorder = new AudioClipRecorder(pingDetector);
+////        final PingRecorder pingRecorder = new PingRecorder(pingDetector);
+//
+//        // TODO: put Async call into the onClick so it can be executed again.
+//
+//
+////        final AsyncRecord pingContinuousRecord = new AsyncRecord(this);
+//        AsyncRecord pingContinuousRecord;
+//        final Activity _main_activity = this;
+//
+//        findViewById(R.id.btnStart).setOnClickListener(new View.OnClickListener() {
+//        @Override
+//        public void onClick(View v) {
+//            Log.e("SelectCoin", "Reach here at least?");
+//
+//            if (ContextCompat.checkSelfPermission(SelectCoin.this, Manifest.permission.RECORD_AUDIO)
+//                    != PackageManager.PERMISSION_GRANTED) {
+//                // Request permission
+//                ActivityCompat.requestPermissions(SelectCoin.this,
+//                        new String[] { Manifest.permission.RECORD_AUDIO },
+//                        PERMISSION_RECORD_AUDIO);
+//                return;
+//            }
+//
+//            Log.i(TAG, "Declaring and instantiating AsyncRecord");
+//            AsyncRecord pingContinuousRecord = new AsyncRecord(_main_activity);
+//            // Permission already available
+////            pingRecorder.startRecording();
+//
+//            Log.i(TAG, "Executing AsyncRecord instance");
+//            pingContinuousRecord.execute();
+//            Log.e(TAG, "Async Record executed");
+//
+//
+//            Log.i(TAG, "Test " + pingContinuousRecord.spectrumData.toString());
 
 //
-        }
-        });
+//        }
+
+
+//        });
 
 
 
@@ -442,6 +530,7 @@ public class SelectCoin extends AppCompatActivity {
 //        MySingleton.getInstance(this).addToRequestQueue(jsObjRequest);
 //
 //        cursor.close();
+
     }
 
     public static Context getContext(){
@@ -470,6 +559,9 @@ public class SelectCoin extends AppCompatActivity {
     }
 
 
+    public float convertHzToBin(long inputFrequency, int windowSize, int sampleRate) {
+        return (float) inputFrequency / (sampleRate / windowSize);
+    }
 
 
 }
