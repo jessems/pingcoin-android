@@ -51,8 +51,8 @@ public class SpectrumPlottingUtils {
 
     }
 
-    public static void addEmptyData(LineChart chartView, int FFTSize) {
-        float[] spectrumData = new float[FFTSize/4];
+    public static void addEmptyData(LineChart chartView, int sampleRate, int windowSize) {
+        float[] spectrumData = new float[windowSize/4];
 
         // Create entries List
         List<Entry> entries = new ArrayList<Entry>();
@@ -71,8 +71,13 @@ public class SpectrumPlottingUtils {
 
     }
 
-    public static void configureSpectrumChart(LineChart chart, int FFTSize, int samplingFrequency) {
-        addEmptyData(chart, FFTSize);
+
+
+    public static void configureSpectrumChart(LineChart chart, int windowSize, int sampleRate) {
+
+
+
+        addEmptyData(chart, sampleRate, windowSize);
         YAxis leftAxis = chart.getAxisLeft();
         leftAxis.setEnabled(false);
 
@@ -86,7 +91,14 @@ public class SpectrumPlottingUtils {
 
         XAxis xAxis = chart.getXAxis();
         xAxis.setDrawGridLines(false);
-        xAxis.setValueFormatter(new LargeValueFormatter());
+        xAxis.setLabelCount(5);
+        xAxis.setAxisMinimum(0);
+        xAxis.setAxisMaximum(windowSize/4);
+        xAxis.setGranularityEnabled(true);
+        xAxis.setValueFormatter(new LargeValueFormatter(windowSize, sampleRate));
+//        xAxis.set
+        xAxis.setGranularity(5000/ ((2*sampleRate)/windowSize));
+
         xAxis.setAxisLineColor(android.R.color.white);
         xAxis.setTextColor(Color.WHITE);
 //        xAxis.setTextColor(android.R.color.white);
@@ -99,7 +111,7 @@ public class SpectrumPlottingUtils {
 
     }
 
-    public static void plotNaturalFrequency(LineChart chart, String naturalFrequencyLabel, float naturalFrequencyValue, int sampleRate, int windowSize) {
+    public static void plotNaturalFrequency(LineChart chart, String naturalFrequencyLabel, float naturalFrequencyValue, float naturalFrequencyError, int sampleRate, int windowSize) {
         // Initialize the limit line
         LimitLine cxdx = new LimitLine(0);
 
@@ -110,17 +122,17 @@ public class SpectrumPlottingUtils {
         // Determine which natural frequency we're plotting
         switch (naturalFrequencyLabel) {
             case "c0d2":
-                convertedXValue = (naturalFrequencyValue/sampleRate)*windowSize/2;
+                convertedXValue = naturalFrequencyValue / ((2*sampleRate)/windowSize);
                 cxdx = new LimitLine(convertedXValue, naturalFrequencyLabel);
-                cxdx.setLineWidth(0.02f * convertedXValue);
+                cxdx.setLineWidth(naturalFrequencyError/100 * convertedXValue);
             case "c0d3":
-                convertedXValue = (naturalFrequencyValue/sampleRate) * windowSize / 2;
+                convertedXValue = naturalFrequencyValue / ((2*sampleRate)/windowSize);
                 cxdx = new LimitLine(convertedXValue, naturalFrequencyLabel);
-                cxdx.setLineWidth(0.02f * convertedXValue);
+                cxdx.setLineWidth(naturalFrequencyError/100 * convertedXValue);
             case "c0d4":
-                convertedXValue = (naturalFrequencyValue/sampleRate)*windowSize/2;
+                convertedXValue = naturalFrequencyValue / ((2*sampleRate)/windowSize);
                 cxdx = new LimitLine(convertedXValue, naturalFrequencyLabel);
-                cxdx.setLineWidth(0.02f * convertedXValue);
+                cxdx.setLineWidth(naturalFrequencyError/100 * convertedXValue);
             default:
                 break;
         }
@@ -131,9 +143,35 @@ public class SpectrumPlottingUtils {
         cxdx.setTextSize(10f);
         cxdx.setTextColor(Color.DKGRAY);
 
+        bottomAxis.setDrawLimitLinesBehindData(true);
         bottomAxis.addLimitLine(cxdx);
 
     }
+
+    public static void detectedNaturalFrequency(LineChart chart, String frequencyLabel, boolean detected) {
+        XAxis bottomAxis = chart.getXAxis();
+        List<LimitLine> existingLimitLines = bottomAxis.getLimitLines();
+        int detectedColor = Color.argb(80,0,153,51);
+        int notDetectedColor = Color.argb(80,255,80,80);
+
+            for(LimitLine limitline : existingLimitLines) {
+                if (limitline.getLabel() == frequencyLabel) {
+                    if (detected) {
+                        limitline.setLineColor(detectedColor);
+                    } else {
+                        limitline.setLineColor(notDetectedColor);
+                    }
+                }
+            }
+
+
+
+
+
+        chart.invalidate();
+
+    }
+
 
     public static void plotDetectedFrequencies(LineChart chart, LinkedList<Integer> detectedFrequencies) {
         XAxis bottomAxis = chart.getXAxis();

@@ -44,11 +44,19 @@ public class PingcoinDatabaseHelper extends SQLiteOpenHelper {
         Log.i("asd", "After table creation");
 
         addCoins(db, "1 oz Gold Krugerrand", "Krugerrand", "Gold", "1 oz", 31,
-                36, 4844, 10895, 18626, 100);
-        addCoins(db, "1 oz Gold American Eagle", "American Eagle", "Gold", "1 oz", 31,
-                36, 4100, 9478, 16360, 100);
-        addCoins(db, "1 oz Gold Maple Leaf", "Maple Leaf", "Gold", "1 oz", 31,
-                36, 4410, 9950, 0, 100);
+                36, 4764, 10835, 18593, 5.5f);
+//        addCoins(db, "1 oz Gold American Eagle", "American Eagle", "Gold", "1 oz", 31,
+//                36, 3789, 8699, 14384, 5);
+//        addCoins(db, "1 oz Gold Napoleon", "Napoleon", "Gold", "1 oz", 31,
+//                38, 6880, 10300, 17200, 5);
+        addCoins(db, "1 oz Silver American Eagle", "American Eagle", "Silver", "1 oz", 31,
+                38, 3726, 8708, 15210, 5);
+        addCoins(db, "1 oz Silver Maple Leaf", "American Eagle", "Silver", "1 oz", 31,
+                38, 4680, 11004, 19014, 5);
+        addCoins(db, "German 20 Mark Preussen", "20 Mark", "Gold", "1/4 oz", 31,
+                38, 5102, 11678, 20532, 7.65f);
+        addCoins(db, "German 20 Mark Wuerttemberg", "20 Mark", "Gold", "1/4 oz", 31,
+                38, 4680, 11257, 19942, 7.65f);
     }
 
     @Override

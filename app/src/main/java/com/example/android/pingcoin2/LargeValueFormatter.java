@@ -6,6 +6,7 @@ import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.formatter.IValueFormatter;
 import com.github.mikephil.charting.utils.ViewPortHandler;
 
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 
 /**
@@ -28,11 +29,19 @@ public class LargeValueFormatter implements IValueFormatter, IAxisValueFormatter
     private DecimalFormat mFormat;
     private String mText = "";
     private int sampleRate = 44100; // Default
-    private int windowSize = 512; // Default
+    private int windowSize = 2048; // Default
 
 
     public LargeValueFormatter() {
+
         mFormat = new DecimalFormat("###E00");
+//        mFormat.setRoundingMode(RoundingMode.CEILING);
+    }
+
+    public LargeValueFormatter(int windowSize, int sampleRate) {
+        mFormat = new DecimalFormat("###E00");
+        this.sampleRate = sampleRate;
+        this.windowSize = windowSize;
     }
 
     /**
@@ -45,16 +54,46 @@ public class LargeValueFormatter implements IValueFormatter, IAxisValueFormatter
         mText = appendix;
     }
 
+    public float convertToHz(float binNr) {
+        return binNr * ((2*sampleRate)/windowSize);
+
+    }
+
+    public float convertToBin(float Hz) {
+        return Hz / ((2*sampleRate)/windowSize);
+
+    }
+
+    // So the spectrum is plotted as just arbitrary bins. The way to map it to Hz is to modify the way the Hz are displayed, not to generate
+    // a larger range of bins up until the values that you want to reach in Hz. The transformation calculation SHOULD take place in the formatter.
+
+
     // IValueFormatter
     @Override
     public String getFormattedValue(float value, Entry entry, int dataSetIndex, ViewPortHandler viewPortHandler) {
-        return makePretty(value * (sampleRate/windowSize)) + mText;
+//        return makePretty(value * ((2*sampleRate)/(windowSize))) + mText;
+        return makePretty(convertToHz(value)) + mText;
+
     }
 
     // IAxisValueFormatter
+    // The valueformatter goes through the x values as defined by the dataset. These values are the bin numbers. In order to display Hz on the x-axis
+    // we convert them to Hz values and when they fall close to 5, 10, 15 or 20k mark, we apply those respective labels.
     @Override
     public String getFormattedValue(float value, AxisBase axis) {
-        return makePretty(value * (sampleRate / windowSize)) + mText;
+        float valueInHz = convertToHz(value);
+        if ((valueInHz > 4995 && valueInHz < 5005)) {
+            return makePretty(5000) + mText;
+        } else if (valueInHz > 9990 && valueInHz < 10010) {
+            return makePretty(10000) + mText;
+        } else if (valueInHz > 14990 && valueInHz < 15010) {
+            return makePretty(15000) + mText;
+        } else if (valueInHz > 19990 && valueInHz < 20010) {
+            return makePretty(20000) + mText;
+        } else {
+            return "";
+        }
+
     }
 
     /**

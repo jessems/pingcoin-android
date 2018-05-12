@@ -24,6 +24,7 @@
 
 package com.example.android.pingcoin2;
 
+import android.support.design.widget.TabLayout;
 import android.util.Log;
 
 import org.apache.commons.math3.stat.descriptive.moment.Kurtosis;
@@ -34,6 +35,10 @@ import com.example.android.pingcoin2.AudioProcessor;
 import com.example.android.pingcoin2.FFT;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedList;
+
+import static java.util.Arrays.fill;
 
 /**
  * <p>
@@ -102,6 +107,8 @@ public class PercussionOnsetDetector implements AudioProcessor, OnsetDetector {
     private final float sampleRate;//samples per second (Hz)
     private long processedSamples;//in samples
 
+    final static String TAG = "PercussionOnsetDetector";
+
     /**
      * Sensitivity of peak detector applied to broadband detection function (%).
      * In [0-100].
@@ -166,6 +173,14 @@ public class PercussionOnsetDetector implements AudioProcessor, OnsetDetector {
         this.processedSamples += audioFloatBuffer.length;
         this.processedSamples -= audioEvent.getOverlap();
 
+        float[] a = new float[] {0f, 0f, 0f, 0f};
+
+        // TODO: Apparently we cannot do a FFT transform on a float array with zeros.
+        // Why do we have a float array of zeros?
+        // Problem seems to be that we are trying to access index 1024 in the array, when the length is 1024 (e.g. 1023 is last index)
+        // Maybe it's the window?
+
+//        fft.forwardTransform(a);
 
 
         fft.forwardTransform(audioFloatBuffer);
@@ -208,10 +223,11 @@ public class PercussionOnsetDetector implements AudioProcessor, OnsetDetector {
 
         // Divide spectrum into bands
         float[] bandArray;
-        bandArray = chunkArray(audioSpectrum, 128);
+        bandArray = chunkArray(audioSpectrum, 64);
 
         float[] bandArraySorted = Arrays.copyOf(bandArray, bandArray.length);
         Arrays.sort(bandArraySorted);
+
 
         float median;
         if (bandArraySorted.length % 2 == 0)
@@ -219,8 +235,8 @@ public class PercussionOnsetDetector implements AudioProcessor, OnsetDetector {
         else
             median = bandArraySorted[bandArraySorted.length/2];
 
-        float[] topBandsArray = Arrays.copyOfRange(bandArraySorted,0,8);
-        float[] bottomBandsArray = Arrays.copyOfRange(bandArraySorted, 9, bandArraySorted.length - 1);
+        float[] topBandsArray = Arrays.copyOfRange(bandArraySorted,bandArraySorted.length-4,bandArraySorted.length);
+        float[] bottomBandsArray = Arrays.copyOfRange(bandArraySorted, 0, bandArraySorted.length );
 
         float sumTopBands = 0;
         float sumBottomBands = 0;
@@ -233,18 +249,59 @@ public class PercussionOnsetDetector implements AudioProcessor, OnsetDetector {
 
         float peakinessRatio = sumTopBands / sumBottomBands;
 
+
+//        Log.i("PercussionOnsetDetector", "peakinessRatio: " + peakinessRatio);
+
         float com = centerOfMass(bandArray);
 
         Kurtosis kurtosisObject = new Kurtosis();
 
         double kurtosis = kurtosisObject.evaluate(doubleSpectrum);
 
+        double[] spectrumDoubleArray = new double[audioSpectrum.length];
+
+        for(int i=0; i<audioSpectrum.length; ++i) {
+            spectrumDoubleArray[i] = (double) audioSpectrum[i];
+        }
+
+        LinkedList<Integer> peaks = new LinkedList<Integer>();
+        peaks = Peaks.findPeaks(spectrumDoubleArray, 30, 0.1, 0, true);
+
+        float lastPeak = 0;
+
+//        lastPeak = (peaks.getLast() / 1024) * sampleRate;
+//        Log.i(TAG, "Last peak: " + lastPeak);
+
+
+        double peakRatio = 0;
+        if (peaks.size() > 2) {
+            if (peaks.get(0) == 0) {
+                peakRatio = (double) peaks.get(1) / peaks.get(2);
+//                Log.i("PercussionOnsetDetector", "first peak: " + peaks.get(1));
+//                Log.i("PercussionOnsetDetector", "second peak: " + peaks.get(2));
+
+            } else {
+                peakRatio = (double) peaks.get(0) / peaks.get(1);
+//                Log.i("PercussionOnsetDetector", "first peak: " + peaks.get(0));
+//                Log.i("PercussionOnsetDetector", "second peak: " + peaks.get(1));
+            }
+            Log.i("PercussionOnsetDetector", "peak ratio: " + peakRatio);
+
+        }
+
         if (dfMinus2 < dfMinus1
                 && dfMinus1 >= binsOverThreshold
-                && dfMinus1 > ((100 - sensitivity) * audioFloatBuffer.length) / 200) {
+                && dfMinus1 > ((100 - 80) * audioFloatBuffer.length) / 200) {
+            Log.i("PercussionOnsetDetector", "sumTopBands: " + sumTopBands);
+            Log.i("PercussionOnsetDetector", "sumBottomBands: " + sumBottomBands);
             Log.i("PercussionOnsetDetector", "Peakiness ratio: " + peakinessRatio);
             Log.i("PercussionOnsetDetector", "Center of mass: " + com);
-            Log.i("PercussionOnsetDetector", "kurtosis: " + kurtosis);
+//            Log.i("PercussionOnsetDetector", "kurtosis: " + kurtosis);
+//            Log.i("PercussionOnsetDetector", "dfMinu1: " + dfMinus1);
+            Log.i("PercussionOnsetDetector", "peaks: " + peaks.size());
+//            Log.i("PercussionOnsetDetector", "First peak: " + firstPeak);
+
+
 
         }
 
@@ -252,10 +309,12 @@ public class PercussionOnsetDetector implements AudioProcessor, OnsetDetector {
 
         if (dfMinus2 < dfMinus1
                 && dfMinus1 >= binsOverThreshold
-                && dfMinus1 > ((100 - sensitivity) * audioFloatBuffer.length) / 200
-//                && peakinessRatio > 0.003
-                && com > 30000
-                && kurtosis > 100) {
+                && dfMinus1 > ((100 - 80) * audioFloatBuffer.length) / 200
+                && peakinessRatio > 0.5
+//                && kurtosis > 50
+//                && com < 0.2
+//                && (peakRatio > 0.3 && peakRatio < 0.5)
+                && (peaks.size() > 2 && peaks.size() < 10)) {
 
 
 
@@ -304,16 +363,15 @@ public class PercussionOnsetDetector implements AudioProcessor, OnsetDetector {
     }
 
     public static float centerOfMass(float[] array) {
-        int com = 0;
+        float weighted = 0;
+        float total = 0;
         for(int i = 0; i < array.length; ++i) {
-            if (i < 50) { // Get rid of low frequencies
-                com += 0;
-            }
-            else {
-                com += i * i * array[i] * array[i];
-            }
+
+            weighted += i * array[i];
+            total += i;
         }
-        return com;
+//        Log.i("What?", "Weighted: " + weighted + " total: " + total);
+        return weighted / total;
     }
 
 }

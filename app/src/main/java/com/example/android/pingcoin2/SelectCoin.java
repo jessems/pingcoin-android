@@ -56,6 +56,28 @@ import android.database.DatabaseUtils;
 
 public class SelectCoin extends AppCompatActivity {
 
+    private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
+
+    // Requesting permission to RECORD_AUDIO
+    private boolean permissionToRecordAccepted = false;
+    private String [] permissions = {Manifest.permission.RECORD_AUDIO};
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode){
+            case REQUEST_RECORD_AUDIO_PERMISSION:
+                permissionToRecordAccepted  = grantResults[0] == PackageManager.PERMISSION_GRANTED;
+                break;
+        }
+        if (!permissionToRecordAccepted ) finish();
+
+    }
+
+
+
+
+
     private TextView mTextMessage;
     TextView mDisplayCoinParameters;
 //    final static String COIN_API_URL = "https://pataguides-1490028016004.appspot.com/_ah/api/echo/v1/coins";
@@ -67,6 +89,7 @@ public class SelectCoin extends AppCompatActivity {
     static Long naturalFrequencyC0D2 = null;
     static Long naturalFrequencyC0D3 = null;
     static Long naturalFrequencyC0D4 = null;
+    static Long naturalFrequencyError = null;
 
     private static Context mContext;
 
@@ -122,6 +145,8 @@ public class SelectCoin extends AppCompatActivity {
     private static final int PERMISSION_RECORD_AUDIO = 0;
 
 
+    private SQLiteDatabase db;
+    private Cursor cursor;
 
 
     @Override
@@ -130,6 +155,14 @@ public class SelectCoin extends AppCompatActivity {
         setContentView(R.layout.activity_select_coin);
         mContext = this;
         VolleyLog.DEBUG = true;
+
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.RECORD_AUDIO},1);
+
+        }
 
 
 
@@ -155,7 +188,7 @@ public class SelectCoin extends AppCompatActivity {
 
 
         // Use array adapter
-        ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, itemIds);
+        ArrayAdapter adapter = new ArrayAdapter(this, R.layout.spinner_item, itemIds);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         // Set spinner items to array adapter
@@ -186,6 +219,9 @@ public class SelectCoin extends AppCompatActivity {
                 naturalFrequencyC0D4 = cursor.getLong(
                         cursor.getColumnIndexOrThrow(CoinContract.CoinEntry.COLUMN_C0D4));
                 Log.i(TAG, naturalFrequencyC0D4.toString());
+                naturalFrequencyError = cursor.getLong(
+                        cursor.getColumnIndexOrThrow(CoinContract.CoinEntry.COLUMN_CD_ERROR));
+                Log.i(TAG, naturalFrequencyError.toString());
 
             }
 
@@ -197,7 +233,7 @@ public class SelectCoin extends AppCompatActivity {
 
 
         final int sampleRate = 44100;
-        final int windowSize = 1024;
+        final int windowSize = 4096;
 
 
 
@@ -212,7 +248,7 @@ public class SelectCoin extends AppCompatActivity {
                 Log.i(TAG,parent.getItemAtPosition(position).toString());
 
                 chart.clear();
-                SpectrumPlottingUtils.addEmptyData(chart, windowSize);
+                SpectrumPlottingUtils.addEmptyData(chart, sampleRate, windowSize);
 
                 XAxis bottomAxis = chart.getXAxis();
                 bottomAxis.removeAllLimitLines();
@@ -234,13 +270,13 @@ public class SelectCoin extends AppCompatActivity {
                         Log.i(TAG, naturalFrequencyC0D4.toString());
 
                         if (naturalFrequencyC0D2.intValue() != 0) {
-                            SpectrumPlottingUtils.plotNaturalFrequency(chart, "c0d2", naturalFrequencyC0D2, sampleRate, windowSize);
+                            SpectrumPlottingUtils.plotNaturalFrequency(chart, "c0d2", naturalFrequencyC0D2, naturalFrequencyError, sampleRate, windowSize);
                         }
                         if (naturalFrequencyC0D3.intValue() != 0) {
-                            SpectrumPlottingUtils.plotNaturalFrequency(chart, "c0d3", naturalFrequencyC0D3, sampleRate, windowSize);
+                            SpectrumPlottingUtils.plotNaturalFrequency(chart, "c0d3", naturalFrequencyC0D3, naturalFrequencyError, sampleRate, windowSize);
                         }
                         if (naturalFrequencyC0D4.intValue() !=0) {
-                            SpectrumPlottingUtils.plotNaturalFrequency(chart, "c0d4", naturalFrequencyC0D4, sampleRate, windowSize);
+                            SpectrumPlottingUtils.plotNaturalFrequency(chart, "c0d4", naturalFrequencyC0D4, naturalFrequencyError, sampleRate, windowSize);
                         }
                         chart.invalidate();
 
@@ -267,13 +303,13 @@ public class SelectCoin extends AppCompatActivity {
         // Expected peaks plotting
         Log.i(TAG, "Plotting expected peaks");
         Log.i(TAG, "C0D2: " + Float.toString(convertHzToBin(SelectCoin.naturalFrequencyC0D2, windowSize, sampleRate)));
-        SpectrumPlottingUtils.plotNaturalFrequency(chart, "c0d2", SelectCoin.naturalFrequencyC0D2, sampleRate, windowSize);
+        SpectrumPlottingUtils.plotNaturalFrequency(chart, "c0d2", SelectCoin.naturalFrequencyC0D2, naturalFrequencyError, sampleRate, windowSize);
 
         Log.i(TAG, "C0D3: " + Float.toString(convertHzToBin(SelectCoin.naturalFrequencyC0D3, windowSize, sampleRate)));
-        SpectrumPlottingUtils.plotNaturalFrequency(chart, "c0d3", SelectCoin.naturalFrequencyC0D3, sampleRate, windowSize);
+        SpectrumPlottingUtils.plotNaturalFrequency(chart, "c0d3", SelectCoin.naturalFrequencyC0D3, naturalFrequencyError, sampleRate, windowSize);
 
         Log.i(TAG, "C0D4: " + Float.toString(convertHzToBin(SelectCoin.naturalFrequencyC0D4, windowSize, sampleRate)));
-        SpectrumPlottingUtils.plotNaturalFrequency(chart, "c0d4", SelectCoin.naturalFrequencyC0D4, sampleRate, windowSize);
+        SpectrumPlottingUtils.plotNaturalFrequency(chart, "c0d4", SelectCoin.naturalFrequencyC0D4, naturalFrequencyError, sampleRate, windowSize);
 
 
         chart.invalidate();
@@ -281,7 +317,7 @@ public class SelectCoin extends AppCompatActivity {
 
         // Experimental Tarsos implementation:
 
-        AudioDispatcher dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(sampleRate,windowSize*2,0);
+        AudioDispatcher dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(sampleRate,windowSize,(int) 0.75 * windowSize);
 
 
 //        dispatcher.addAudioProcessor(new PitchProcessor(PitchEstimationAlgorithm.PING_ONSET_DETECTION, 44100, 1024, new PitchDetectionHandler() {
@@ -320,7 +356,7 @@ public class SelectCoin extends AppCompatActivity {
                 }
 
                 LinkedList<Integer> peaks = new LinkedList<Integer>();
-                peaks = Peaks.findPeaks(audioSpectrumDoubleArray, 5, 0.1, 0, true);
+                peaks = Peaks.findPeaks(audioSpectrumDoubleArray, 10, 0.1, 0, true);
 
 
                 final LineChart chart = findViewById(R.id.chart);
@@ -333,8 +369,49 @@ public class SelectCoin extends AppCompatActivity {
                         Log.i(TAG, "Plotting detected frequencies");
 //                        SpectrumPlottingUtils.plotDetectedFrequencies(chart, finalPeaks);
 
+                        // Reset expected frequency colors:
+                        SpectrumPlottingUtils.detectedNaturalFrequency(chart, "c0d2", false);
+                        SpectrumPlottingUtils.detectedNaturalFrequency(chart, "c0d3", false);
+                        SpectrumPlottingUtils.detectedNaturalFrequency(chart, "c0d4", false);
+
                         // Plot spectrum
                         SpectrumPlottingUtils.addData(chart, audioSpectrum);
+
+                        // Check if expected frequencies are detected
+                        double errorMargin = 0.05;
+                        boolean C0D2Detected = false;
+                        boolean C0D3Detected = false;
+                        boolean C0D4Detected = false;
+                        float tempC0D2 = SelectCoin.naturalFrequencyC0D2;
+                        float tempC0D3 = SelectCoin.naturalFrequencyC0D3;
+                        float tempC0D4 = SelectCoin.naturalFrequencyC0D4;
+
+                        Log.i(TAG, "Natural frequencies: " + tempC0D2 + " " + tempC0D3 + " " + tempC0D4);
+                        Log.i(TAG, "Sample Rate and Window Size: " + sampleRate + " " + windowSize);
+                        Log.i(TAG, "Original: " +SelectCoin.naturalFrequencyC0D2);
+
+
+                        for (int realPeakvalue : finalPeaks) {
+                            float peak = ((float) realPeakvalue / windowSize) * sampleRate * 2;
+//                            float peak = realPeakvalue * 4;
+                            Log.i(TAG, "Peak: " + peak + ", Lower limit: " + tempC0D2 * (1 - errorMargin) + " + , Upper Limit : " + tempC0D2 * (1 + errorMargin));
+                            if (peak > tempC0D2 * (1 - errorMargin) && peak < tempC0D2 * (1 + errorMargin)) {
+                                C0D2Detected = true;
+                                SpectrumPlottingUtils.detectedNaturalFrequency(chart, "c0d2", C0D2Detected);
+                            } else if (peak > tempC0D3 * (1 - errorMargin) && peak < tempC0D3 * (1 + errorMargin)) {
+                                C0D3Detected = true;
+                                SpectrumPlottingUtils.detectedNaturalFrequency(chart, "c0d3", C0D3Detected);
+                            } else if (peak > tempC0D4 * (1 - errorMargin) && peak < tempC0D4 * (1 + errorMargin)) {
+                                C0D4Detected = true;
+                                SpectrumPlottingUtils.detectedNaturalFrequency(chart, "c0d4", C0D4Detected);
+                            }
+                        }
+
+                        Log.i(TAG, "C0D2 Detected: " + C0D2Detected);
+                        Log.i(TAG, "C0D3 Detected: " + C0D3Detected);
+                        Log.i(TAG, "C0D4 Detected: " + C0D4Detected);
+
+                        // If detected change their color
 
                         chart.invalidate();
 
@@ -561,6 +638,13 @@ public class SelectCoin extends AppCompatActivity {
 
     public float convertHzToBin(long inputFrequency, int windowSize, int sampleRate) {
         return (float) inputFrequency / (sampleRate / windowSize);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        cursor.close();
+        db.close();
     }
 
 

@@ -10,9 +10,9 @@ import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 public class XAxisValueFormatter implements IAxisValueFormatter {
 
     private int sampleRate = 44100; // Default
-    private int windowSize = 512; // Default
+    private int windowSize = 1024; // Default
 
-    public XAxisValueFormatter(int sampleRate) {
+    public XAxisValueFormatter(int sampleRate, int windowSize) {
         this.sampleRate = sampleRate;
         this.windowSize = windowSize;
 
