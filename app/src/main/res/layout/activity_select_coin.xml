@@ -35,7 +35,8 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
-            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"/>
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+            />
 
         <!--<TextView-->
         <!--android:id="@+id/message"-->
@@ -59,6 +60,8 @@
                 android:layout_margin="26dp"
                 android:layout_weight="1"
                 android:textColor="#FFFFFF"
+                android:dropDownSelector="@color/colorAccent"
+                android:backgroundTint="@color/colorPrimary"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
