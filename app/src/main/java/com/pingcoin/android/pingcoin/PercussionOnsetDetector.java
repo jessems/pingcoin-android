@@ -31,6 +31,7 @@ import org.apache.commons.math3.stat.descriptive.moment.Kurtosis;
 
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.concurrent.TimeUnit;
 
 import static java.util.Arrays.fill;
 
@@ -151,7 +152,7 @@ public class PercussionOnsetDetector implements AudioProcessor, OnsetDetector {
      *            broadband total (dB). In [0-20].
      */
     public PercussionOnsetDetector(float sampleRate, int bufferSize, OnsetHandler handler, double sensitivity, double threshold) {
-        fft = new FFT(bufferSize);
+        fft = new FFT(bufferSize, new HammingWindow());
         this.threshold = threshold;
         this.sensitivity = sensitivity;
         priorMagnitudes = new float[bufferSize/2];
@@ -183,6 +184,8 @@ public class PercussionOnsetDetector implements AudioProcessor, OnsetDetector {
         float[] audioSpectrumDouble;
         float[] audioSpectrum;
         audioSpectrum = currentMagnitudes.clone();
+
+//        Log.i(TAG,Arrays.toString(audioSpectrum));
 
 //        audioSpectrum = Arrays.copyOfRange(audioSpectrumDouble, 0, audioSpectrumDouble.length/2);
 
@@ -259,12 +262,24 @@ public class PercussionOnsetDetector implements AudioProcessor, OnsetDetector {
         }
 
         LinkedList<Integer> peaks = new LinkedList<Integer>();
-        peaks = Peaks.findPeaks(spectrumDoubleArray, 20, 10, 0, true);
+        peaks = Peaks.findPeaks(spectrumDoubleArray, 50, 3, 0, true);
 
         float lastPeak = 0;
 
 //        lastPeak = (peaks.getLast() / 1024) * sampleRate;
 //        Log.i(TAG, "Last peak: " + lastPeak);
+
+        boolean highFreqDetected = false;
+        for (int j = 0; j < peaks.size(); j++) {
+            // Convert to Hz
+            float peakHz;
+            peakHz = (float) peaks.get(j) / audioFloatBuffer.length * sampleRate;
+            Log.i("PercussionOnsetDetector", "Peak: " + Float.toString(peakHz));
+
+            if (peakHz > 3000) {
+                highFreqDetected = true;
+            }
+        }
 
 
         double peakRatio = 0;
@@ -285,7 +300,8 @@ public class PercussionOnsetDetector implements AudioProcessor, OnsetDetector {
 
         if (dfMinus2 < dfMinus1
                 && dfMinus1 >= binsOverThreshold
-                && dfMinus1 > ((100 - sensitivity) * audioFloatBuffer.length) / 200) {
+                && dfMinus1 > ((100 - sensitivity) * audioFloatBuffer.length) / 200
+                ) {
             Log.i("PercussionOnsetDetector", "sumTopBands: " + sumTopBands);
             Log.i("PercussionOnsetDetector", "sumBottomBands: " + sumBottomBands);
             Log.i("PercussionOnsetDetector", "Peakiness ratio: " + peakinessRatio);
@@ -301,14 +317,15 @@ public class PercussionOnsetDetector implements AudioProcessor, OnsetDetector {
 
 
 
-        if (dfMinus2 < dfMinus1
-                && dfMinus1 >= binsOverThreshold
-                && dfMinus1 > ((100 - sensitivity) * audioFloatBuffer.length) / 200
+        if (highFreqDetected
+//                dfMinus2 < dfMinus1
+//                && dfMinus1 >= binsOverThreshold
+//                && dfMinus1 > ((100 - sensitivity) * audioFloatBuffer.length) / 200
 //                && peakinessRatio > 0.5
 //                && kurtosis > 50
 //                && com < 0.2
 //                && (peakRatio > 0.3 && peakRatio < 0.5)
-//                && (peaks.size() > 2 && peaks.size() < 10)
+                && (peaks.size() > 1 && peaks.size() < 8)
                 ) {
 
 

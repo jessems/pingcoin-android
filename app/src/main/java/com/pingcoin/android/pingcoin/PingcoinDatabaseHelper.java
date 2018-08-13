@@ -46,28 +46,8 @@ public class PingcoinDatabaseHelper extends SQLiteOpenHelper {
         Log.i("asd", "Before table creation");
         db.execSQL(SQL_CREATE_COINS_TABLE);
         Log.i("asd", "After table creation");
-        
 
-        addCoins(db,
-                "1 oz Silver American Buffalo",
-                "American Buffalo",
-                "Silver",
-                "1 oz",
-                31,
-                36,
-                3818,
-                3958,
-                7146,
-                9562,
-                0,
-                16830,
-                0,
-                16095,
-                0,
-                5
-        );
-
-
+        // Works
         addCoins(db,
                 "1 oz Silver American Eagle",
                 "American Eagle",
@@ -84,9 +64,32 @@ public class PingcoinDatabaseHelper extends SQLiteOpenHelper {
                 0,
                 13955,
                 14377,
-                5
+                2
         );
 
+        // Works
+        addCoins(db,
+                "1 oz Silver American Buffalo",
+                "American Buffalo",
+                "Silver",
+                "1 oz",
+                31,
+                36,
+                4233,
+                4402,
+                7526,
+                9890,
+                0,
+                16984,
+                0,
+                16224,
+                16392,
+                2
+        );
+
+
+
+        // Works
         addCoins(db,
                 "1 oz Silver Australian Rooster",
                 "Australian Rooster",
@@ -94,18 +97,20 @@ public class PingcoinDatabaseHelper extends SQLiteOpenHelper {
                 "1 oz",
                 31,
                 36,
-                1917,
+                2460,
                 0,
                 3730,
-                5341,
+                5753,
                 0,
-                9930,
+                10228,
                 0,
-                8880,
                 0,
-                5
+                0,
+                2
         );
 
+
+        // Working
         addCoins(db,
                 "1 oz Silver Canadian Maple Leaf",
                 "Canadian Maple Leaf",
@@ -113,18 +118,19 @@ public class PingcoinDatabaseHelper extends SQLiteOpenHelper {
                 "1 oz",
                 31,
                 36,
-                4238,
+                4655,
                 0,
                 7881,
-                10674,
+                10988,
                 0,
-                18950,
+                19010,
                 0,
-                17811,
+                0,
                 0,
                 2
         );
 
+        // Not tested
         addCoins(db,
                 "1 oz Gold Brittania",
                 "Britannia",
@@ -132,19 +138,20 @@ public class PingcoinDatabaseHelper extends SQLiteOpenHelper {
                 "1 oz",
                 31,
                 36,
-                4387,
+                4824,
                 0,
-                8442,
-                10728,
                 0,
-                18801,
+                10988,
                 0,
-                18460,
+                18841,
                 0,
-                5
+                0,
+                0,
+                2
         );
 
 
+        // Not tested
         addCoins(db,
                 "1 oz Gold Australian Kangaroo",
                 "Australian Kangaroo",
@@ -152,18 +159,19 @@ public class PingcoinDatabaseHelper extends SQLiteOpenHelper {
                 "1 oz",
                 31,
                 36,
-                3019,
+                3557,
                 0,
-                6130,
-                8074,
                 0,
-                14607,
+                8370,
                 0,
-                13573,
+                14872,
                 0,
-                5
+                0,
+                0,
+                2
         );
 
+        // Not tested
         addCoins(db,
                 "1 oz Gold Chinese Panda",
                 "Chinese Panda",
@@ -171,18 +179,19 @@ public class PingcoinDatabaseHelper extends SQLiteOpenHelper {
                 "1 oz",
                 31,
                 36,
-                3170,
-                3293,
-                6375,
-                8205,
+                3634,
+                3735,
                 0,
-                14712,
+                8531,
                 0,
-                14134,
+                14806,
+                14959,
                 0,
-                5
+                0,
+                2
         );
 
+        // Works
         addCoins(db,
                 "1 oz Silver Chinese Panda",
                 "Chinese Panda",
@@ -190,18 +199,19 @@ public class PingcoinDatabaseHelper extends SQLiteOpenHelper {
                 "1 oz",
                 31,
                 36,
-                3310,
-                3398,
-                6393,
-                8582,
+                3796,
+                3892,
                 0,
-                15642,
+                8922,
                 0,
-                14377,
-                14630,
-                5
+                15623,
+                0,
+                0,
+                0,
+                2
         );
 
+        // Works
         addCoins(db,
                 "1 oz Silver Australian Kookaburra",
                 "Australian Kangaroo",
@@ -209,18 +219,19 @@ public class PingcoinDatabaseHelper extends SQLiteOpenHelper {
                 "1 oz",
                 31,
                 36,
-                3117,
-                3363,
-                6077,
-                8275,
+                3628,
+                3864,
                 0,
-                14878,
+                8630,
                 0,
-                13871,
+                15053,
                 0,
-                5
+                0,
+                0,
+                2
         );
 
+        // Works
         addCoins(db,
                 "1 oz Gold Krugerrand",
                 "South African Krugerrand",
@@ -228,18 +239,19 @@ public class PingcoinDatabaseHelper extends SQLiteOpenHelper {
                 "1 oz",
                 31,
                 36,
-                4376,
-                4436,
+                4792,
+                0,
                 8652,
-                10609,
-                10713,
-                18483,
-                18582,
-                18762,
-                19048,
-                1
+                10856,
+                0,
+                18629,
+                0,
+                0,
+                0,
+                2
         );
 
+        // Not tested
         addCoins(db,
                 "1 oz Gold Canadian Maple Leaf",
                 "Canadian Maple Leaf",
@@ -247,15 +259,35 @@ public class PingcoinDatabaseHelper extends SQLiteOpenHelper {
                 "1 oz",
                 31,
                 36,
-                4579,
-                4965,
-                8355,
-                10846,
-                11001,
-                18665,
-                18852,
-                17706,
-                17919,
+                4658,
+                4945,
+                0,
+                10839,
+                11030,
+                18648,
+                18936,
+                0,
+                0,
+                2
+        );
+
+        // Works
+        addCoins(db,
+                "1 oz Silver Philharmoniker",
+                "Canadian Maple Leaf",
+                "Silver",
+                "1 oz",
+                31,
+                36,
+                5202,
+                5355,
+                0,
+                11870,
+                12023,
+                20421,
+                20472,
+                0,
+                0,
                 2
         );
 

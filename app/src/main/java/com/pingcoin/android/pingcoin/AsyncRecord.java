@@ -150,7 +150,7 @@ public class AsyncRecord extends AsyncTask<Void, PingRecording, Void> {
             // Plot the spectrum
             Log.i(TAG, "Plotting the spectrum");
 
-            SpectrumPlottingUtils.addData(chart, floatArray);
+            SpectrumPlottingUtils.addData(chart, floatArray, "Spectrum");
 
             // Peak detection
             Log.i(TAG, "Starting peak detection with spectrumData: " + Arrays.toString(this.spectrumData));
@@ -240,7 +240,7 @@ public class AsyncRecord extends AsyncTask<Void, PingRecording, Void> {
         // Plot the spectrum
         Log.i(TAG, "Plotting the spectrum");
 
-        SpectrumPlottingUtils.addData(chart, floatArray);
+        SpectrumPlottingUtils.addData(chart, floatArray, "Spectrum");
 
         // Peak detection
         Log.i(TAG, "Starting peak detection with spectrumData: " + Arrays.toString(this.spectrumData));

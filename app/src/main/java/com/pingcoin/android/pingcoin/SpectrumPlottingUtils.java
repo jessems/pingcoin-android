@@ -12,6 +12,8 @@ import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.charts.LineChart;
 
 
+import org.apache.commons.math3.analysis.function.Exp;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -26,7 +28,15 @@ import static android.graphics.Color.argb;
 public class SpectrumPlottingUtils {
     static String TAG = "SpectrumPlottingUtil";
 
-    public static void addData(LineChart chartView, float[] spectrumData) {
+    public static List<Entry> floatArrayToList(float[] floatArray) {
+        List<Entry> entries = new ArrayList<Entry>();
+        for(int i = 0; i < floatArray.length; i++) {
+            entries.add(new Entry(i,floatArray[i]));
+        }
+        return entries;
+    }
+
+    public static void addData(LineChart chartView, float[] spectrumData, String label) {
 
         // Create entries List
         List<Entry> entries = new ArrayList<Entry>();
@@ -34,7 +44,7 @@ public class SpectrumPlottingUtils {
             entries.add(new Entry(i,spectrumData[i]));
         }
 
-        LineDataSet dataSet = new LineDataSet(entries, "Coin Spectrum"); // add entries to dataset
+        LineDataSet dataSet = new LineDataSet(entries, label); // add entries to dataset
         dataSet.setDrawCircles(false);
         dataSet.setDrawFilled(true);
         dataSet.setDrawValues(false);
@@ -109,10 +119,14 @@ public class SpectrumPlottingUtils {
         xAxis.setAxisMaximum(windowSize/2);
 
 
-        xAxis.setGranularityEnabled(true);
+//        xAxis.setGranularityEnabled(true);
+        xAxis.setLabelCount(1000,true);
+
         xAxis.setValueFormatter(new LargeValueFormatter(windowSize, sampleRate));
+
+//        xAxis.setLabelCount(442);
+
 //        xAxis.set
-//        xAxis.setGranularity(5000/ ((2*sampleRate)/windowSize));
 
         xAxis.setAxisLineColor(android.R.color.white);
         xAxis.setTextColor(Color.WHITE);
@@ -129,44 +143,87 @@ public class SpectrumPlottingUtils {
     }
 
     public static void plotNaturalFrequency(LineChart chart, String naturalFrequencyLabel, float naturalFrequencyValue, float naturalFrequencyError, int sampleRate, int windowSize) {
+        naturalFrequencyError = naturalFrequencyError / 2;
+
         // Initialize the limit line
-        LimitLine cxdx = new LimitLine(0);
+        ExpectedFrequencyLine cxdx = new ExpectedFrequencyLine(0,"");
+        LimitLine cxdxBottomThreshold = new LimitLine(0);
+        LimitLine cxdxTopThreshold = new LimitLine(0);
 
 
         XAxis bottomAxis = chart.getXAxis();
-        float convertedXValue;
+        float convertedXValue, convertedXValueBottomThreshold, convertedXValueTopThreshold;
+        float lineWidth = 22f;
 
         // Determine which natural frequency we're plotting
         switch (naturalFrequencyLabel) {
             case "c0d2":
                 convertedXValue = (naturalFrequencyValue / (sampleRate)) * windowSize;
-                cxdx = new LimitLine(convertedXValue, naturalFrequencyLabel);
-                cxdx.setLineWidth(naturalFrequencyError/100 * convertedXValue);
+                convertedXValueBottomThreshold = convertedXValue * (1 - naturalFrequencyError/2/100);
+                convertedXValueTopThreshold = convertedXValue * (1 + naturalFrequencyError/2/100);
+                cxdx = new ExpectedFrequencyLine(convertedXValue, naturalFrequencyLabel);
+                lineWidth = convertedXValue * naturalFrequencyError/100;
+                cxdx.setLineWidth(lineWidth);
+
+
                 Log.i(TAG, "The " + naturalFrequencyLabel + " value loaded is: " + Float.toString(naturalFrequencyValue));
                 Log.i(TAG, "The " + naturalFrequencyLabel + " value calculated is: " + Float.toString(convertedXValue));
+                Log.i(TAG, "The " + naturalFrequencyLabel + " bottom threshold is : " + Float.toString(convertedXValueBottomThreshold));
+                Log.i(TAG, "The " + naturalFrequencyLabel + " top threshold is : " + Float.toString(convertedXValueTopThreshold));
+
+                Log.i("WHAT WHAT", Float.toString(lineWidth));
+
+
             case "c0d3":
                 convertedXValue = (naturalFrequencyValue / (sampleRate)) * windowSize;
-                cxdx = new LimitLine(convertedXValue, naturalFrequencyLabel);
-                cxdx.setLineWidth(naturalFrequencyError/100 * convertedXValue);
+                convertedXValueBottomThreshold = convertedXValue * (1 - naturalFrequencyError/100);
+                convertedXValueTopThreshold = convertedXValue * (1 + naturalFrequencyError/100);
+                cxdx = new ExpectedFrequencyLine(convertedXValue, naturalFrequencyLabel);
+                lineWidth = convertedXValue * naturalFrequencyError/100;
+                cxdx.setLineWidth(lineWidth);
+
+
+
                 Log.i(TAG, "The " + naturalFrequencyLabel + " value loaded is: " + Float.toString(naturalFrequencyValue));
                 Log.i(TAG, "The " + naturalFrequencyLabel + " value calculated is: " + Float.toString(convertedXValue));
+                Log.i(TAG, "The " + naturalFrequencyLabel + " bottom threshold is : " + Float.toString(convertedXValueBottomThreshold));
+                Log.i(TAG, "The " + naturalFrequencyLabel + " top threshold is : " + Float.toString(convertedXValueTopThreshold));
+
+                Log.i("WHAT WHAT", Float.toString(lineWidth));
+
+
             case "c0d4":
                 convertedXValue = (naturalFrequencyValue / (sampleRate)) * windowSize;
-                cxdx = new LimitLine(convertedXValue, naturalFrequencyLabel);
-                cxdx.setLineWidth(naturalFrequencyError/100 * convertedXValue);
+                convertedXValueBottomThreshold = convertedXValue * (1 - naturalFrequencyError/100);
+                convertedXValueTopThreshold = convertedXValue * (1 + naturalFrequencyError/100);
+                cxdx = new ExpectedFrequencyLine(convertedXValue, naturalFrequencyLabel);
+                lineWidth = convertedXValue * naturalFrequencyError/100;
+                cxdx.setLineWidth(lineWidth);
+
+
+                Log.i("WHAT WHAT", Float.toString(lineWidth));
+
                 Log.i(TAG, "The " + naturalFrequencyLabel + " value loaded is: " + Float.toString(naturalFrequencyValue));
                 Log.i(TAG, "The " + naturalFrequencyLabel + " value calculated is: " + Float.toString(convertedXValue));
+                Log.i(TAG, "The " + naturalFrequencyLabel + " bottom threshold is : " + Float.toString(convertedXValueBottomThreshold));
+                Log.i(TAG, "The " + naturalFrequencyLabel + " top threshold is : " + Float.toString(convertedXValueTopThreshold));
+
+
             default:
                 break;
         }
 
+//        cxdx.setLineWidth(22f);
         cxdx.setLineColor( argb(40, 240, 240, 240));
+        cxdxBottomThreshold.setLineColor( argb(40, 240, 240, 240));
+        cxdxTopThreshold.setLineColor( argb(40, 240, 240, 240));
 //        cxdx.enableDashedLine(10f, 10f, 0f);
         cxdx.setLabelPosition(LimitLine.LimitLabelPosition.LEFT_TOP);
         cxdx.setTextSize(10f);
         cxdx.setTextColor(Color.rgb(150,150,150));
 
         bottomAxis.setDrawLimitLinesBehindData(true);
+
         bottomAxis.addLimitLine(cxdx);
 
     }
@@ -215,7 +272,11 @@ public class SpectrumPlottingUtils {
         List<LimitLine> limitLineList = new ArrayList<>();
         for (int k = 0; k < detectedFrequencies.size(); k++) {
             Log.i(TAG,"Iterating through detected frequency: " + detectedFrequencies.get(k));
-            limitLineList.add(new LimitLine(detectedFrequencies.get(k)));
+
+            LimitLine detectedFreqLine = new LimitLine(detectedFrequencies.get(k));
+            detectedFreqLine.setLineColor( argb(40, 255, 255, 0));
+            limitLineList.add(detectedFreqLine);
+
             limitLineList.get(limitLineList.size() - 1).setLineWidth(0.5f);
         }
 

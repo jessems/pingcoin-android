@@ -1,5 +1,7 @@
 package com.pingcoin.android.pingcoin;
 
+import android.util.Log;
+
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
@@ -54,12 +56,12 @@ public class LargeValueFormatter implements IValueFormatter, IAxisValueFormatter
     }
 
     public float convertToHz(float binNr) {
-        return (binNr / windowSize * (sampleRate/2));
+        return (binNr / windowSize * (sampleRate));
 
     }
 
     public float convertToBin(float Hz) {
-        return Hz / (sampleRate/2) * windowSize;
+        return Hz / (sampleRate) * windowSize;
 
     }
 
@@ -81,14 +83,9 @@ public class LargeValueFormatter implements IValueFormatter, IAxisValueFormatter
     @Override
     public String getFormattedValue(float value, AxisBase axis) {
         float valueInHz = convertToHz(value);
-        if ((valueInHz > 4995 && valueInHz < 5005)) {
-            return makePretty(5000) + mText;
-        } else if (valueInHz > 9990 && valueInHz < 10010) {
-            return makePretty(10000) + mText;
-        } else if (valueInHz > 14990 && valueInHz < 15010) {
-            return makePretty(15000) + mText;
-        } else if (valueInHz > 19990 && valueInHz < 20010) {
-            return makePretty(20000) + mText;
+//        Log.i("LargeValueFormatter", Float.toString(valueInHz));
+        if ((valueInHz > 4990) && (valueInHz < 5010)) {
+            return "5kHz";
         } else {
             return "";
         }
