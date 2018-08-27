@@ -1,245 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--<android.support.constraint.ConstraintLayout-->
-    <!--xmlns:android="http://schemas.android.com/apk/res/android"-->
-    <!--xmlns:app="http://schemas.android.com/apk/res-auto"-->
-    <!--xmlns:tools="http://schemas.android.com/tools"-->
-    <!--android:id="@+id/container"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="match_parent"-->
-    <!--tools:context="com.example.android.pingcoin2.SelectCoin">-->
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                             xmlns:app="http://schemas.android.com/apk/res-auto"
+                                             xmlns:tools="http://schemas.android.com/tools"
+                                             android:layout_width="match_parent"
+                                             android:layout_height="match_parent">
 
-
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_alignParentTop="true"
-    android:layout_gravity="top"
-    android:background="@color/background_material_dark"
-    android:gravity="top">
-
-
-    <android.support.v7.widget.LinearLayoutCompat
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/linearLayoutCompat"
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/select_coin_toolbar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/background_material_dark"
-        android:orientation="vertical">
+        android:layout_height="50dp"
+        android:background="#f5f5f5"
+        android:elevation="4dp"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+        app:title="test"
+        app:titleMarginStart="72dp"
+        app:titleTextColor="@android:color/black"/>
 
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-            />
-
-        <!--<TextView-->
-        <!--android:id="@+id/message"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_weight="1"-->
-        <!--android:text="@string/title_select"-->
-        <!--app:layout_constraintLeft_toLeftOf="parent"-->
-        <!--app:layout_constraintTop_toTopOf="parent"/>-->
-
-
-        <LinearLayout
-            android:id="@+id/coin_selector_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <Spinner
-                android:id="@+id/coin_selector"
-                android:layout_width="wrap_content"
-                android:layout_height="21dp"
-                android:layout_margin="15dp"
-                android:layout_weight="1"
-                android:backgroundTint="@color/colorPrimary"
-                android:dropDownSelector="@color/colorAccent"
-                android:textColor="#FFFFFF"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toStartOf="parent"
-                tools:layout_editor_absoluteY="89dp"/>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/coin_info"
-            android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:orientation="horizontal">
-
-            <ImageView
-                android:id="@+id/imageView3"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:layout_weight="1"
-                app:srcCompat="@drawable/ic_home_black_24dp"/>
-
-            <LinearLayout
-                android:layout_width="200dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/textView5"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="CoinName"/>
-            </LinearLayout>
-
-        </LinearLayout>
-
-
-        <!--         android:entries="@array/coins" -->
-
-
-        <!--TODO: Figure out a way to link the Text to a @string-->
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:orientation="vertical">
-
-            <com.github.mikephil.charting.charts.LineChart
-                android:id="@+id/chart"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="@color/background_material_dark">
-
-            </com.github.mikephil.charting.charts.LineChart>
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/detected_frequencies"
-            android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/textView6"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Detected Frequencies"/>
-
-            <LinearLayout
-                android:id="@+id/frequency_icons"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
-
-                <ImageView
-                    android:id="@+id/imageView6"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    app:srcCompat="@mipmap/ic_launcher_foreground"/>
-
-                <ImageView
-                    android:id="@+id/imageView4"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    app:srcCompat="@mipmap/ic_launcher_foreground"/>
-
-                <ImageView
-                    android:id="@+id/imageView5"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    app:srcCompat="@mipmap/ic_launcher_foreground"/>
-            </LinearLayout>
-        </LinearLayout>
-
-        <!--<com.github.mikephil.charting.charts.LineChart-->
-        <!--android:id="@+id/timeChart"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="10dp"-->
-        <!--android:layout_weight="1"/>-->
-
-
-        <!--<TextView-->
-        <!--android:id="@+id/coin_details"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_margin="16dp"-->
-        <!--android:text="TextView"-->
-        <!--tools:layout_editor_absoluteX="163dp"-->
-        <!--tools:layout_editor_absoluteY="246dp"/>-->
-
-        <!--<ScrollView-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content">-->
-        <!--<TextView-->
-        <!--android:id="@+id/coin_parameters"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"/>-->
-        <!--</ScrollView>-->
-
-
-    </android.support.v7.widget.LinearLayoutCompat>
-
-    <RelativeLayout
-        android:layout_width="wrap_content"
+    <TextView
+        android:id="@+id/instruction_text"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true">
+        android:background="@color/colorDefaultLightBackground"
+        android:paddingBottom="16dp"
+        android:paddingLeft="16dp"
+        android:paddingTop="16dp"
+        android:text="Select the coin you would like to test"
+        android:textAllCaps="true"
+        android:textSize="14dp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@+id/select_coin_toolbar"/>
 
-        <LinearLayout
-            android:id="@+id/bottom_bar"
-            android:layout_width="match_parent"
-            android:layout_height="150dp"
-            android:background="?android:attr/colorPrimaryDark"
-            android:baselineAligned="false"
-            android:gravity="bottom|center_vertical"
-            android:orientation="horizontal">
+    <View
+        android:id="@+id/instruction_text_divider"
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:alpha="0.12"
+        android:background="#000000"
+        app:layout_constraintTop_toBottomOf="@+id/instruction_text"/>
 
-            <ImageView
-                android:id="@+id/imageView2"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:layout_gravity="top"
-                android:layout_weight="1"
-                app:srcCompat="@drawable/ic_notifications_black_24dp"/>
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rvCoins"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@color/colorDefaultLightBackground"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/instruction_text_divider"/>
 
-            <TextView
-                android:id="@+id/textView4"
-                android:layout_width="300dp"
-                android:layout_height="200dp"
-                android:layout_weight="1"
-                android:text="TextView"/>
-        </LinearLayout>
-    </RelativeLayout>
-
-    <!--<android.support.design.widget.BottomNavigationView-->
-    <!--android:id="@+id/navigation"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_gravity="bottom"-->
-    <!--android:layout_alignParentBottom="true"-->
-    <!--android:background="?android:attr/windowBackground"-->
-    <!--app:menu="@menu/navigation"/>-->
-
-    <!--<android.support.design.widget.BottomNavigationView-->
-    <!--android:id="@+id/bottomNavigation"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_gravity="start"-->
-    <!--app:itemBackground="@color/accent"-->
-    <!--app:itemIconTint="@color/icons"-->
-    <!--app:itemTextColor="@color/secondary_text"-->
-    <!--app:menu="@menu/bottom_menu">-->
-
-
-</RelativeLayout>
-<!--</android.support.constraint.ConstraintLayout>-->
+</android.support.constraint.ConstraintLayout>

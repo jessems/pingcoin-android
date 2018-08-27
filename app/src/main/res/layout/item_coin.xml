@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/coin_row"
+    android:layout_width="fill_parent"
+    android:layout_height="72dp"
+    android:paddingLeft="16dp">
+
+    <ImageView
+        android:id="@+id/coin_icon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentBottom="false"
+        android:layout_alignParentTop="true"
+        android:layout_marginRight="6dip"
+        android:layout_marginTop="16dp"
+        app:srcCompat="@drawable/ic_coin_silver"/>
+
+
+    <TextView
+        android:id="@+id/coin_name"
+
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+
+        android:layout_above="@id/coin_class_weight"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignWithParentIfMissing="true"
+        android:layout_marginLeft="16dp"
+
+        android:layout_marginTop="16dp"
+        android:layout_toRightOf="@id/coin_icon"
+        android:text="Krugerrand"
+        android:textSize="16sp"/>
+
+    <TextView
+        android:id="@+id/coin_class_weight"
+
+        android:layout_width="wrap_content"
+
+        android:layout_height="26dip"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="false"
+
+        android:layout_marginLeft="16dp"
+        android:layout_toRightOf="@id/coin_icon"
+        android:singleLine="false"
+        android:text="Gold (1 oz)"
+        android:textSize="14sp"/>
+
+    <TextView
+        android:id="@+id/coin_country"
+
+        android:layout_width="match_parent"
+
+        android:layout_height="26dip"
+        android:layout_alignParentBottom="true"
+
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="16dp"
+        android:layout_toRightOf="@id/coin_class_weight"
+        android:gravity="right|end"
+        android:singleLine="true"
+        android:text="South Africa"
+        android:textSize="14sp"/>
+
+
+</RelativeLayout>

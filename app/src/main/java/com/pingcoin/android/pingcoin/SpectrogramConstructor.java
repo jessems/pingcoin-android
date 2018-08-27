@@ -24,16 +24,11 @@
 
 package com.pingcoin.android.pingcoin;
 
-import android.content.Context;
 import android.util.Log;
-
-import org.apache.commons.math3.stat.descriptive.moment.Kurtosis;
 
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.concurrent.TimeUnit;
 
 import static java.util.Arrays.fill;
 
@@ -100,12 +95,12 @@ public class SpectrogramConstructor implements AudioProcessor {
 
     final static String TAG = "SpectrogramConstructor";
 
-    private SelectCoin mainObject;
+    private TestCoin mainObject;
     private ArrayList<float[]> S;
 
 
 
-    public SpectrogramConstructor(float sampleRate, int bufferSize, int frames, SelectCoin mainObject, ArrayList<float[]> S) {
+    public SpectrogramConstructor(float sampleRate, int bufferSize, int frames, TestCoin mainObject, ArrayList<float[]> S) {
         fft = new FFT(bufferSize, new HammingWindow());
         this.sampleRate = sampleRate;
         this.mainObject = mainObject;

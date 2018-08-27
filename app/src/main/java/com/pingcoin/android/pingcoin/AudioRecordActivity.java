@@ -78,7 +78,7 @@ public class AudioRecordActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_select_coin);
+        setContentView(R.layout.activity_test_coin);
 
 //        startButton = (Button) findViewById(R.id.btnStart);
 //        startButton.setOnClickListener(new View.OnClickListener() {

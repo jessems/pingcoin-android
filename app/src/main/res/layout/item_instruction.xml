@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/coin_row"
+    android:layout_width="fill_parent"
+    android:layout_height="72dp"
+    android:paddingLeft="16dp">
+
+
+    <TextView
+        android:id="@+id/instruction_text"
+
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+
+        android:layout_above="@id/coin_class_weight"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignWithParentIfMissing="true"
+        android:layout_marginLeft="16dp"
+
+        android:layout_marginTop="16dp"
+        android:layout_toRightOf="@id/coin_icon"
+        android:text="SELECT A COIN TO PERFORM A TEST"
+        android:textSize="16sp"/>
+
+    <View
+        android:layout_width="1dp"
+        android:layout_height="fill_parent"
+        android:background="#000000" />
+
+
+</RelativeLayout>

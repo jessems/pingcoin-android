@@ -143,7 +143,8 @@ public class SpectrumPlottingUtils {
     }
 
     public static void plotNaturalFrequency(LineChart chart, String naturalFrequencyLabel, float naturalFrequencyValue, float naturalFrequencyError, int sampleRate, int windowSize) {
-        naturalFrequencyError = naturalFrequencyError / 2;
+        Log.d("BLA",Float.toString(naturalFrequencyError));
+        naturalFrequencyError = naturalFrequencyError / 2f;
 
         // Initialize the limit line
         ExpectedFrequencyLine cxdx = new ExpectedFrequencyLine(0,"");
@@ -159,10 +160,10 @@ public class SpectrumPlottingUtils {
         switch (naturalFrequencyLabel) {
             case "c0d2":
                 convertedXValue = (naturalFrequencyValue / (sampleRate)) * windowSize;
-                convertedXValueBottomThreshold = convertedXValue * (1 - naturalFrequencyError/2/100);
-                convertedXValueTopThreshold = convertedXValue * (1 + naturalFrequencyError/2/100);
+                convertedXValueBottomThreshold = convertedXValue * (1 - naturalFrequencyError/2);
+                convertedXValueTopThreshold = convertedXValue * (1 + naturalFrequencyError/2);
                 cxdx = new ExpectedFrequencyLine(convertedXValue, naturalFrequencyLabel);
-                lineWidth = convertedXValue * naturalFrequencyError/100;
+                lineWidth = convertedXValue * naturalFrequencyError;
                 cxdx.setLineWidth(lineWidth);
 
 
@@ -176,10 +177,10 @@ public class SpectrumPlottingUtils {
 
             case "c0d3":
                 convertedXValue = (naturalFrequencyValue / (sampleRate)) * windowSize;
-                convertedXValueBottomThreshold = convertedXValue * (1 - naturalFrequencyError/100);
-                convertedXValueTopThreshold = convertedXValue * (1 + naturalFrequencyError/100);
+                convertedXValueBottomThreshold = convertedXValue * (1 - naturalFrequencyError);
+                convertedXValueTopThreshold = convertedXValue * (1 + naturalFrequencyError);
                 cxdx = new ExpectedFrequencyLine(convertedXValue, naturalFrequencyLabel);
-                lineWidth = convertedXValue * naturalFrequencyError/100;
+                lineWidth = convertedXValue * naturalFrequencyError;
                 cxdx.setLineWidth(lineWidth);
 
 
@@ -194,10 +195,10 @@ public class SpectrumPlottingUtils {
 
             case "c0d4":
                 convertedXValue = (naturalFrequencyValue / (sampleRate)) * windowSize;
-                convertedXValueBottomThreshold = convertedXValue * (1 - naturalFrequencyError/100);
-                convertedXValueTopThreshold = convertedXValue * (1 + naturalFrequencyError/100);
+                convertedXValueBottomThreshold = convertedXValue * (1 - naturalFrequencyError);
+                convertedXValueTopThreshold = convertedXValue * (1 + naturalFrequencyError);
                 cxdx = new ExpectedFrequencyLine(convertedXValue, naturalFrequencyLabel);
-                lineWidth = convertedXValue * naturalFrequencyError/100;
+                lineWidth = convertedXValue * naturalFrequencyError;
                 cxdx.setLineWidth(lineWidth);
 
 
@@ -248,7 +249,7 @@ public class SpectrumPlottingUtils {
 
 
 
-        chart.invalidate();
+//        chart.invalidate();
 
     }
 

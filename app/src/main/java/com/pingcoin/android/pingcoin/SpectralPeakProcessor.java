@@ -110,7 +110,7 @@ public class SpectralPeakProcessor implements AudioProcessor {
      * The phase information of the previous frame, or null.
      */
     private float[] previousPhaseOffsets;
-//    private SelectCoin mainObject;
+//    private TestCoin mainObject;
 
 
 
