@@ -11,12 +11,14 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -27,6 +29,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -44,17 +47,22 @@ import java.util.Arrays;
 import java.util.List;
 
 import static android.graphics.Color.argb;
+import static android.graphics.Color.colorSpace;
 
 // TODO: Close cursor.close()
 
-public class TestCoin extends AppCompatActivity {
+public class TestCoin extends OverflowMenuActivity {
 
     private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
 
     // Requesting permission to RECORD_AUDIO
     private boolean permissionToRecordAccepted = false;
-    private String [] permissions = {Manifest.permission.RECORD_AUDIO};
-    private boolean debugNoiseFloor = false;
+    private String [] permissions = new String[]{
+            Manifest.permission.RECORD_AUDIO,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+    };
+    private boolean debugNoiseFloor = true;
     private Thread audioProcessorThread;
 
     private RecyclerView mRecyclerView;
@@ -62,8 +70,7 @@ public class TestCoin extends AppCompatActivity {
     private RecyclerView.LayoutManager mLayoutManager;
 
     private AudioDispatcher dispatcher;
-
-
+    private int menuResource;
 
 
     @Override
@@ -139,25 +146,6 @@ public class TestCoin extends AppCompatActivity {
 
 
 
-    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
-            = new BottomNavigationView.OnNavigationItemSelectedListener() {
-
-        @Override
-        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-            switch (item.getItemId()) {
-                case R.id.navigation_home:
-                    mTextMessage.setText(R.string.title_home);
-                    return true;
-                case R.id.navigation_dashboard:
-                    mTextMessage.setText(R.string.title_dashboard);
-                    return true;
-                case R.id.navigation_notifications:
-                    mTextMessage.setText(R.string.title_notifications);
-                    return true;
-            }
-            return false;
-        }
-    };
 
     private static final int PERMISSION_RECORD_AUDIO = 0;
 
@@ -170,28 +158,24 @@ public class TestCoin extends AppCompatActivity {
 
 
 
-
-
-//    @Dao
-//    public interface MyDao {
-//        @Query("SELECT c0d2a, c0d3a, c0d4a FROM coin_table WHERE coin_id = :selectedCoinId LIMIT 1")
-//        public LiveData<Coin> loadSingleCoin(String selectedCoinId);
-//    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
+
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test_coin);
+
 
         // Prevent the screen from dimming
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
 
-//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
 
 
+        String selectedCoinPopularName = "";
+        float selectedCoinWeightInOz = 0;
+        String selectedCoinMaterialClass = "";
         float selectedCoinC0D2a = 0;
         float selectedCoinC0D3a = 0;
         float selectedCoinC0D4a = 0;
@@ -200,11 +184,28 @@ public class TestCoin extends AppCompatActivity {
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             //The key argument here must match that used in the other activity
+            selectedCoinPopularName = extras.getString("PopularName");
+            selectedCoinWeightInOz = extras.getFloat("WeightInOz");
+            selectedCoinMaterialClass = extras.getString("MaterialClass");
             selectedCoinC0D2a = extras.getFloat("C0D2a");
             selectedCoinC0D3a = extras.getFloat("C0D3a");
             selectedCoinC0D4a = extras.getFloat("C0D4a");
             selectedCoinError = extras.getFloat("Error");
         }
+
+        Toolbar toolbar = findViewById(R.id.test_coin_toolbar);
+        setSupportActionBar(toolbar);
+
+        // Get a support ActionBar corresponding to this toolbar
+        ActionBar actionBar = getSupportActionBar();
+
+        // Enable the Up button
+        actionBar.setDisplayHomeAsUpEnabled(true);
+
+        actionBar.setTitle(selectedCoinPopularName);
+        actionBar.setSubtitle(selectedCoinMaterialClass+ " (" + Float.toString(selectedCoinWeightInOz) + " oz)");
+
+
 
         final String TAG = "TestCoin";
 
@@ -212,6 +213,7 @@ public class TestCoin extends AppCompatActivity {
         Log.d(TAG, Float.toString(selectedCoinC0D3a));
         Log.d(TAG, Float.toString(selectedCoinC0D4a));
         Log.d(TAG, Float.toString(selectedCoinError));
+
 
 
 
@@ -262,11 +264,6 @@ public class TestCoin extends AppCompatActivity {
         ArrayAdapter adapter = new ArrayAdapter(this, R.layout.spinner_item, itemIds);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
-        // Set spinner items to array adapter
-        Spinner sItems = (Spinner) findViewById(R.id.coin_selector);
-        sItems.setAdapter(adapter);
-
-        final String selectedCoin = sItems.getSelectedItem().toString();
 
 
 
@@ -280,33 +277,7 @@ public class TestCoin extends AppCompatActivity {
 
 
 
-//        Log.i(TAG, selectedCoin);
-//
-//        cursor.moveToPosition(-1);
-//
-//        // Loop through cursor again to obtain the natural frequencies for the selected coin
-//        while(cursor.moveToNext()) {
-//            String itemId = cursor.getString(
-//                    cursor.getColumnIndexOrThrow(CoinContract.CoinEntry.COLUMN_FULL_NAME));
-//            Log.i(TAG, itemId + " vs " + selectedCoin);
-//
-//            if (itemId.equals(selectedCoin)) {
-//                naturalFrequencyC0D2 = cursor.getLong(
-//                        cursor.getColumnIndexOrThrow(CoinContract.CoinEntry.COLUMN_C0D2A));
-//                Log.i(TAG, naturalFrequencyC0D2.toString());
-//                naturalFrequencyC0D3 = cursor.getLong(
-//                        cursor.getColumnIndexOrThrow(CoinContract.CoinEntry.COLUMN_C0D3A));
-//                Log.i(TAG, naturalFrequencyC0D3.toString());
-//                naturalFrequencyC0D4 = cursor.getLong(
-//                        cursor.getColumnIndexOrThrow(CoinContract.CoinEntry.COLUMN_C0D4A));
-//                Log.i(TAG, naturalFrequencyC0D4.toString());
-//                naturalFrequencyError = cursor.getLong(
-//                        cursor.getColumnIndexOrThrow(CoinContract.CoinEntry.COLUMN_CD_ERROR));
-//                Log.i(TAG, naturalFrequencyError.toString());
-//
-//            }
-//
-//        }
+
         // We need to close the database connection
 
         final LineChart chart = findViewById(R.id.chart);
@@ -322,76 +293,16 @@ public class TestCoin extends AppCompatActivity {
         SpectrumPlottingUtils.configureSpectrumChart(chart, windowSize, sampleRate);
 
 
-//        sItems.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-//            @Override
-//            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-//                Log.i(TAG,parent.getItemAtPosition(position).toString());
-//
-////                chart.clear();
-////                SpectrumPlottingUtils.addEmptyData(chart, sampleRate, windowSize);
-//
-//                XAxis bottomAxis = chart.getXAxis();
-//                bottomAxis.removeAllLimitLines();
-//
-//                cursor.moveToPosition(-1);
-//                while(cursor.moveToNext()) {
-//                    String itemId = cursor.getString(
-//                            cursor.getColumnIndexOrThrow(CoinContract.CoinEntry.COLUMN_FULL_NAME));
-//                    Log.i(TAG, itemId + " vs " + selectedCoin);
-//                    if (itemId.equals(parent.getItemAtPosition(position).toString())) {
-//                        naturalFrequencyC0D2 = cursor.getLong(
-//                                cursor.getColumnIndexOrThrow(CoinContract.CoinEntry.COLUMN_C0D2A));
-//                        Log.i(TAG, naturalFrequencyC0D2.toString());
-//                        naturalFrequencyC0D3 = cursor.getLong(
-//                                cursor.getColumnIndexOrThrow(CoinContract.CoinEntry.COLUMN_C0D3A));
-//                        Log.i(TAG, naturalFrequencyC0D3.toString());
-//                        naturalFrequencyC0D4 = cursor.getLong(
-//                                cursor.getColumnIndexOrThrow(CoinContract.CoinEntry.COLUMN_C0D4A));
-//                        Log.i(TAG, naturalFrequencyC0D4.toString());
-//                        naturalFrequencyError = cursor.getLong(
-//                                cursor.getColumnIndexOrThrow(CoinContract.CoinEntry.COLUMN_CD_ERROR));
-//                        Log.i(TAG, naturalFrequencyError.toString());
-//
-//                        if (naturalFrequencyC0D2.intValue() != 0) {
-//                            SpectrumPlottingUtils.plotNaturalFrequency(chart, "c0d2", naturalFrequencyC0D2, naturalFrequencyError, sampleRate, windowSize);
-//                        }
-//                        if (naturalFrequencyC0D3.intValue() != 0) {
-//                            SpectrumPlottingUtils.plotNaturalFrequency(chart, "c0d3", naturalFrequencyC0D3, naturalFrequencyError, sampleRate, windowSize);
-//                        }
-//                        if (naturalFrequencyC0D4.intValue() !=0) {
-//                            SpectrumPlottingUtils.plotNaturalFrequency(chart, "c0d4", naturalFrequencyC0D4, naturalFrequencyError, sampleRate, windowSize);
-//                        }
-//                        chart.invalidate();
-//
-//                    }
-//
-//                }
-//
-//
-//
-//            }
-//
-//
-//            @Override
-//            public void onNothingSelected(AdapterView<?> parent) {
-//                //Another interface callback
-//            }
-//
-//
-//        });
 
 
 
 
         // Expected peaks plotting
-        Log.i(TAG, "Plotting expected peaks");
-        Log.i(TAG, "C0D2: " + Float.toString(convertHzToBin(naturalFrequencyC0D2, windowSize, sampleRate)));
+
         SpectrumPlottingUtils.plotNaturalFrequency(chart, "c0d2", naturalFrequencyC0D2, naturalFrequencyError, sampleRate, windowSize);
 
-        Log.i(TAG, "C0D3: " + Float.toString(convertHzToBin(naturalFrequencyC0D3, windowSize, sampleRate)));
         SpectrumPlottingUtils.plotNaturalFrequency(chart, "c0d3", naturalFrequencyC0D3, naturalFrequencyError, sampleRate, windowSize);
 
-        Log.i(TAG, "C0D4: " + Float.toString(convertHzToBin(naturalFrequencyC0D4, windowSize, sampleRate)));
         SpectrumPlottingUtils.plotNaturalFrequency(chart, "c0d4", naturalFrequencyC0D4, naturalFrequencyError, sampleRate, windowSize);
 
 
@@ -421,6 +332,7 @@ public class TestCoin extends AppCompatActivity {
         // In this case the fromDefaultMicrophone() method returns an AudioDispatcher object.
 
         this.dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(sampleRate,windowSize,(int) 0.75 * windowSize);
+        this.dispatcher.addAudioProcessor(new HighPass(500, sampleRate));
         this.dispatcher.addAudioProcessor(spectralPeakFollower);
 
 
@@ -430,8 +342,25 @@ public class TestCoin extends AppCompatActivity {
             }
 
             public boolean process(AudioEvent audioEvent) {
-                final float [] currentMagnitudes = spectralPeakFollower.getMagnitudes();
-                final float[] noiseFloor = SpectralPeakProcessor.calculateNoiseFloor(spectralPeakFollower.getMagnitudes(), medianFilterLength, noiseFloorFactor);
+                final float[] currentMagnitudes = spectralPeakFollower.getMagnitudes();
+                final float[] currentLogMagnitudes = spectralPeakFollower.getLogMagnitudes();
+                final float[] noiseFloor = SpectralPeakProcessor.calculateNoiseFloor(spectralPeakFollower.getLogMagnitudes(), medianFilterLength, noiseFloorFactor);
+
+
+                double[] doubleArray = new double[currentMagnitudes.length];
+                for (int i = 0; i < currentMagnitudes.length; i++) {
+                    doubleArray[i] = (double) Math.abs(currentMagnitudes[i]);
+                }
+
+                double gm = MeanCalculator.geometricMean(doubleArray);
+                double am = MeanCalculator.arithmeticMean(doubleArray);
+                final double spectralFlatness = gm / am;
+
+                final double spectralCentroid = MeanCalculator.spectralCentroid(doubleArray);
+
+
+                Log.i("Spectral Flatness: ", Double.toString(spectralFlatness));
+
 
                 // The first element of the noise floor is sometimes infinity. Here we filter that out.
                 for (int i = 0; i < noiseFloor.length; i++) {
@@ -442,11 +371,8 @@ public class TestCoin extends AppCompatActivity {
                     }
                 }
 
-                List<Integer> localMaxima = SpectralPeakProcessor.findLocalMaxima(spectralPeakFollower.getMagnitudes(), noiseFloor);
-                List<SpectralPeakProcessor.SpectralPeak> list = SpectralPeakProcessor.findPeaks(spectralPeakFollower.getMagnitudes(), spectralPeakFollower.getFrequencyEstimates(), localMaxima, numberOfPeaks, 1);
-
-
-
+                List<Integer> localMaxima = SpectralPeakProcessor.findLocalMaxima(spectralPeakFollower.getLogMagnitudes(), noiseFloor);
+                List<SpectralPeakProcessor.SpectralPeak> list = SpectralPeakProcessor.findPeaks(spectralPeakFollower.getLogMagnitudes(), spectralPeakFollower.getFrequencyEstimates(), localMaxima, numberOfPeaks, 1);
 
 
                 final ArrayList<List> peakogram = addSliceToPeakogram(P, list);
@@ -455,15 +381,10 @@ public class TestCoin extends AppCompatActivity {
                 final List<Entry> binnedPeaksList = SpectrumPlottingUtils.floatArrayToList(binnedPeaks);
 
 
-
-                Log.i("Slice: ", list.toString());
-                Log.i("Peakogram: ", peakogram.toString());
-
-
-                // Get list of bin indexes where the value exceeds 5
+                // Get list of bin indexes where the value exceeds binnedPeakThresh
                 ArrayList<Integer> binnedPeaksExceedingThresh = new ArrayList<>();
-                int binnedPeakThresh = 1;
-                for (int k=0; k<binnedPeaks.length; k++) {
+                int binnedPeakThresh = 0;
+                for (int k = 0; k < binnedPeaks.length; k++) {
                     if (binnedPeaks[k] > binnedPeakThresh) {
                         binnedPeaksExceedingThresh.add(k);
                     } else {
@@ -471,17 +392,8 @@ public class TestCoin extends AppCompatActivity {
                     }
                 }
 
-                Log.i(TAG,"binnedPeaksExceedingThreshold: " + binnedPeaksExceedingThresh.toString());
 
-
-
-                // Convert bin indexes to Hz
-                ArrayList<Float> binnedPeaksExceedingThreshHz = new ArrayList<>();
-                for (int binnedPeak : binnedPeaksExceedingThresh) {
-                    float binnedPeakHz = ((float) binnedPeak / windowSize) * sampleRate;
-                    binnedPeaksExceedingThreshHz.add(binnedPeakHz);
-                    Log.i("PeaksExcThreshHz", binnedPeaksExceedingThreshHz.toString());
-                }
+                ArrayList<Float> binnedPeaksExceedingThreshHz = binIndexesToHz(binnedPeaksExceedingThresh);
 
 
                 // Compare to expected frequencies
@@ -491,18 +403,34 @@ public class TestCoin extends AppCompatActivity {
                 SpectrumPlottingUtils.detectedNaturalFrequency(chart, "c0d3", false);
                 SpectrumPlottingUtils.detectedNaturalFrequency(chart, "c0d4", false);
 
+                final ImageView c0d2 = findViewById(R.id.imageView_c0d2);
+                final ImageView c0d3 = findViewById(R.id.imageView_c0d3);
+                final ImageView c0d4 = findViewById(R.id.imageView_c0d4);
+
+                runOnUiThread(new Runnable() {
+
+                    @Override
+                    public void run() {
+//                        ImageView c0d2 = findViewById(R.id.imageView_c0d2);
+//                        ImageView c0d3 = findViewById(R.id.imageView_c0d3);
+//                        ImageView c0d4 = findViewById(R.id.imageView_c0d4);
+                        c0d2.setImageDrawable(getResources().getDrawable(R.drawable.ic_c0d2));
+                        c0d3.setImageDrawable(getResources().getDrawable(R.drawable.ic_c0d3));
+                        c0d4.setImageDrawable(getResources().getDrawable(R.drawable.ic_c0d4));
+                    }
+                });
+
+
                 // Check if expected frequencies are detected
                 boolean C0D2Detected = false;
                 boolean C0D3Detected = false;
                 boolean C0D4Detected = false;
+
+
                 float tempC0D2 = TestCoin.naturalFrequencyC0D2;
                 float tempC0D3 = TestCoin.naturalFrequencyC0D3;
                 float tempC0D4 = TestCoin.naturalFrequencyC0D4;
                 float tempErrorMargin = (float) TestCoin.naturalFrequencyError;
-
-                Log.i(TAG, "Natural frequencies: " + tempC0D2 + " " + tempC0D3 + " " + tempC0D4);
-                Log.i(TAG, "Sample Rate and Window Size: " + sampleRate + " " + windowSize);
-                Log.i(TAG, "Original: " + TestCoin.naturalFrequencyC0D2);
 
 
                 // Loop through each detected peak and compare with expected peaks
@@ -512,36 +440,40 @@ public class TestCoin extends AppCompatActivity {
                     float peak = realPeakvalue;
                     if (peak > tempC0D2 * (1 - tempErrorMargin) && peak < tempC0D2 * (1 + tempErrorMargin)) {
                         C0D2Detected = true;
-                        SpectrumPlottingUtils.detectedNaturalFrequency(chart, "c0d2", C0D2Detected);
-                        Log.i(TAG, "Expected: " + tempC0D2 + ". Peak: " + peak + ", Lower limit: " + tempC0D2 * (1 - tempErrorMargin) + " + , Upper Limit : " + tempC0D2 * (1 + tempErrorMargin));
                     } else if (peak > tempC0D3 * (1 - tempErrorMargin) && peak < tempC0D3 * (1 + tempErrorMargin)) {
                         C0D3Detected = true;
-                        SpectrumPlottingUtils.detectedNaturalFrequency(chart, "c0d3", C0D3Detected);
-                        Log.i(TAG, "Expected: " + tempC0D3 + ". Peak: " + peak + ", Lower limit: " + tempC0D3 * (1 - tempErrorMargin) + " + , Upper Limit : " + tempC0D3 * (1 + tempErrorMargin));
-                        chart.invalidate();
                     } else if (peak > tempC0D4 * (1 - tempErrorMargin) && peak < tempC0D4 * (1 + tempErrorMargin)) {
                         C0D4Detected = true;
-                        SpectrumPlottingUtils.detectedNaturalFrequency(chart, "c0d4", C0D4Detected);
-                        Log.i(TAG, "Expected: " + tempC0D4 + ". Peak: " + peak + ", Lower limit: " + tempC0D4 * (1 - tempErrorMargin) + " + , Upper Limit : " + tempC0D4 * (1 + tempErrorMargin));
                     }
 
-                    Log.i("Peak detection", realPeakvalue + ": C0D2(" + C0D2Detected + ") C0D3(" + C0D3Detected + ") C0D4(" + C0D4Detected + ")");
                 }
 
-                Log.i(TAG, "C0D2 Detected: " + C0D2Detected);
-                Log.i(TAG, "C0D3 Detected: " + C0D3Detected);
-                Log.i(TAG, "C0D4 Detected: " + C0D4Detected);
+                final boolean finalC0D2Detected1 = C0D2Detected;
+                final boolean finalC0D3Detected1 = C0D3Detected;
+                final boolean finalC0D4Detected1 = C0D4Detected;
+                runOnUiThread(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        if (finalC0D2Detected1 == true) {
+                            c0d2.setImageDrawable(getResources().getDrawable(R.drawable.ic_c0d2_check));
+                            SpectrumPlottingUtils.detectedNaturalFrequency(chart, "c0d2", finalC0D2Detected1);
+                        }
+                        if (finalC0D3Detected1 == true) {
+                            c0d3.setImageDrawable(getResources().getDrawable(R.drawable.ic_c0d3_check));
+                            SpectrumPlottingUtils.detectedNaturalFrequency(chart, "c0d3", finalC0D3Detected1);
+
+                        }
+                        if (finalC0D4Detected1 == true) {
+                            c0d4.setImageDrawable(getResources().getDrawable(R.drawable.ic_c0d4_check));
+                            SpectrumPlottingUtils.detectedNaturalFrequency(chart, "c0d4", finalC0D4Detected1);
+                        }
+                        chart.invalidate();
+                    }
+                });
 
 
-
-
-
-
-
-
-
-
-
+                final List<Entry> logMagnitudesList = SpectrumPlottingUtils.floatArrayToList(currentLogMagnitudes);
                 final List<Entry> magnitudesList = SpectrumPlottingUtils.floatArrayToList(currentMagnitudes);
                 final List<Entry> noiseFloorList = SpectrumPlottingUtils.floatArrayToList(noiseFloor);
 
@@ -551,103 +483,117 @@ public class TestCoin extends AppCompatActivity {
                 final boolean finalC0D4Detected = C0D4Detected;
                 final boolean allPeaksDetected = (C0D2Detected && C0D3Detected && C0D4Detected);
 
+                final boolean plotSpectrum = true;
+                final boolean plotNoiseFloor = false;
 
-                runOnUiThread(new Runnable() {
-                                  @Override
-                                  public void run() {
-
-
-                                      // Plot detected fr
-
-                                      LineData chartData = new LineData();
+                if (!audioProcessorThread.isInterrupted()) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
 
 
-                                      if (debugNoiseFloor == true) {
+                            // Plot detected fr
 
-                                          // Below code works to plot the real time spectrum and the noise floor.
-                                          LineDataSet dataSet1 = new LineDataSet(magnitudesList, "Current Magnitudes"); // add entries to dataset
-                                          LineDataSet dataSet2 = new LineDataSet(noiseFloorList, "Noise Floor"); // add entries to dataset
-
-                                          dataSet1.setDrawCircles(false);
-                                          dataSet1.setDrawFilled(true);
-                                          dataSet1.setDrawValues(false);
-                                          dataSet1.setColor(android.R.color.holo_blue_light);
-
-                                          dataSet2.setDrawCircles(false);
-                                          dataSet2.setDrawFilled(true);
-                                          dataSet2.setDrawValues(false);
-                                          dataSet2.setColor(android.R.color.holo_red_light);
+                            LineData chartData = new LineData();
 
 
-                                          chartData.addDataSet(dataSet1);
-                                          chartData.addDataSet(dataSet2);
+                            if (plotNoiseFloor) {
 
-                                          chart.setData(chartData);
+                                // Below code works to plot the real time spectrum and the noise floor.
+                                LineDataSet dataSet1 = new LineDataSet(magnitudesList, "Current Magnitudes"); // add entries to dataset
+                                LineDataSet dataSet2 = new LineDataSet(noiseFloorList, "Noise Floor"); // add entries to dataset
 
-                                      } else {
-                                          // do nothing
-                                      }
+                                dataSet1.setDrawCircles(false);
+                                dataSet1.setDrawFilled(true);
+                                dataSet1.setDrawValues(false);
+                                dataSet1.setColor(Color.BLACK);
 
-                                      // Continue to update the graph after every block as long as NOT all 3 peaks are detected
-                                      if (!allPeaksDetected) {
+                                dataSet2.setDrawCircles(false);
+                                dataSet2.setDrawFilled(true);
+                                dataSet2.setDrawValues(false);
+                                dataSet2.setColor(Color.RED);
 
 
-                                          LineDataSet dataSet3 = new LineDataSet(binnedPeaksList, "Binned Peaks");
+                                chartData.addDataSet(dataSet1);
+                                chartData.addDataSet(dataSet2);
 
-                                          dataSet3.setDrawCircles(false);
-                                          dataSet3.setDrawFilled(true);
-                                          dataSet3.setDrawValues(false);
-                                          dataSet3.setColor(R.color.colorAccent);
+                                chart.setData(chartData);
+
+                            } else if (plotSpectrum) {
+                                LineDataSet dataSet1 = new LineDataSet(magnitudesList, "Current Magnitudes"); // add entries to dataset
+
+                                dataSet1.setDrawCircles(false);
+                                dataSet1.setDrawFilled(true);
+                                dataSet1.setDrawValues(false);
+                                dataSet1.setColor(Color.BLACK);
+
+
+                                chartData.addDataSet(dataSet1);
+                                chart.setData(chartData);
+
+                            }
+
+                            // Continue to update the graph after every block as long as NOT all 3 peaks are detected
+                            if (!allPeaksDetected) {
+
+
+                                LineDataSet dataSet3 = new LineDataSet(binnedPeaksList, "Binned Peaks");
+
+                                dataSet3.setDrawCircles(false);
+                                dataSet3.setDrawFilled(true);
+                                dataSet3.setDrawValues(false);
+                                dataSet3.setColor(R.color.colorAccent);
 
 //                                      LineData chartData = new LineData();
 
-                                          chartData.addDataSet(dataSet3);
+                                chartData.addDataSet(dataSet3);
 
-                                          chartData.setValueTextColor(android.R.color.white);
-                                          chart.setData(chartData);
-                                          chart.invalidate();
+//                                          chartData.setValueTextColor(android.R.color.white);
+                                chart.setData(chartData);
+                                chart.invalidate();
 
-                                      } else {
-                                          if (audioProcessorThread.isAlive() && !audioProcessorThread.isInterrupted()) {
-                                              // Interrupt thread and display dialog
-                                              audioProcessorThread.interrupt();
-                                              AlertDialog.Builder builder;
-                                              if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                                  builder = new AlertDialog.Builder(getContext(), android.R.style.Theme_Material_Dialog_Alert);
-                                              } else {
-                                                  builder = new AlertDialog.Builder(getContext());
-                                              }
 
-                                              builder.setTitle("Authentic Coin Detected!")
-                                                      .setMessage("All three resonance frequencies detected!")
-                                                      .setPositiveButton("New Ping", new DialogInterface.OnClickListener() {
-                                                          public void onClick(DialogInterface dialog, int which) {
-                                                              // TODO: A solution needs to be found here. I cannot access dispatcher in this inner class
-                                                              // because I was declaring it final before.
-//                                                              audioProcessorThread = new Thread(this.dispatcher,"Audio Dispatcher");
-//                                                              audioProcessorThread.start();
-                                                          }
-                                                      })
+                            }
+
+                            // In the case where ALL 3 peaks are detected:
+                            else {
+                                if (audioProcessorThread.isAlive() && !audioProcessorThread.isInterrupted() && spectralCentroid > 600 && spectralFlatness < 0.5) {
+                                    // Interrupt thread and display dialog
+                                    audioProcessorThread.interrupt();
+
+                                    AlertDialog.Builder builder;
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                        builder = new AlertDialog.Builder(getContext(), android.R.style.Theme_Material_Dialog_Alert);
+                                    } else {
+                                        builder = new AlertDialog.Builder(getContext());
+                                    }
+
+                                    builder.setTitle("Authentic Coin Detected!")
+                                            .setMessage("Spectral Flatness: " + spectralFlatness + ", Spectral Centroid: " + spectralCentroid)
+                                            .setPositiveButton("New Ping", new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    audioProcessorThread = new Thread(TestCoin.this.dispatcher, "Audio Dispatcher");
+                                                    audioProcessorThread.start();
+                                                }
+                                            })
 //
-                                                      .show();
-                                          } else {
-                                              // Do nothing
-                                          }
+                                            .show();
+                                } else {
+                                    // Do nothing
+                                }
 
-                                      }
-
-
-
-                                      // Pause the updating of the spectrum
-                                      // Update the UI to show that all 3 peaks were detected
-                                      // Require a user action to go back to recording
-                                  }
-
-                              });
+                            }
 
 
+                            // Pause the updating of the spectrum
+                            // Update the UI to show that all 3 peaks were detected
+                            // Require a user action to go back to recording
+                        }
 
-                return true;
+                    });
+
+                }
+                    return true;
             }
         });
 
@@ -655,19 +601,6 @@ public class TestCoin extends AppCompatActivity {
 
         audioProcessorThread = new Thread(this.dispatcher,"Audio Dispatcher");
         audioProcessorThread.start();
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -685,10 +618,7 @@ public class TestCoin extends AppCompatActivity {
 
 
     public void onClickSelectCoin(View view){
-//        TextView coinDetails = (TextView) findViewById(R.id.coin_details);
-        Spinner coinSelector = (Spinner) findViewById(R.id.coin_selector);
-        String selectedCoin = String.valueOf(coinSelector.getSelectedItem());
-//        coinDetails.setText(selectedCoin);
+
     }
 
     private Cursor getAllCoinNames(SQLiteDatabase db) {
@@ -726,7 +656,6 @@ public class TestCoin extends AppCompatActivity {
         P.add(0,slice);
         P.remove(P.size()-1);
         this.P = P;
-        Log.i("addSliceToPeakogram", P.toString());
 
         return P;
     }
@@ -745,11 +674,9 @@ public class TestCoin extends AppCompatActivity {
             for (int j = 0; j < currentPeakList.size() - 1; j++) {
                 SpectralPeakProcessor.SpectralPeak currentPeak = currentPeakList.get(j);
                 int currentPeakBin = currentPeak.getBin();
-                Log.i(TAG, Integer.toString(currentPeakBin));
                 binnedPeaks[currentPeakBin] = binnedPeaks[currentPeakBin] + 1;
             }
         }
-        Log.i("binnedPeaks",Arrays.toString(binnedPeaks));
         return binnedPeaks;
     }
 
@@ -788,6 +715,15 @@ public class TestCoin extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
         this.finish();
+    }
+
+    public ArrayList<Float> binIndexesToHz(ArrayList<Integer> binnedPeaksExceedingThresh) {
+        ArrayList<Float> binnedPeaksExceedingThreshHz = new ArrayList<>();
+        for (int binnedPeak : binnedPeaksExceedingThresh) {
+            float binnedPeakHz = ((float) binnedPeak / windowSize) * sampleRate;
+            binnedPeaksExceedingThreshHz.add(binnedPeakHz);
+        }
+        return binnedPeaksExceedingThreshHz;
     }
 
 

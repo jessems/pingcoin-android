@@ -100,6 +100,8 @@ public class SpectralPeakProcessor implements AudioProcessor {
      * The magnitudes in the current frame.
      */
     private final float[] magnitudes;
+    private final float[] logMagnitudes;
+
 
     /**
      * Detailed frequency estimates for each bin, using phase info
@@ -118,6 +120,8 @@ public class SpectralPeakProcessor implements AudioProcessor {
         fft = new FFT(bufferSize, new HammingWindow());
 
         magnitudes = new float[bufferSize / 2];
+        logMagnitudes = new float[bufferSize / 2];
+
         currentPhaseOffsets = new float[bufferSize / 2];
         frequencyEstimates = new float[bufferSize / 2];
 
@@ -140,7 +144,7 @@ public class SpectralPeakProcessor implements AudioProcessor {
         fft.powerPhaseFFT(fftData, magnitudes, currentPhaseOffsets);
     }
 
-    private void normalizeMagintudes(){
+    private void normalizeMagnitudes(){
         float maxMagnitude = (float) -1e6;
         for(int i = 0;i<magnitudes.length;i++){
             maxMagnitude = Math.max(maxMagnitude, magnitudes[i]);
@@ -149,7 +153,9 @@ public class SpectralPeakProcessor implements AudioProcessor {
         //log10 of the normalized value
         //adding 75 makes sure the value is above zero, a bit ugly though...
         for(int i = 1;i<magnitudes.length;i++){
-            magnitudes[i] = (float) (10 * Math.log10(magnitudes[i]/maxMagnitude)) + 75;
+            logMagnitudes[i] = (float) (10 * Math.log10(magnitudes[i]/maxMagnitude)) + 75;
+            magnitudes[i] = (float) (magnitudes[i]/maxMagnitude);
+
         }
     }
 
@@ -164,7 +170,7 @@ public class SpectralPeakProcessor implements AudioProcessor {
         calculateFrequencyEstimates();
 
         // 3. Normalize the each magnitude.
-        normalizeMagintudes();
+        normalizeMagnitudes();
 
         // 4. Store the current phase so it can be used for the next frequency estimates block.
         previousPhaseOffsets = currentPhaseOffsets.clone();
@@ -193,6 +199,11 @@ public class SpectralPeakProcessor implements AudioProcessor {
     public float[] getMagnitudes() {
         return magnitudes.clone();
     }
+
+    public float[] getLogMagnitudes() {
+        return logMagnitudes.clone();
+    }
+
 
     /**
      * @return the precise frequency for each bin.

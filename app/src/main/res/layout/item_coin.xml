@@ -8,7 +8,7 @@
     android:paddingLeft="16dp">
 
     <ImageView
-        android:id="@+id/coin_icon"
+        android:id="@+id/verdict_icon"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_alignParentBottom="false"
@@ -31,7 +31,7 @@
         android:layout_marginLeft="16dp"
 
         android:layout_marginTop="16dp"
-        android:layout_toRightOf="@id/coin_icon"
+        android:layout_toRightOf="@id/verdict_icon"
         android:text="Krugerrand"
         android:textSize="16sp"/>
 
@@ -45,7 +45,7 @@
         android:layout_alignParentRight="false"
 
         android:layout_marginLeft="16dp"
-        android:layout_toRightOf="@id/coin_icon"
+        android:layout_toRightOf="@id/verdict_icon"
         android:singleLine="false"
         android:text="Gold (1 oz)"
         android:textSize="14sp"/>

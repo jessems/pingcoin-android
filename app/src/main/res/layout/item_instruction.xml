@@ -21,7 +21,7 @@
         android:layout_marginLeft="16dp"
 
         android:layout_marginTop="16dp"
-        android:layout_toRightOf="@id/coin_icon"
+        android:layout_toRightOf="@id/verdict_icon"
         android:text="SELECT A COIN TO PERFORM A TEST"
         android:textSize="16sp"/>
 

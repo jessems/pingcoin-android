@@ -3,7 +3,6 @@ package com.pingcoin.android.pingcoin;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
-import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -42,7 +41,7 @@ public class CoinListAdapter extends RecyclerView.Adapter<CoinListAdapter.CoinVi
             coinItemNameView = itemView.findViewById(R.id.coin_name);
             coinItemCountryView = itemView.findViewById(R.id.coin_country);
             coinItemClassWeightView = itemView.findViewById(R.id.coin_class_weight);
-            coinItemIcon = itemView.findViewById(R.id.coin_icon);
+            coinItemIcon = itemView.findViewById(R.id.verdict_icon);
             coinItemRowLayout = itemView.findViewById(R.id.coin_row);
 
             instructionTextView = itemView.findViewById(R.id.instruction_text);
@@ -98,6 +97,9 @@ public class CoinListAdapter extends RecyclerView.Adapter<CoinListAdapter.CoinVi
                     Context context = v.getContext();
 
                     Intent intent = new Intent(context, TestCoin.class);
+                    intent.putExtra("PopularName", current.getPopularName());
+                    intent.putExtra("WeightInOz", current.getWeightInOz());
+                    intent.putExtra("MaterialClass", current.getMaterialClass());
                     intent.putExtra("C0D2a", current.getC0D2a());
                     intent.putExtra("C0D3a", current.getC0D3a());
                     intent.putExtra("C0D4a", current.getC0D4a());

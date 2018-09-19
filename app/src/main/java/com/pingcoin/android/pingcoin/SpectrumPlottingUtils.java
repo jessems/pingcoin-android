@@ -81,12 +81,13 @@ public class SpectrumPlottingUtils {
         chartView.setData(lineData);
 
         chartView.setDrawBorders(true);
-        chartView.setBorderColor(Color.rgb(40,40,40));
+//        chartView.setBorderColor(Color.rgb(40,40,40));
+        chartView.setDrawBorders(false);
         chartView.getData().setHighlightEnabled(false);
         chartView.setScaleEnabled(false);
         chartView.setDrawGridBackground(true);
-        chartView.setGridBackgroundColor(Color.rgb(60,60,60));
-
+//        chartView.setGridBackgroundColor(Color.rgb(60,60,60));
+        chartView.setGridBackgroundColor(Color.rgb(255,255,255));
 
     }
 

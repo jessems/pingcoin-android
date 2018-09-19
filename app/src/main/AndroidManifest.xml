@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          xmlns:tools="http://schemas.android.com/tools"
           package="com.pingcoin.android.pingcoin">
 
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -8,7 +9,7 @@
 
 
 
-    <application android:theme="@style/Theme.AppCompat.Light.DarkActionBar">
+    <application android:theme="@style/Theme.AppCompat.Light.NoActionBar">
         <activity
             android:name=".PingcoinSplashActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
@@ -21,13 +22,13 @@
         </activity>
         <activity
             android:name=".TestCoin"
+            android:parentActivityName="com.pingcoin.android.pingcoin.SelectCoin"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:label="@string/app_name">
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.MAIN"/>-->
-
-                <!--<category android:name="android.intent.category.HOME"/>-->
-            <!--</intent-filter>-->
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.pingcoin.android.pingcoin.TestCoin" />
         </activity>
         <activity
             android:name=".SelectCoin"
@@ -35,7 +36,6 @@
             android:theme="@style/AppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
-
                 <category android:name="android.intent.category.HOME"/>
             </intent-filter>
         </activity>

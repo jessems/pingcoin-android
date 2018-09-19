@@ -140,7 +140,8 @@ public class AudioRecordActivity extends AppCompatActivity {
 
         @Override
         public void run() {
-            final File file = new File(Environment.getExternalStorageDirectory(), "recording.pcm");
+//            final File file = new File(Environment.getExternalStorageDirectory(), "recording.pcm");
+            final File file = new File(getApplicationContext().getFilesDir().getPath(), "recording.pcm");
             final ByteBuffer buffer = ByteBuffer.allocateDirect(BUFFER_SIZE);
 
             try (final FileOutputStream outStream = new FileOutputStream(file)) {
