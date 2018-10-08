@@ -15,8 +15,10 @@ import com.github.mikephil.charting.charts.LineChart;
 import org.apache.commons.math3.analysis.function.Exp;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import static android.graphics.Color.argb;
 
@@ -268,15 +270,11 @@ public class SpectrumPlottingUtils {
         }
 
 
-
-
-
         List<LimitLine> limitLineList = new ArrayList<>();
         for (int k = 0; k < detectedFrequencies.size(); k++) {
             Log.i(TAG,"Iterating through detected frequency: " + detectedFrequencies.get(k));
-
-            LimitLine detectedFreqLine = new LimitLine(detectedFrequencies.get(k));
-            detectedFreqLine.setLineColor( argb(40, 255, 255, 0));
+            LimitLine detectedFreqLine = new LimitLine((float) detectedFrequencies.get(k));
+            detectedFreqLine.setLineColor( argb(255, 255, 0, 0));
             limitLineList.add(detectedFreqLine);
 
             limitLineList.get(limitLineList.size() - 1).setLineWidth(0.5f);
@@ -288,6 +286,121 @@ public class SpectrumPlottingUtils {
 //            Log.i(TAG, "plotting " + l);
         }
         chart.invalidate();
+    }
+
+    public static void plotNoiseFloor(LineChart chart, LineData chartData, List<Entry> magnitudesList, List<Entry> noiseFloorList) {
+
+
+        // Below code works to plot the real time spectrum and the noise floor.
+        LineDataSet dataSet1 = new LineDataSet(magnitudesList, "Current Magnitudes"); // add entries to dataset
+        LineDataSet dataSet2 = new LineDataSet(noiseFloorList, "Noise Floor"); // add entries to dataset
+
+        dataSet1.setDrawCircles(false);
+        dataSet1.setDrawFilled(true);
+        dataSet1.setDrawValues(false);
+        dataSet1.setColor(Color.BLACK);
+
+        dataSet2.setDrawCircles(false);
+        dataSet2.setDrawFilled(true);
+        dataSet2.setDrawValues(false);
+        dataSet2.setColor(Color.RED);
+
+
+        chartData.addDataSet(dataSet1);
+        chartData.addDataSet(dataSet2);
+
+        chart.setData(chartData);
+//        chart.invalidate();
+
+    }
+
+    public static void plotSpectrum(LineChart chart, LineData chartData, List<Entry> magnitudesList) {
+        LineDataSet dataSet1 = new LineDataSet(magnitudesList, "Current Magnitudes"); // add entries to dataset
+
+        dataSet1.setDrawCircles(false);
+        dataSet1.setDrawFilled(true);
+        dataSet1.setDrawValues(false);
+        dataSet1.setColor(Color.BLACK);
+
+
+        chartData.addDataSet(dataSet1);
+        chart.setData(chartData);
+//        chart.invalidate();
+    }
+
+    public static void plotBinnedPeaks(LineChart chart, LineData chartData, List<Entry> binnedPeaksList) {
+        LineDataSet dataSet3 = new LineDataSet(binnedPeaksList, "Binned Peaks");
+
+        dataSet3.setDrawCircles(false);
+        dataSet3.setDrawFilled(true);
+        dataSet3.setDrawValues(false);
+        dataSet3.setColor(R.color.colorAccent);
+
+
+        chartData.addDataSet(dataSet3);
+
+        chart.setData(chartData);
+//        chart.invalidate();
+    }
+
+    public static Map<String, Boolean> getRecognizedResonanceFrequencies(LinkedList<Float> binnedPeaksExceedingThreshHz, Map<String, Float> resonanceFrequencies) {
+        boolean C0D2Detected = false;
+        boolean C0D3Detected = false;
+        boolean C0D4Detected = false;
+        Map<String, Boolean> recognizedResonanceFrequencies = new HashMap();
+
+        for (float realPeakvalue : binnedPeaksExceedingThreshHz) {
+            float peak = realPeakvalue;
+            if ((peak > ((float) resonanceFrequencies.get("C0D2") * (1 - resonanceFrequencies.get("tolerance")))) && (peak < ((float) resonanceFrequencies.get("C0D2") * (1 + resonanceFrequencies.get("tolerance"))))) {
+                C0D2Detected = true;
+            } else if ((peak > ((float) resonanceFrequencies.get("C0D3") * (1 - resonanceFrequencies.get("tolerance")))) && (peak < ((float) resonanceFrequencies.get("C0D3") * (1 + resonanceFrequencies.get("tolerance"))))) {
+                C0D3Detected = true;
+            } else if ((peak > ((float) resonanceFrequencies.get("C0D4") * (1 - resonanceFrequencies.get("tolerance")))) && (peak < ((float) resonanceFrequencies.get("C0D4") * (1 + resonanceFrequencies.get("tolerance"))))) {
+                C0D4Detected = true;
+            }
+        }
+        recognizedResonanceFrequencies.put("C0D2", C0D2Detected);
+        recognizedResonanceFrequencies.put("C0D3", C0D3Detected);
+        recognizedResonanceFrequencies.put("C0D4", C0D4Detected);
+
+        return recognizedResonanceFrequencies;
+    }
+
+    public static Map<String,Double> getSpectralFeatures(float[] currentMagnitudes) {
+
+        Map<String,Double> spectralFeatures = new HashMap();
+
+        double[] doubleArray = new double[currentMagnitudes.length];
+        for (int i = 0; i < currentMagnitudes.length; i++) {
+            doubleArray[i] = (double) Math.abs(currentMagnitudes[i]);
+        }
+
+        double gm = MeanCalculator.geometricMean(doubleArray);
+        double am = MeanCalculator.arithmeticMean(doubleArray);
+        final double spectralFlatness = convertToDesiredDecimals(gm / am,2);
+        final double spectralCentroid = convertToDesiredDecimals(MeanCalculator.spectralCentroid(doubleArray),2);
+        final double spectralMedian = convertToDesiredDecimals(MeanCalculator.spectralMedian(doubleArray), 2);
+        Log.i("Spectral Flatness: ", Double.toString(spectralFlatness));
+        Log.i("Spectral Median: ", Double.toString(spectralMedian));
+
+        // Convert features to 2 decimals
+
+        spectralFeatures.put("spectralCentroid", spectralCentroid);
+        spectralFeatures.put("spectralFlatness", spectralFlatness);
+        spectralFeatures.put("spectralMedian", spectralMedian);
+
+        return spectralFeatures;
+
+    }
+
+
+
+
+
+
+    public static double convertToDesiredDecimals(double feature, double decimals) {
+        double decimalsMultiplier = Math.pow(10,decimals);
+        return (double) Math.round(feature * decimalsMultiplier) / decimalsMultiplier;
     }
 
 }

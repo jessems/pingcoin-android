@@ -2,6 +2,8 @@ package com.pingcoin.android.pingcoin;
 
 import android.util.Log;
 
+import org.apache.commons.math3.stat.descriptive.rank.Median;
+
 class MeanCalculator {
     private MeanCalculator() {}
 
@@ -43,5 +45,11 @@ class MeanCalculator {
             sumOfMagnitudes += n[i];
         }
         return sumOfWeightedMagnitudes / sumOfMagnitudes;
+    }
+
+    public static double spectralMedian(double [] n) {
+        Median median = new Median();
+        double medianValue = median.evaluate(n);
+        return medianValue;
     }
 }

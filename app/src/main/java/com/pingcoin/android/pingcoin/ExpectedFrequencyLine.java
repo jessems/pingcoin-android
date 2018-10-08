@@ -15,6 +15,8 @@ public class ExpectedFrequencyLine extends LimitLine {
 
     }
 
+
+
     @Override
     public void setLineWidth(float width) {
         if (width < 0.2f) {
