@@ -24,6 +24,8 @@
 
 package com.pingcoin.android.pingcoin;
 
+import android.util.Log;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -295,6 +297,7 @@ public class AudioDispatcher implements Runnable {
         if(!stopped){
             stop();
         }
+        Log.i("AudioDispatcher", "Dispatcher is being run.");
     }
 
 

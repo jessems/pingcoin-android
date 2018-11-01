@@ -19,6 +19,7 @@
     <string name="toolbar_submit_coin">Submit a coin</string>
     <string name="toolbar_about_ping_test">About the ping test</string>
     <string name="start_again">Start Again</string>
+    <string name="zero_resonance_frequences_recognized_clean_toast">Was that a coin?</string>
 
 
 </resources>

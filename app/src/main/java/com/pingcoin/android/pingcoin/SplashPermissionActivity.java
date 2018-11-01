@@ -14,6 +14,7 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -70,7 +71,7 @@ abstract public class SplashPermissionActivity extends Activity {
     /**
      * The time that the splash screen will be on the screen in milliseconds.
      */
-    private int                 timeoutMillis       = 5000;
+    private int                 timeoutMillis       = 2000;
 
     /** The time when this {@link Activity} was created. */
     private long                startTimeMillis     = 0;

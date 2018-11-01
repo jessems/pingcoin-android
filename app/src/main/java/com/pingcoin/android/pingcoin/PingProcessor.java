@@ -52,9 +52,9 @@ import java.util.List;
  }
 
  public boolean process(AudioEvent audioEvent) {
- float[] noiseFloor = SpectralPeakProcessor.calculateNoiseFloor(spectralPeakFollower.getMagnitudes(), medianFilterLength, noiseFloorFactor);
- List<Integer> localMaxima = SpectralPeakProcessor.findLocalMaxima(spectralPeakFollower.getMagnitudes(), noiseFloor);
- List<> list = SpectralPeakProcessor.findPeaks(spectralPeakFollower.getMagnitudes(), spectralPeakFollower.getFrequencyEstimates(), localMaxima, numberOfPeaks);
+ float[] noiseFloor = PingProcessor.calculateNoiseFloor(spectralPeakFollower.getMagnitudes(), medianFilterLength, noiseFloorFactor);
+ List<Integer> localMaxima = PingProcessor.findLocalMaxima(spectralPeakFollower.getMagnitudes(), noiseFloor);
+ List<> list = PingProcessor.findPeaks(spectralPeakFollower.getMagnitudes(), spectralPeakFollower.getFrequencyEstimates(), localMaxima, numberOfPeaks);
  // do something with the list...
  return true;
  }
@@ -70,7 +70,7 @@ import java.util.List;
  * @author James Plamondon
  *
  */
-public class SpectralPeakProcessor implements AudioProcessor {
+public class PingProcessor implements AudioProcessor {
 
     /**
      * The sample rate of the signal.
@@ -116,7 +116,7 @@ public class SpectralPeakProcessor implements AudioProcessor {
 
 
 
-    public SpectralPeakProcessor(int bufferSize, int overlap, int sampleRate) {
+    public PingProcessor(int bufferSize, int overlap, int sampleRate) {
         fft = new FFT(bufferSize, new HammingWindow());
 
         magnitudes = new float[bufferSize / 2];
@@ -239,49 +239,6 @@ public class SpectralPeakProcessor implements AudioProcessor {
     }
 
     /**
-     * Calculate a noise floor for an array of magnitudes.
-     * @param magnitudes The magnitudes of the current frame.
-     * @param medianFilterLength The length of the median filter used to determine the noise floor.
-     * @param noiseFloorFactor The noise floor is multiplied with this factor to determine if the
-     * information is either noise or an interesting spectral peak.
-     * @return a float array representing the noise floor.
-     */
-    public static float[] calculateNoiseFloor(float[] magnitudes, int medianFilterLength, float noiseFloorFactor) {
-        double[] noiseFloorBuffer;
-        float[] noisefloor = new float[magnitudes.length];
-
-        float median = (float) median(magnitudes.clone());
-
-        // Naive median filter implementation.
-        // For each element take a median of surrounding values (noiseFloorBuffer)
-        // Store the median as the noise floor.
-        for (int i = 0; i < magnitudes.length; i++) {
-            noiseFloorBuffer = new double[medianFilterLength];
-            int index = 0;
-            for (int j = i - medianFilterLength/2; j <= i + medianFilterLength/2 && index < noiseFloorBuffer.length; j++) {
-                if(j >= 0 && j < magnitudes.length){
-                    noiseFloorBuffer[index] = magnitudes[j];
-                } else{
-                    noiseFloorBuffer[index] = median;
-                }
-                index++;
-            }
-            // calculate the noise floor value.
-            noisefloor[i] = (float) (median(noiseFloorBuffer) * (noiseFloorFactor)) ;
-        }
-
-        float rampLength = 12.0f;
-        for(int i = 0 ; i <= rampLength ; i++){
-            //ramp
-            float ramp = 1.0f;
-            ramp = (float) (-1 * (Math.log(i/rampLength))) + 1.0f;
-            noisefloor[i] = ramp * noisefloor[i];
-        }
-
-        return noisefloor;
-    }
-
-    /**
      * Finds the local magintude maxima and stores them in the given list.
      * @param magnitudes The magnitudes.
      * @param noisefloor The noise floor.
@@ -316,77 +273,7 @@ public class SpectralPeakProcessor implements AudioProcessor {
         return maxMagnitudeIndex;
     }
 
-    /**
-     *
-     * @param magnitudes the magnitudes..
-     * @param frequencyEstimates The frequency estimates for each bin.
-     * @param localMaximaIndexes The indexes of the local maxima.
-     * @param numberOfPeaks The requested number of peaks.
-     * @param minDistanceInCents The minimum distance in cents between the peaks
-     * @return A list with spectral peaks.
-     */
-    public static List<SpectralPeak> findPeaks(float[] magnitudes, float[] frequencyEstimates, List<Integer> localMaximaIndexes, int numberOfPeaks, int minDistanceInCents){
-        int maxMagnitudeIndex = findMaxMagnitudeIndex(magnitudes);
-        List<SpectralPeak> spectralPeakList = new ArrayList<SpectralPeak>();
 
-        if(localMaximaIndexes.size()==0)
-            return spectralPeakList;
-
-        float referenceFrequency=0;
-        //the frequency of the bin with the highest magnitude
-        referenceFrequency =  frequencyEstimates[maxMagnitudeIndex];
-
-        //remove frequency estimates below zero
-        for(int i = 0 ; i < localMaximaIndexes.size() ; i++){
-            if(frequencyEstimates[localMaximaIndexes.get(i)] < 0 ){
-                localMaximaIndexes.remove(i);
-                frequencyEstimates[localMaximaIndexes.get(i)]=1;//Hz
-                i--;
-            }
-        }
-
-        //filter the local maxima indexes, remove peaks that are too close to each other
-        //assumes that localmaximaIndexes is sorted from lowest to higest index
-        for(int i = 1 ; i < localMaximaIndexes.size() ; i++){
-            double centCurrent = PitchConverter.hertzToAbsoluteCent(frequencyEstimates[localMaximaIndexes.get(i)]);
-            double centPrev = PitchConverter.hertzToAbsoluteCent(frequencyEstimates[localMaximaIndexes.get(i-1)]);
-            double centDelta = centCurrent - centPrev;
-            if(centDelta  < minDistanceInCents ){
-                if(magnitudes[localMaximaIndexes.get(i)] > magnitudes[localMaximaIndexes.get(i-1)]){
-                    localMaximaIndexes.remove(i-1);
-                }else{
-                    localMaximaIndexes.remove(i);
-                }
-                i--;
-            }
-        }
-
-        // Retrieve the maximum values for the indexes
-        float[] maxMagnitudes = new float[localMaximaIndexes.size()];
-        for(int i = 0 ; i < localMaximaIndexes.size() ; i++){
-            maxMagnitudes[i] = magnitudes[localMaximaIndexes.get(i)];
-        }
-        // Sort the magnitudes in ascending order
-        Arrays.sort(maxMagnitudes);
-
-        // Find the threshold, the first value or somewhere in the array.
-        float peakthresh = maxMagnitudes[0];
-        if (maxMagnitudes.length > numberOfPeaks) {
-            peakthresh = maxMagnitudes[maxMagnitudes.length - numberOfPeaks];
-        }
-
-        //store the peaks
-        for(Integer i : localMaximaIndexes){
-            if(magnitudes[i]>= peakthresh){
-                final float frequencyInHertz= frequencyEstimates[i];
-                //ignore frequencies lower than 30Hz
-                float binMagnitude = magnitudes[i];
-                SpectralPeak peak = new SpectralPeak(0,frequencyInHertz, binMagnitude, referenceFrequency,i);
-                spectralPeakList.add(peak);
-            }
-        }
-        return spectralPeakList;
-    }
 
     public static final float median(double[] arr){
         return percentile(arr, 0.5);
@@ -432,58 +319,7 @@ public class SpectralPeakProcessor implements AudioProcessor {
     }
 
 
-    public static class SpectralPeak{
-        private final float frequencyInHertz;
-        private final float magnitude;
-        private final float referenceFrequency;
-        private final int bin;
-        /**
-         * Timestamp in fractional seconds
-         */
-        private final float timeStamp;
 
-        public SpectralPeak(float timeStamp,float frequencyInHertz, float magnitude,float referenceFrequency,int bin){
-            this.frequencyInHertz = frequencyInHertz;
-            this.magnitude = magnitude;
-            this.referenceFrequency = referenceFrequency;
-            this.timeStamp = timeStamp;
-            this.bin = bin;
-        }
-
-        public float getRelativeFrequencyInCents(){
-            if(referenceFrequency > 0 && frequencyInHertz > 0){
-                float refInCents = (float) PitchConverter.hertzToAbsoluteCent(referenceFrequency);
-                float valueInCents = (float) PitchConverter.hertzToAbsoluteCent(frequencyInHertz);
-                return valueInCents - refInCents;
-            }else{
-                return 0;
-            }
-        }
-
-        public float getTimeStamp(){
-            return timeStamp;
-        }
-
-        public float getMagnitude(){
-            return magnitude;
-        }
-
-        public float getFrequencyInHertz(){
-            return frequencyInHertz;
-        }
-
-        public float getRefFrequencyInHertz(){
-            return referenceFrequency;
-        }
-
-        public String toString(){
-            return String.format("%.2f %.2f %.2f", frequencyInHertz,getRelativeFrequencyInCents(),magnitude);
-        }
-
-        public int getBin() {
-            return bin;
-        }
-    }
 
 
 }

@@ -1,31 +1,37 @@
 package com.pingcoin.android.pingcoin;
 
+import android.util.Log;
+
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
 class VerdictCalculationUtils {
 
-    VerdictCalculationUtils() {
-        //
-    }
+    static String TAG = VerdictCalculationUtils.class.getSimpleName();
 
-    public static Map<String, Boolean> getRecognizedResonanceFrequencies(LinkedList<Float> binnedPeaksExceedingThreshHz, Map<String, Float> resonanceFrequencies) {
+    public static Map<String, Boolean> getRecognizedResonanceFrequencies(LinkedList<Float> detectedPeaksHz, Map<String, Float> resonanceFrequencies) {
         boolean C0D2Detected = false;
         boolean C0D3Detected = false;
         boolean C0D4Detected = false;
         Map<String, Boolean> recognizedResonanceFrequencies = new HashMap();
 
-        for (float realPeakvalue : binnedPeaksExceedingThreshHz) {
-            float peak = realPeakvalue;
-            if ((peak > ((float) resonanceFrequencies.get("C0D2") * (1 - resonanceFrequencies.get("tolerance")))) && (peak < ((float) resonanceFrequencies.get("C0D2") * (1 + resonanceFrequencies.get("tolerance"))))) {
-                C0D2Detected = true;
-            } else if ((peak > ((float) resonanceFrequencies.get("C0D3") * (1 - resonanceFrequencies.get("tolerance")))) && (peak < ((float) resonanceFrequencies.get("C0D3") * (1 + resonanceFrequencies.get("tolerance"))))) {
-                C0D3Detected = true;
-            } else if ((peak > ((float) resonanceFrequencies.get("C0D4") * (1 - resonanceFrequencies.get("tolerance")))) && (peak < ((float) resonanceFrequencies.get("C0D4") * (1 + resonanceFrequencies.get("tolerance"))))) {
-                C0D4Detected = true;
+
+        if(detectedPeaksHz.size() < 10) {
+            for (float realPeakvalue : detectedPeaksHz) {
+                float peak = realPeakvalue;
+                if ((peak > ((float) resonanceFrequencies.get("C0D2") * (1 - resonanceFrequencies.get("tolerance")))) && (peak < ((float) resonanceFrequencies.get("C0D2") * (1 + resonanceFrequencies.get("tolerance"))))) {
+                    C0D2Detected = true;
+                } else if ((peak > ((float) resonanceFrequencies.get("C0D3") * (1 - resonanceFrequencies.get("tolerance")))) && (peak < ((float) resonanceFrequencies.get("C0D3") * (1 + resonanceFrequencies.get("tolerance"))))) {
+                    C0D3Detected = true;
+                } else if ((peak > ((float) resonanceFrequencies.get("C0D4") * (1 - resonanceFrequencies.get("tolerance")))) && (peak < ((float) resonanceFrequencies.get("C0D4") * (1 + resonanceFrequencies.get("tolerance"))))) {
+                    C0D4Detected = true;
+                }
             }
+        } else {
+            Log.e(TAG, "Too many peaks to get the recognized peaks.");
         }
+
         recognizedResonanceFrequencies.put("C0D2", C0D2Detected);
         recognizedResonanceFrequencies.put("C0D3", C0D3Detected);
         recognizedResonanceFrequencies.put("C0D4", C0D4Detected);
@@ -33,9 +39,10 @@ class VerdictCalculationUtils {
         return recognizedResonanceFrequencies;
     }
 
-    public static String getVerdict(Map<String,Boolean> detectedPeaks, Map<String, Double> spectralFeatures, Map<String, Double> featureThresholds) {
+    public static Verdict getVerdict(Map<String,Boolean> detectedPeaks, Map<String, Double> spectralFeatures, Map<String, Double> featureThresholds) {
         boolean pingIsClean = false;
-        String verdict = "NONE";
+//        String verdict = "NONE";
+        Verdict verdict;
 
         int amountOfFrequenciesDetected =
                 booleanToInt(detectedPeaks.get("C0D2")) +
@@ -50,21 +57,23 @@ class VerdictCalculationUtils {
         }
 
         if (amountOfFrequenciesDetected == 0 && !pingIsClean) {
-            verdict = "ZERO_PEAKS_DETECTED_NOT_CLEAN";
+            verdict = Verdict.ZERO_RESONANCE_FREQUENCIES_RECOGNIZED_NOT_CLEAN;
         } else if (amountOfFrequenciesDetected == 0 && pingIsClean) {
-            verdict = "ZERO_PEAKS_DETECTED_CLEAN";
+            verdict = Verdict.ZERO_RESONANCE_FREQUENCIES_RECOGNIZED_CLEAN;
         } else if (amountOfFrequenciesDetected == 1 && !pingIsClean) {
-            verdict = "ONE_PEAK_DETECTED_NOT_CLEAN";
+            verdict = Verdict.ONE_RESONANCE_FREQUENCY_RECOGNIZED_NOT_CLEAN;
         } else if (amountOfFrequenciesDetected == 1 && pingIsClean) {
-            verdict = "ONE_PEAK_DETECTED_CLEAN";
+            verdict = Verdict.ONE_RESONANCE_FREQUENCY_RECOGNIZED_CLEAN;
         } else if (amountOfFrequenciesDetected == 2 && !pingIsClean) {
-            verdict = "TWO_PEAKS_DETECTED_NOT_CLEAN";
+            verdict = Verdict.TWO_RESONANCE_FREQUENCIES_RECOGNIZED_NOT_CLEAN;
         } else if (amountOfFrequenciesDetected == 2 && pingIsClean) {
-            verdict = "TWO_PEAKS_DETECTED_CLEAN";
+            verdict = Verdict.TWO_RESONANCE_FREQUENCIES_RECOGNIZED_CLEAN;
         } else if (amountOfFrequenciesDetected == 3 && !pingIsClean) {
-            verdict = "THREE_PEAKS_DETECTED_NOT_CLEAN";
+            verdict = Verdict.THREE_RESONANCE_FREQUENCIES_RECOGNIZED_NOT_CLEAN;
         } else if (amountOfFrequenciesDetected == 3 && pingIsClean) {
-            verdict = "THREE_PEAKS_DETECTED_CLEAN";
+            verdict = Verdict.THREE_RESONANCE_FREQUENCIES_RECOGNIZED_CLEAN;
+        } else {
+            verdict = Verdict.NONE;
         }
         return verdict;
     }

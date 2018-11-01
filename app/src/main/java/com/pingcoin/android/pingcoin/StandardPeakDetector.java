@@ -21,7 +21,7 @@ import java.util.ArrayList;
  * </pre>
  * @author Jean-Yves Tinevez <jeanyves.tinevez@gmail.com> May 10, 2011
  */
-public class PeakDetector {
+public class StandardPeakDetector {
 
     final private float offset = 0.1f;
     private float[] T;
@@ -29,7 +29,7 @@ public class PeakDetector {
     /**
      * Create a peak detector for the given time series.
      */
-    public PeakDetector(final float[] timeSeries) {
+    public StandardPeakDetector(final float[] timeSeries) {
         this.T = timeSeries;
     }
 

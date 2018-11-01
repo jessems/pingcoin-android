@@ -16,6 +16,7 @@ import org.apache.commons.math3.analysis.function.Exp;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -32,8 +33,8 @@ public class SpectrumPlottingUtils {
 
     public static List<Entry> floatArrayToList(float[] floatArray) {
         List<Entry> entries = new ArrayList<Entry>();
-        for(int i = 0; i < floatArray.length; i++) {
-            entries.add(new Entry(i,floatArray[i]));
+        for (int i = 0; i < floatArray.length; i++) {
+            entries.add(new Entry(i, floatArray[i]));
         }
         return entries;
     }
@@ -42,8 +43,8 @@ public class SpectrumPlottingUtils {
 
         // Create entries List
         List<Entry> entries = new ArrayList<Entry>();
-        for(int i = 0; i < spectrumData.length; i++) {
-            entries.add(new Entry(i,spectrumData[i]));
+        for (int i = 0; i < spectrumData.length; i++) {
+            entries.add(new Entry(i, spectrumData[i]));
         }
 
         LineDataSet dataSet = new LineDataSet(entries, label); // add entries to dataset
@@ -60,8 +61,6 @@ public class SpectrumPlottingUtils {
         chartView.setScaleEnabled(false);
 
 
-
-
     }
 
     public static void addEmptyData(LineChart chartView, int sampleRate, int windowSize) {
@@ -69,8 +68,8 @@ public class SpectrumPlottingUtils {
 
         // Create entries List
         List<Entry> entries = new ArrayList<Entry>();
-        for(int i = 0; i < spectrumData.length; i++) {
-            entries.add(new Entry(i,0));
+        for (int i = 0; i < spectrumData.length; i++) {
+            entries.add(new Entry(i, 0));
         }
 
         LineDataSet dataSet = new LineDataSet(entries, "Coin Spectrum"); // add entries to dataset
@@ -89,14 +88,12 @@ public class SpectrumPlottingUtils {
         chartView.setScaleEnabled(false);
         chartView.setDrawGridBackground(true);
 //        chartView.setGridBackgroundColor(Color.rgb(60,60,60));
-        chartView.setGridBackgroundColor(Color.rgb(255,255,255));
+        chartView.setGridBackgroundColor(Color.rgb(255, 255, 255));
 
     }
 
 
-
     public static void configureSpectrumChart(LineChart chart, int windowSize, int sampleRate) {
-
 
 
         addEmptyData(chart, sampleRate, windowSize);
@@ -119,11 +116,11 @@ public class SpectrumPlottingUtils {
 
         // The windowSize pertains to the blockSize that the PercussionOnsetDetector looks at.
         // If it looks at 512 samples, the frequency resolution will be half: 256.
-        xAxis.setAxisMaximum(windowSize/2);
+        xAxis.setAxisMaximum(windowSize / 2);
 
 
 //        xAxis.setGranularityEnabled(true);
-        xAxis.setLabelCount(1000,true);
+        xAxis.setLabelCount(1000, true);
 
         xAxis.setValueFormatter(new LargeValueFormatter(windowSize, sampleRate));
 
@@ -146,11 +143,11 @@ public class SpectrumPlottingUtils {
     }
 
     public static void plotNaturalFrequency(LineChart chart, String naturalFrequencyLabel, float naturalFrequencyValue, float naturalFrequencyError, int sampleRate, int windowSize) {
-        Log.d("BLA",Float.toString(naturalFrequencyError));
+        Log.d("BLA", Float.toString(naturalFrequencyError));
         naturalFrequencyError = naturalFrequencyError / 2f;
 
         // Initialize the limit line
-        ExpectedFrequencyLine cxdx = new ExpectedFrequencyLine(0,"");
+        ExpectedFrequencyLine cxdx = new ExpectedFrequencyLine(0, "");
         LimitLine cxdxBottomThreshold = new LimitLine(0);
         LimitLine cxdxTopThreshold = new LimitLine(0);
 
@@ -163,8 +160,8 @@ public class SpectrumPlottingUtils {
         switch (naturalFrequencyLabel) {
             case "c0d2":
                 convertedXValue = (naturalFrequencyValue / (sampleRate)) * windowSize;
-                convertedXValueBottomThreshold = convertedXValue * (1 - naturalFrequencyError/2);
-                convertedXValueTopThreshold = convertedXValue * (1 + naturalFrequencyError/2);
+                convertedXValueBottomThreshold = convertedXValue * (1 - naturalFrequencyError / 2);
+                convertedXValueTopThreshold = convertedXValue * (1 + naturalFrequencyError / 2);
                 cxdx = new ExpectedFrequencyLine(convertedXValue, naturalFrequencyLabel);
                 lineWidth = convertedXValue * naturalFrequencyError;
                 cxdx.setLineWidth(lineWidth);
@@ -185,7 +182,6 @@ public class SpectrumPlottingUtils {
                 cxdx = new ExpectedFrequencyLine(convertedXValue, naturalFrequencyLabel);
                 lineWidth = convertedXValue * naturalFrequencyError;
                 cxdx.setLineWidth(lineWidth);
-
 
 
                 Log.i(TAG, "The " + naturalFrequencyLabel + " value loaded is: " + Float.toString(naturalFrequencyValue));
@@ -218,13 +214,13 @@ public class SpectrumPlottingUtils {
         }
 
 //        cxdx.setLineWidth(22f);
-        cxdx.setLineColor( argb(40, 240, 240, 240));
-        cxdxBottomThreshold.setLineColor( argb(40, 240, 240, 240));
-        cxdxTopThreshold.setLineColor( argb(40, 240, 240, 240));
+        cxdx.setLineColor(argb(40, 240, 240, 240));
+        cxdxBottomThreshold.setLineColor(argb(40, 240, 240, 240));
+        cxdxTopThreshold.setLineColor(argb(40, 240, 240, 240));
 //        cxdx.enableDashedLine(10f, 10f, 0f);
         cxdx.setLabelPosition(LimitLine.LimitLabelPosition.LEFT_TOP);
         cxdx.setTextSize(10f);
-        cxdx.setTextColor(Color.rgb(150,150,150));
+        cxdx.setTextColor(Color.rgb(150, 150, 150));
 
         bottomAxis.setDrawLimitLinesBehindData(true);
 
@@ -232,60 +228,133 @@ public class SpectrumPlottingUtils {
 
     }
 
-    public static void detectedNaturalFrequency(LineChart chart, String frequencyLabel, boolean detected) {
+    public static void resonanceFrequencyToleranceBar(LineChart chart, String frequencyLabel, boolean detected) {
         XAxis bottomAxis = chart.getXAxis();
         List<LimitLine> existingLimitLines = bottomAxis.getLimitLines();
-        int detectedColor = Color.argb(80,0,153,51);
-        int notDetectedColor = Color.argb(80,255,80,80);
+        int detectedColor = Color.argb(80, 0, 153, 51);
+        int notDetectedColor = Color.argb(80, 255, 80, 80);
 
-            for(LimitLine limitline : existingLimitLines) {
-                if (limitline.getLabel() == frequencyLabel) {
-                    if (detected) {
-                        limitline.setLineColor(detectedColor);
-                    } else {
-                        limitline.setLineColor(notDetectedColor);
-                    }
+        for (Iterator<LimitLine> iterator = existingLimitLines.iterator(); iterator.hasNext(); ) {
+            LimitLine limitLine = iterator.next();
+            if (limitLine.getLabel().equals(frequencyLabel)) {
+                if (detected) {
+                    limitLine.setLineColor(detectedColor);
+                } else {
+                    limitLine.setLineColor(notDetectedColor);
                 }
             }
+        }
+
+//        for (LimitLine limitline : existingLimitLines) {
+//            if (limitline.getLabel() == frequencyLabel) {
+//                if (detected) {
+//                    limitline.setLineColor(detectedColor);
+//                } else {
+//                    limitline.setLineColor(notDetectedColor);
+//                }
+//            }
+//        }
 
 
-
-
-
-//        chart.invalidate();
+        chart.invalidate();
 
     }
 
 
-    public static void plotDetectedFrequencies(LineChart chart, LinkedList<Integer> detectedFrequencies) {
+    public static void drawDetectedPeaks(LinkedList<Integer> detectedPeaksBins, LineChart chart) {
         XAxis bottomAxis = chart.getXAxis();
 
+        // Remove existing LimitLines corresponding to the detected peaks of the previous frame (they have label "")
         List<LimitLine> existingLimitLines = bottomAxis.getLimitLines();
-        for (int p = 0; p < existingLimitLines.size(); p++) {
-            LimitLine currentLimitLine = existingLimitLines.get(p);
-            Log.i(TAG, "Current LimitLineLabel is :" + currentLimitLine.getLabel());
-            if (currentLimitLine.getLabel().equals("")) {
-                bottomAxis.removeLimitLine(currentLimitLine);
+
+        List<LimitLine> limitLinesToRemove = new ArrayList<LimitLine>();
+
+        for (LimitLine limitLine : existingLimitLines) {
+            if (limitLine.getLabel().equals("")) {
+                limitLinesToRemove.add(limitLine);
             }
         }
 
+        existingLimitLines.removeAll(limitLinesToRemove);
 
-        List<LimitLine> limitLineList = new ArrayList<>();
-        for (int k = 0; k < detectedFrequencies.size(); k++) {
-            Log.i(TAG,"Iterating through detected frequency: " + detectedFrequencies.get(k));
-            LimitLine detectedFreqLine = new LimitLine((float) detectedFrequencies.get(k));
-            detectedFreqLine.setLineColor( argb(255, 255, 0, 0));
-            limitLineList.add(detectedFreqLine);
 
-            limitLineList.get(limitLineList.size() - 1).setLineWidth(0.5f);
+//        Iterator<LimitLine> iterator = existingLimitLines.iterator();
+
+//        while (iterator.hasNext()) {
+//            LimitLine currentLimitLine = iterator.next();
+//            if (!currentLimitLine.getLabel().equals("c0d2")
+//                    || !currentLimitLine.getLabel() .equals("c0d3")
+//                    || !currentLimitLine.getLabel().equals("c0d4")) {
+//                // If the limitline has no label, it is a drawn detected peak
+//                bottomAxis.removeLimitLine(currentLimitLine);
+//            }
+//        }
+
+
+
+//        bottomAxis.removeAllLimitLines();
+
+
+        if (detectedPeaksBins.size() < 10) {
+
+            for (Iterator<Integer> iterator = detectedPeaksBins.iterator(); iterator.hasNext(); ) {
+                float value = iterator.next();
+                LimitLine detectedFreqLine = new LimitLine(value);
+                detectedFreqLine.setLineColor(argb(255, 255, 0, 0));
+                detectedFreqLine.setLineWidth(0.5f);
+                detectedFreqLine.setLabel("");
+                bottomAxis.addLimitLine(detectedFreqLine);
+            }
+        } else {
+            Log.e("drawDetectedPeaks", "Too many LimitLines on the graph!");
         }
 
 
-        for (int l = 0; l < limitLineList.size(); l++) {
-            bottomAxis.addLimitLine(limitLineList.get(l));
-//            Log.i(TAG, "plotting " + l);
-        }
-        chart.invalidate();
+//        List<LimitLine> existingLimitLines = bottomAxis.getLimitLines();
+//
+//        for (Iterator<LimitLine> iterator = existingLimitLines.iterator(); ((Iterator) iterator).hasNext()) {
+//            LimitLine currentLimitLine = iterator.next();
+//            if (currentLimitLine.getLabel().equals("")) {
+//                // If the limitline has no label, it is a drawn detected peak
+//                bottomAxis.removeLimitLine(currentLimitLine);
+//            }
+//        }
+
+
+//        for (int p = 0; p < existingLimitLines.size(); p++) {
+//            LimitLine currentLimitLine = existingLimitLines.get(p);
+//            Log.i(TAG, "Current LimitLineLabel is :" + currentLimitLine.getLabel());
+//            if (currentLimitLine.getLabel().equals("")) {
+//                bottomAxis.removeLimitLine(currentLimitLine);
+//            }
+//        }
+
+//        List<LimitLine> limitLineList = new ArrayList<>();
+//        for (Iterator<Integer> iterator = detectedPeaksBins.iterator(); iterator.hasNext(); ) {
+//            float value = iterator.next();
+//            LimitLine detectedFreqLine = new LimitLine(value);
+//            detectedFreqLine.setLineColor( argb(255, 255, 0, 0));
+//            detectedFreqLine.setLineWidth(0.5f);
+////            limitLineList.add(detectedFreqLine);
+//            bottomAxis.addLimitLine(detectedFreqLine);
+//        }
+
+//
+//        List<LimitLine> limitLineList = new ArrayList<>();
+//        for (int k = 0; k < detectedPeaksBins.size(); k++) {
+//            Log.i(TAG,"Iterating through detected frequency: " + detectedPeaksBins.get(k));
+//            LimitLine detectedFreqLine = new LimitLine((float) detectedPeaksBins.get(k));
+//            detectedFreqLine.setLineColor( argb(255, 255, 0, 0));
+//            limitLineList.add(detectedFreqLine);
+//
+//            limitLineList.get(limitLineList.size() - 1).setLineWidth(0.5f);
+//        }
+
+
+//        for (int l = 0; l < limitLineList.size(); l++) {
+//            bottomAxis.addLimitLine(limitLineList.get(l));
+////            Log.i(TAG, "plotting " + l);
+//        }
     }
 
     public static void plotNoiseFloor(LineChart chart, LineData chartData, List<Entry> magnitudesList, List<Entry> noiseFloorList) {
@@ -325,7 +394,8 @@ public class SpectrumPlottingUtils {
 
         chartData.addDataSet(dataSet1);
         chart.setData(chartData);
-//        chart.invalidate();
+
+        chart.invalidate();
     }
 
     public static void plotBinnedPeaks(LineChart chart, LineData chartData, List<Entry> binnedPeaksList) {
@@ -366,9 +436,9 @@ public class SpectrumPlottingUtils {
         return recognizedResonanceFrequencies;
     }
 
-    public static Map<String,Double> getSpectralFeatures(float[] currentMagnitudes) {
+    public static Map<String, Double> getSpectralFeatures(float[] currentMagnitudes) {
 
-        Map<String,Double> spectralFeatures = new HashMap();
+        Map<String, Double> spectralFeatures = new HashMap();
 
         double[] doubleArray = new double[currentMagnitudes.length];
         for (int i = 0; i < currentMagnitudes.length; i++) {
@@ -377,8 +447,8 @@ public class SpectrumPlottingUtils {
 
         double gm = MeanCalculator.geometricMean(doubleArray);
         double am = MeanCalculator.arithmeticMean(doubleArray);
-        final double spectralFlatness = convertToDesiredDecimals(gm / am,2);
-        final double spectralCentroid = convertToDesiredDecimals(MeanCalculator.spectralCentroid(doubleArray),2);
+        final double spectralFlatness = convertToDesiredDecimals(gm / am, 2);
+        final double spectralCentroid = convertToDesiredDecimals(MeanCalculator.spectralCentroid(doubleArray), 2);
         final double spectralMedian = convertToDesiredDecimals(MeanCalculator.spectralMedian(doubleArray), 2);
         Log.i("Spectral Flatness: ", Double.toString(spectralFlatness));
         Log.i("Spectral Median: ", Double.toString(spectralMedian));
@@ -394,12 +464,8 @@ public class SpectrumPlottingUtils {
     }
 
 
-
-
-
-
     public static double convertToDesiredDecimals(double feature, double decimals) {
-        double decimalsMultiplier = Math.pow(10,decimals);
+        double decimalsMultiplier = Math.pow(10, decimals);
         return (double) Math.round(feature * decimalsMultiplier) / decimalsMultiplier;
     }
 
