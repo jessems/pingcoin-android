@@ -541,14 +541,7 @@ public class TestCoin extends OverflowMenuActivity {
 
 
     private void setStartAgainButtonVisibility(final Button startAgainButton, final int visibility) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-
-                startAgainButton.setVisibility(visibility);
-
-            }
-        });
+        runOnUiThread(() -> startAgainButton.setVisibility(visibility));
     }
 
     private void resetResonanceFrequencyIcons(final Map<String, ImageView> resonanceFrequencyIconImageViews) {
@@ -587,21 +580,12 @@ public class TestCoin extends OverflowMenuActivity {
             builder = new AlertDialog.Builder(getContext());
         }
 
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                builder.setTitle("Authentic " + selectedCoinPopularName + " Detected!")
-                        .setMessage("The ping you produced was consistent with an authentic " + selectedCoinPopularName + ".")
-//                        .setMessage("Spectral Flatness: " + spectralFeatures.get("spectralFlatness") +
-//                                ", Spectral Centroid: " + spectralFeatures.get("spectralCentroid"))
-                        .setIcon(getResources().getIdentifier("ic_" + selectedCoinId + "_listview", "drawable", getContext().getPackageName()))
-                        .setPositiveButton("New Ping", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                            }
-                        })
-                        .show();
-            }
-        });
+        runOnUiThread(() -> builder.setTitle("Authentic " + selectedCoinPopularName + " Detected!")
+                .setMessage("The ping you produced was consistent with an authentic " + selectedCoinPopularName + ".")
+                .setIcon(getResources().getIdentifier("ic_" + selectedCoinId + "_listview", "drawable", getContext().getPackageName()))
+                .setPositiveButton("New Ping", (dialog, which) -> {
+                })
+                .show());
 
     }
 
@@ -767,19 +751,16 @@ public class TestCoin extends OverflowMenuActivity {
             slideOutVerdictBanner = findViewById(R.id.verdict_secondary_banner);
         }
 
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                slideInVerdictIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_listening));
-                slideInVerdictText.setText("Listening...");
-                slideInVerdictSubtitle.setText("I didn't hear a coin yet");
-                slideInVerdictInstructionText.setText("Flick a coin to get started");
+        runOnUiThread(() -> {
+            slideInVerdictIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_listening));
+            slideInVerdictText.setText("Listening...");
+            slideInVerdictSubtitle.setText("I didn't hear a coin yet");
+            slideInVerdictInstructionText.setText("Flick a coin to get started");
 
-                slideVerdictBannerDown(slideInVerdictBanner);
+            slideVerdictBannerDown(slideInVerdictBanner);
 
-                slideVerdictBannerUp(slideOutVerdictBanner);
+            slideVerdictBannerUp(slideOutVerdictBanner);
 
-            }
         });
 
 
@@ -821,131 +802,104 @@ public class TestCoin extends OverflowMenuActivity {
 
             case ZERO_RESONANCE_FREQUENCIES_RECOGNIZED_NOT_CLEAN:
                 // If no peaks are detected, this case should actually not get triggered at all...
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        slideInVerdictIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_unclear));
-                        slideInVerdictText.setText("Unclear");
-                        slideInVerdictSubtitle.setText("No resonance frequencies detected");
-                        Log.d("SPEC", "Flat " + spectralFeatures.get("spectralFlatness").toString() +
-                                ", Cen: " + spectralFeatures.get("spectralCentroid").toString() + ", Median: " + spectralFeatures.get("spectralMedian").toString());
+                runOnUiThread(() -> {
+                    slideInVerdictIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_unclear));
+                    slideInVerdictText.setText("Unclear");
+                    slideInVerdictSubtitle.setText("No resonance frequencies detected");
+                    Log.d("SPEC", "Flat " + spectralFeatures.get("spectralFlatness").toString() +
+                            ", Cen: " + spectralFeatures.get("spectralCentroid").toString() + ", Median: " + spectralFeatures.get("spectralMedian").toString());
 
-                    }
                 });
                 break;
 
             case ZERO_RESONANCE_FREQUENCIES_RECOGNIZED_CLEAN:
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        slideInVerdictIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_unclear));
-                        slideInVerdictText.setText("Not recognized");
-                        slideInVerdictSubtitle.setText("No resonance frequencies detected");
-                        slideInVerdictInstructionText.setText("");
-                        Log.d("SPEC", "Flat " + spectralFeatures.get("spectralFlatness").toString() +
-                                ", Cen: " + spectralFeatures.get("spectralCentroid").toString() + ", Median: " + spectralFeatures.get("spectralMedian").toString());
+                runOnUiThread(() -> {
+                    slideInVerdictIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_unclear));
+                    slideInVerdictText.setText("Not recognized");
+                    slideInVerdictSubtitle.setText("No resonance frequencies detected");
+                    slideInVerdictInstructionText.setText("");
+                    Log.d("SPEC", "Flat " + spectralFeatures.get("spectralFlatness").toString() +
+                            ", Cen: " + spectralFeatures.get("spectralCentroid").toString() + ", Median: " + spectralFeatures.get("spectralMedian").toString());
 
-                    }
                 });
                 break;
 
             case ONE_RESONANCE_FREQUENCY_RECOGNIZED_NOT_CLEAN:
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        slideInVerdictIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_unclear));
-                        slideInVerdictText.setText("Unclear");
-                        slideInVerdictSubtitle.setText("Detected 1 out of 3 frequencies");
-                        Log.d("SPEC", "Flat " + spectralFeatures.get("spectralFlatness").toString() +
-                                ", Cen: " + spectralFeatures.get("spectralCentroid").toString() + ", Median: " + spectralFeatures.get("spectralMedian").toString());
+                runOnUiThread(() -> {
+                    slideInVerdictIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_unclear));
+                    slideInVerdictText.setText("Unclear");
+                    slideInVerdictSubtitle.setText("Detected 1 out of 3 frequencies");
+                    Log.d("SPEC", "Flat " + spectralFeatures.get("spectralFlatness").toString() +
+                            ", Cen: " + spectralFeatures.get("spectralCentroid").toString() + ", Median: " + spectralFeatures.get("spectralMedian").toString());
 
-                    }
                 });
                 break;
 
             case ONE_RESONANCE_FREQUENCY_RECOGNIZED_CLEAN:
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        slideInVerdictIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_unclear));
-                        slideInVerdictText.setText("Ping again");
-                        slideInVerdictSubtitle.setText("Detected 1 out of 3 frequencies");
-                        Log.d("SPEC", "Flat " + spectralFeatures.get("spectralFlatness").toString() +
-                                ", Cen: " + spectralFeatures.get("spectralCentroid").toString() + ", Median: " + spectralFeatures.get("spectralMedian").toString());
+                runOnUiThread(() -> {
+                    slideInVerdictIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_unclear));
+                    slideInVerdictText.setText("Ping again");
+                    slideInVerdictSubtitle.setText("Detected 1 out of 3 frequencies");
+                    Log.d("SPEC", "Flat " + spectralFeatures.get("spectralFlatness").toString() +
+                            ", Cen: " + spectralFeatures.get("spectralCentroid").toString() + ", Median: " + spectralFeatures.get("spectralMedian").toString());
 
-                    }
                 });
                 break;
 
             case TWO_RESONANCE_FREQUENCIES_RECOGNIZED_NOT_CLEAN:
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        slideInVerdictIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_unclear));
-                        slideInVerdictText.setText("Ping not clean!");
-                        slideInVerdictSubtitle.setText("Detected 2 out of 3 frequencies");
-                        slideInVerdictInstructionText.setText("Press \"START AGAIN\" to try again.");
+                runOnUiThread(() -> {
+                    slideInVerdictIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_unclear));
+                    slideInVerdictText.setText("Ping not clean!");
+                    slideInVerdictSubtitle.setText("Detected 2 out of 3 frequencies");
+                    slideInVerdictInstructionText.setText("Press \"START AGAIN\" to try again.");
 
-                        Log.d("SPEC", "Flat " + spectralFeatures.get("spectralFlatness").toString() +
-                                ", Cen: " + spectralFeatures.get("spectralCentroid").toString() + ", Median: " + spectralFeatures.get("spectralMedian").toString());
+                    Log.d("SPEC", "Flat " + spectralFeatures.get("spectralFlatness").toString() +
+                            ", Cen: " + spectralFeatures.get("spectralCentroid").toString() + ", Median: " + spectralFeatures.get("spectralMedian").toString());
 
-                    }
                 });
                 break;
 
             case TWO_RESONANCE_FREQUENCIES_RECOGNIZED_CLEAN:
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        slideInVerdictIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_unclear));
-                        slideInVerdictText.setText("Close!");
-                        slideInVerdictSubtitle.setText("Detected 2 out of 3 frequencies");
-                        slideInVerdictInstructionText.setText("Press \"START AGAIN\" to try again.");
-                        Log.d("SPEC", "Flat " + spectralFeatures.get("spectralFlatness").toString() +
-                                ", Cen: " + spectralFeatures.get("spectralCentroid").toString() + ", Median: " + spectralFeatures.get("spectralMedian").toString());
+                runOnUiThread(() -> {
+                    slideInVerdictIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_unclear));
+                    slideInVerdictText.setText("Close!");
+                    slideInVerdictSubtitle.setText("Detected 2 out of 3 frequencies");
+                    slideInVerdictInstructionText.setText("Press \"START AGAIN\" to try again.");
+                    Log.d("SPEC", "Flat " + spectralFeatures.get("spectralFlatness").toString() +
+                            ", Cen: " + spectralFeatures.get("spectralCentroid").toString() + ", Median: " + spectralFeatures.get("spectralMedian").toString());
 
 
-                    }
                 });
                 break;
 
             case THREE_RESONANCE_FREQUENCIES_RECOGNIZED_NOT_CLEAN:
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        slideInVerdictIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_unclear));
-                        slideInVerdictText.setText("Ping not clean!");
-                        slideInVerdictSubtitle.setText("Detected 3 out of 3 frequencies.");
-                        slideInVerdictInstructionText.setText("Press \"START AGAIN\" to try again.");
-                        Log.d("SPEC", "Flat " + spectralFeatures.get("spectralFlatness").toString() +
-                                ", Cen: " + spectralFeatures.get("spectralCentroid").toString() + ", Median: " + spectralFeatures.get("spectralMedian").toString());
+                runOnUiThread(() -> {
+                    slideInVerdictIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_unclear));
+                    slideInVerdictText.setText("Ping not clean!");
+                    slideInVerdictSubtitle.setText("Detected 3 out of 3 frequencies.");
+                    slideInVerdictInstructionText.setText("Press \"START AGAIN\" to try again.");
+                    Log.d("SPEC", "Flat " + spectralFeatures.get("spectralFlatness").toString() +
+                            ", Cen: " + spectralFeatures.get("spectralCentroid").toString() + ", Median: " + spectralFeatures.get("spectralMedian").toString());
 
-                    }
                 });
                 break;
 
             case THREE_RESONANCE_FREQUENCIES_RECOGNIZED_CLEAN:
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        slideInVerdictIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_authentic));
-                        slideInVerdictText.setText("Authentic!");
-                        slideInVerdictSubtitle.setText("Detected 3 out of 3 frequencies");
-                        slideInVerdictInstructionText.setText("Press \"START AGAIN\" to try again.");
-                        Log.d("SPEC", "Flat " + spectralFeatures.get("spectralFlatness").toString() +
-                                ", Cen: " + spectralFeatures.get("spectralCentroid").toString() + ", Median: " + spectralFeatures.get("spectralMedian").toString());
+                runOnUiThread(() -> {
+                    slideInVerdictIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_authentic));
+                    slideInVerdictText.setText("Authentic!");
+                    slideInVerdictSubtitle.setText("Detected 3 out of 3 frequencies");
+                    slideInVerdictInstructionText.setText("Press \"START AGAIN\" to try again.");
+                    Log.d("SPEC", "Flat " + spectralFeatures.get("spectralFlatness").toString() +
+                            ", Cen: " + spectralFeatures.get("spectralCentroid").toString() + ", Median: " + spectralFeatures.get("spectralMedian").toString());
 
-                    }
                 });
                 break;
         }
 
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                slideVerdictBannerDown(slideInVerdictBanner);
-                slideVerdictBannerUp(slideOutVerdictBanner);
-            }
+        runOnUiThread(() -> {
+            slideVerdictBannerDown(slideInVerdictBanner);
+            slideVerdictBannerUp(slideOutVerdictBanner);
         });
 
 
@@ -954,21 +908,11 @@ public class TestCoin extends OverflowMenuActivity {
     }
 
     public void updateChart(final LineChart chart, final LineData chartData, final List<Entry> magnitudesList) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                SpectrumPlottingUtils.plotSpectrum(chart, chartData, magnitudesList);
-            }
-        });
+        runOnUiThread(() -> SpectrumPlottingUtils.plotSpectrum(chart, chartData, magnitudesList));
     }
 
     public void invalidateChartOnUiThread(final LineChart chart) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                chart.invalidate();
-            }
-        });
+        runOnUiThread(() -> chart.invalidate());
     }
 
 
@@ -994,100 +938,45 @@ public class TestCoin extends OverflowMenuActivity {
         final ImageView c0d4 = findViewById(R.id.imageView_c0d4);
 
         if (detectedPeaks.get("C0D2")) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    c0d2.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_c0d2_check, null));
-                }
-            });
+            runOnUiThread(() -> c0d2.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_c0d2_check, null)));
         } else {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    c0d2.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_c0d2, null));
-                }
-            });
+            runOnUiThread(() -> c0d2.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_c0d2, null)));
         }
         if (detectedPeaks.get("C0D3")) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    c0d3.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_c0d3_check, null));
-                }
-            });
+            runOnUiThread(() -> c0d3.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_c0d3_check, null)));
         } else {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    c0d3.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_c0d3, null));
-                }
-            });
+            runOnUiThread(() -> c0d3.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_c0d3, null)));
         }
         if (detectedPeaks.get("C0D4")) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    c0d4.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_c0d4_check, null));
-                }
-            });
+            runOnUiThread(() -> c0d4.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_c0d4_check, null)));
 
         } else {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    c0d4.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_c0d4, null));
-                }
-            });
+            runOnUiThread(() -> c0d4.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_c0d4, null)));
 
         }
     }
 
     public void showToast(final String toast)
     {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(TestCoin.this, toast, Toast.LENGTH_SHORT).show();
-            }
-        });
+        runOnUiThread(() -> Toast.makeText(TestCoin.this, toast, Toast.LENGTH_SHORT).show());
     }
 
     public void updateResonanceFrequencyToleranceBars(Map<String, Boolean> recognizedResonanceFrequencies, final LineChart chart) {
         if (recognizedResonanceFrequencies.get("C0D2")) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    SpectrumPlottingUtils.resonanceFrequencyToleranceBar(chart, "c0d2", true);
-                }
-            });
+            runOnUiThread(() -> SpectrumPlottingUtils.resonanceFrequencyToleranceBar(chart, "c0d2", true));
         }
         if (recognizedResonanceFrequencies.get("C0D3")) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    SpectrumPlottingUtils.resonanceFrequencyToleranceBar(chart, "c0d3", true);
-                }
-            });
+            runOnUiThread(() -> SpectrumPlottingUtils.resonanceFrequencyToleranceBar(chart, "c0d3", true));
 
         }
         if (recognizedResonanceFrequencies.get("C0D4")) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    SpectrumPlottingUtils.resonanceFrequencyToleranceBar(chart, "c0d4", true);
-                }
-            });
+            runOnUiThread(() -> SpectrumPlottingUtils.resonanceFrequencyToleranceBar(chart, "c0d4", true));
         }
     }
 
     // Draws a line for each peak detected by the peak detection algorithm
     public void updateDetectedPeaks(final LinkedList<Integer> detectedPeaksBins, final LineChart chart) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                SpectrumPlottingUtils.drawDetectedPeaks(detectedPeaksBins, chart);
-            }
-        });
+        runOnUiThread(() -> SpectrumPlottingUtils.drawDetectedPeaks(detectedPeaksBins, chart));
     }
 
     public static double[] convertFloatsToDoubles(float[] input) {
@@ -1102,16 +991,13 @@ public class TestCoin extends OverflowMenuActivity {
     }
 
     public void updateViews(final LineChart chart, final LineData chartData, final LinkedList<Integer> peakIndexes, final List<Entry> magnitudesList, final Verdict verdict, final Map spectralFeatures, final Map detectedPeaks) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                SpectrumPlottingUtils.drawDetectedPeaks(peakIndexes, chart);
-                updateChart(chart, chartData, magnitudesList);
-                updateVerdictBanner(verdict, spectralFeatures);
-                updateResonanceFrequencyIcons(detectedPeaks);
-                updateResonanceFrequencyToleranceBars(detectedPeaks, chart);
-                chart.invalidate();
-            }
+        runOnUiThread(() -> {
+            SpectrumPlottingUtils.drawDetectedPeaks(peakIndexes, chart);
+            updateChart(chart, chartData, magnitudesList);
+            updateVerdictBanner(verdict, spectralFeatures);
+            updateResonanceFrequencyIcons(detectedPeaks);
+            updateResonanceFrequencyToleranceBars(detectedPeaks, chart);
+            chart.invalidate();
         });
     }
 
