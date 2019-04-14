@@ -4,10 +4,12 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -135,6 +137,7 @@ public class TestCoin extends OverflowMenuActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         String selectedCoinPopularName = "";
+        String selectedCoinId = "";
         float selectedCoinWeightInOz = 0;
         String selectedCoinMaterialClass = "";
         float selectedCoinC0D2a = 0;
@@ -148,6 +151,7 @@ public class TestCoin extends OverflowMenuActivity {
         if (extras != null) {
             // The key argument here must match that used in the other activity
             selectedCoinPopularName = extras.getString("PopularName");
+            selectedCoinId = extras.getString("id");
             selectedCoinWeightInOz = extras.getFloat("WeightInOz");
             selectedCoinMaterialClass = extras.getString("MaterialClass");
             selectedCoinC0D2a = extras.getFloat("C0D2a");
@@ -168,6 +172,7 @@ public class TestCoin extends OverflowMenuActivity {
         // Set up ActionBar
         actionBar.setTitle(selectedCoinPopularName);
         actionBar.setSubtitle(selectedCoinMaterialClass + " (" + Float.toString(selectedCoinWeightInOz) + " oz)");
+
 
         // Set up Start Again button and hide it by default
         final Button startAgainButton;
@@ -274,6 +279,8 @@ public class TestCoin extends OverflowMenuActivity {
 
 
         // Add a last anonymous AudioProcessor object where most of the magic happens.
+        final String finalSelectedCoinId = selectedCoinId;
+        final String finalSelectedCoinPopularName = selectedCoinPopularName;
         this.dispatcher.addAudioProcessor(new AudioProcessor() {
 
             public void processingFinished() {
@@ -495,7 +502,7 @@ public class TestCoin extends OverflowMenuActivity {
                                 setFinalVerdictIsBeingDisplayed(true);
                                 setStartAgainButtonVisibility(startAgainButton, View.VISIBLE);
 
-                                displayAuthenticCoinDialog(spectralFeatures);
+                                displayAuthenticCoinDialog(finalSelectedCoinId, finalSelectedCoinPopularName, spectralFeatures);
 //                                SpectrumPlottingUtils.drawDetectedPeaks(detectedPeaksBins, chart);
 
                             }
@@ -571,7 +578,7 @@ public class TestCoin extends OverflowMenuActivity {
     }
 
 
-    public void displayAuthenticCoinDialog(final Map spectralFeatures) {
+    public void displayAuthenticCoinDialog(final String selectedCoinId, final String selectedCoinPopularName, final Map spectralFeatures) {
 
         final AlertDialog.Builder builder;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -583,9 +590,11 @@ public class TestCoin extends OverflowMenuActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                builder.setTitle("Authentic Coin Detected!")
-                        .setMessage("Spectral Flatness: " + spectralFeatures.get("spectralFlatness") +
-                                ", Spectral Centroid: " + spectralFeatures.get("spectralCentroid"))
+                builder.setTitle("Authentic " + selectedCoinPopularName + " Detected!")
+                        .setMessage("The ping you produced was consistent with an authentic " + selectedCoinPopularName + ".")
+//                        .setMessage("Spectral Flatness: " + spectralFeatures.get("spectralFlatness") +
+//                                ", Spectral Centroid: " + spectralFeatures.get("spectralCentroid"))
+                        .setIcon(getResources().getIdentifier("ic_" + selectedCoinId + "_listview", "drawable", getContext().getPackageName()))
                         .setPositiveButton("New Ping", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                             }
@@ -763,15 +772,16 @@ public class TestCoin extends OverflowMenuActivity {
             public void run() {
                 slideInVerdictIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_listening));
                 slideInVerdictText.setText("Listening...");
-                slideInVerdictSubtitle.setText("Ping your coin");
-                slideInVerdictInstructionText.setText("Nothing here");
+                slideInVerdictSubtitle.setText("I didn't hear a coin yet");
+                slideInVerdictInstructionText.setText("Flick a coin to get started");
+
+                slideVerdictBannerDown(slideInVerdictBanner);
+
+                slideVerdictBannerUp(slideOutVerdictBanner);
 
             }
         });
 
-        slideVerdictBannerDown(slideInVerdictBanner);
-
-        slideVerdictBannerUp(slideOutVerdictBanner);
 
         // Make whatever banner was not the slide-in banner the new slide-in banner
         secondaryBannerIsSlideInBanner = !secondaryBannerIsSlideInBanner;
@@ -815,9 +825,9 @@ public class TestCoin extends OverflowMenuActivity {
                     @Override
                     public void run() {
                         slideInVerdictIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_unclear));
-                        slideInVerdictText.setText("VERDICT: Unclear");
+                        slideInVerdictText.setText("Unclear");
                         slideInVerdictSubtitle.setText("No resonance frequencies detected");
-                        slideInVerdictInstructionText.setText("Flat " + spectralFeatures.get("spectralFlatness").toString() +
+                        Log.d("SPEC", "Flat " + spectralFeatures.get("spectralFlatness").toString() +
                                 ", Cen: " + spectralFeatures.get("spectralCentroid").toString() + ", Median: " + spectralFeatures.get("spectralMedian").toString());
 
                     }
@@ -829,9 +839,10 @@ public class TestCoin extends OverflowMenuActivity {
                     @Override
                     public void run() {
                         slideInVerdictIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_unclear));
-                        slideInVerdictText.setText("VERDICT: Not authentic");
+                        slideInVerdictText.setText("Not recognized");
                         slideInVerdictSubtitle.setText("No resonance frequencies detected");
-                        slideInVerdictInstructionText.setText("Flat: " + spectralFeatures.get("spectralFlatness").toString() +
+                        slideInVerdictInstructionText.setText("");
+                        Log.d("SPEC", "Flat " + spectralFeatures.get("spectralFlatness").toString() +
                                 ", Cen: " + spectralFeatures.get("spectralCentroid").toString() + ", Median: " + spectralFeatures.get("spectralMedian").toString());
 
                     }
@@ -845,7 +856,7 @@ public class TestCoin extends OverflowMenuActivity {
                         slideInVerdictIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_unclear));
                         slideInVerdictText.setText("Unclear");
                         slideInVerdictSubtitle.setText("Detected 1 out of 3 frequencies");
-                        slideInVerdictInstructionText.setText("Flat: " + spectralFeatures.get("spectralFlatness").toString() +
+                        Log.d("SPEC", "Flat " + spectralFeatures.get("spectralFlatness").toString() +
                                 ", Cen: " + spectralFeatures.get("spectralCentroid").toString() + ", Median: " + spectralFeatures.get("spectralMedian").toString());
 
                     }
@@ -859,7 +870,7 @@ public class TestCoin extends OverflowMenuActivity {
                         slideInVerdictIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_unclear));
                         slideInVerdictText.setText("Ping again");
                         slideInVerdictSubtitle.setText("Detected 1 out of 3 frequencies");
-                        slideInVerdictInstructionText.setText("Flat: " + spectralFeatures.get("spectralFlatness").toString() +
+                        Log.d("SPEC", "Flat " + spectralFeatures.get("spectralFlatness").toString() +
                                 ", Cen: " + spectralFeatures.get("spectralCentroid").toString() + ", Median: " + spectralFeatures.get("spectralMedian").toString());
 
                     }
@@ -873,7 +884,9 @@ public class TestCoin extends OverflowMenuActivity {
                         slideInVerdictIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_unclear));
                         slideInVerdictText.setText("Ping not clean!");
                         slideInVerdictSubtitle.setText("Detected 2 out of 3 frequencies");
-                        slideInVerdictInstructionText.setText("Flat: " + spectralFeatures.get("spectralFlatness").toString() +
+                        slideInVerdictInstructionText.setText("Press \"START AGAIN\" to try again.");
+
+                        Log.d("SPEC", "Flat " + spectralFeatures.get("spectralFlatness").toString() +
                                 ", Cen: " + spectralFeatures.get("spectralCentroid").toString() + ", Median: " + spectralFeatures.get("spectralMedian").toString());
 
                     }
@@ -887,8 +900,10 @@ public class TestCoin extends OverflowMenuActivity {
                         slideInVerdictIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_unclear));
                         slideInVerdictText.setText("Close!");
                         slideInVerdictSubtitle.setText("Detected 2 out of 3 frequencies");
-                        slideInVerdictInstructionText.setText("Flat: " + spectralFeatures.get("spectralFlatness").toString() +
+                        slideInVerdictInstructionText.setText("Press \"START AGAIN\" to try again.");
+                        Log.d("SPEC", "Flat " + spectralFeatures.get("spectralFlatness").toString() +
                                 ", Cen: " + spectralFeatures.get("spectralCentroid").toString() + ", Median: " + spectralFeatures.get("spectralMedian").toString());
+
 
                     }
                 });
@@ -901,7 +916,8 @@ public class TestCoin extends OverflowMenuActivity {
                         slideInVerdictIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_unclear));
                         slideInVerdictText.setText("Ping not clean!");
                         slideInVerdictSubtitle.setText("Detected 3 out of 3 frequencies.");
-                        slideInVerdictInstructionText.setText("Flat: " + spectralFeatures.get("spectralFlatness").toString() +
+                        slideInVerdictInstructionText.setText("Press \"START AGAIN\" to try again.");
+                        Log.d("SPEC", "Flat " + spectralFeatures.get("spectralFlatness").toString() +
                                 ", Cen: " + spectralFeatures.get("spectralCentroid").toString() + ", Median: " + spectralFeatures.get("spectralMedian").toString());
 
                     }
@@ -915,7 +931,8 @@ public class TestCoin extends OverflowMenuActivity {
                         slideInVerdictIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_authentic));
                         slideInVerdictText.setText("Authentic!");
                         slideInVerdictSubtitle.setText("Detected 3 out of 3 frequencies");
-                        slideInVerdictInstructionText.setText("Flat: " + spectralFeatures.get("spectralFlatness").toString() +
+                        slideInVerdictInstructionText.setText("Press \"START AGAIN\" to try again.");
+                        Log.d("SPEC", "Flat " + spectralFeatures.get("spectralFlatness").toString() +
                                 ", Cen: " + spectralFeatures.get("spectralCentroid").toString() + ", Median: " + spectralFeatures.get("spectralMedian").toString());
 
                     }
@@ -923,9 +940,14 @@ public class TestCoin extends OverflowMenuActivity {
                 break;
         }
 
-        slideVerdictBannerDown(slideInVerdictBanner);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                slideVerdictBannerDown(slideInVerdictBanner);
+                slideVerdictBannerUp(slideOutVerdictBanner);
+            }
+        });
 
-        slideVerdictBannerUp(slideOutVerdictBanner);
 
         // Make whatever banner was not the slide-in banner the new slide-in banner
         secondaryBannerIsSlideInBanner = !secondaryBannerIsSlideInBanner;
@@ -972,19 +994,51 @@ public class TestCoin extends OverflowMenuActivity {
         final ImageView c0d4 = findViewById(R.id.imageView_c0d4);
 
         if (detectedPeaks.get("C0D2")) {
-            c0d2.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_c0d2_check, null));
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    c0d2.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_c0d2_check, null));
+                }
+            });
         } else {
-            c0d2.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_c0d2, null));
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    c0d2.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_c0d2, null));
+                }
+            });
         }
         if (detectedPeaks.get("C0D3")) {
-            c0d3.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_c0d3_check, null));
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    c0d3.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_c0d3_check, null));
+                }
+            });
         } else {
-            c0d3.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_c0d3, null));
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    c0d3.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_c0d3, null));
+                }
+            });
         }
         if (detectedPeaks.get("C0D4")) {
-            c0d4.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_c0d4_check, null));
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    c0d4.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_c0d4_check, null));
+                }
+            });
+
         } else {
-            c0d4.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_c0d4, null));
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    c0d4.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_c0d4, null));
+                }
+            });
+
         }
     }
 

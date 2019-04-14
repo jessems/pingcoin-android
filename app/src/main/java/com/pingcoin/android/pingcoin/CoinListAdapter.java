@@ -80,13 +80,43 @@ public class CoinListAdapter extends RecyclerView.Adapter<CoinListAdapter.CoinVi
             holder.coinItemCountryView.setText(current.getCountry());
             holder.coinItemClassWeightView.setText(current.getMaterialClass() + " " + "(" + Float.toString(current.getWeightInOz()) + " oz" + ")");
 
-            // Change icon to respective material class color e.g. gold-colored, silver-colored
-            if (currentMaterialClass.equals("Gold")) {
-                Log.d("test", "Did we reach here Gold?");
-                holder.coinItemIcon.setImageDrawable(res.getDrawable(R.drawable.ic_coin_gold));
-            } else if (currentMaterialClass.equals("Silver")) {
-                holder.coinItemIcon.setImageDrawable(res.getDrawable(R.drawable.ic_coin_silver));
+            // Set the icon resource name to the name prefixed with "ic_"
+            String currentCoinIconStringName = "ic_" + current.getId() + "_listview";
+//            String currentCoinIconStringName = "ic_1oz_silver_canadian_maple_leaf_listview";
+
+            // check if the resource exists
+            try{
+                Integer currentCoinId = res.getIdentifier(currentCoinIconStringName, "drawable", holder.itemView.getContext().getPackageName());
+
+                Log.d("WHAT", "currentcoinicon: " + currentCoinIconStringName + " id: " + currentCoinId);
+                if (currentCoinId != 0) {
+                    holder.coinItemIcon.setImageResource(currentCoinId);
+                } else {
+                    // Change icon to respective material class color e.g. gold-colored, silver-colored
+                    if (currentMaterialClass.equals("Gold")) {
+                        Log.d("test", "Did we reach here Gold?");
+                        holder.coinItemIcon.setImageDrawable(res.getDrawable(R.drawable.ic_coin_gold));
+                    } else if (currentMaterialClass.equals("Silver")) {
+                        holder.coinItemIcon.setImageDrawable(res.getDrawable(R.drawable.ic_coin_silver));
+                    }
+                }
+
+//                holder.coinItemIcon.setImageResource(R.drawable.ic_1oz_gold_american_eagle_listview);
+
+            } catch(Exception e) {
+                Log.d("EEP","Could not find the icon resource for the coin " + current.getPopularName());
+
             }
+
+
+
+            // if it exists assign it to the current icon
+            // if it doesn't exist fall back on default depending on the metal
+
+//            holder.coinItemIcon.setImageResource(res.getIdentifier(currentCoinIcon, "drawable", null));
+
+
+
 
 
             holder.coinItemRowLayout.setOnClickListener(new View.OnClickListener() {
@@ -98,6 +128,7 @@ public class CoinListAdapter extends RecyclerView.Adapter<CoinListAdapter.CoinVi
 
                     Intent intent = new Intent(context, TestCoin.class);
                     intent.putExtra("PopularName", current.getPopularName());
+                    intent.putExtra("id", current.getId());
                     intent.putExtra("WeightInOz", current.getWeightInOz());
                     intent.putExtra("MaterialClass", current.getMaterialClass());
                     intent.putExtra("C0D2a", current.getC0D2a());

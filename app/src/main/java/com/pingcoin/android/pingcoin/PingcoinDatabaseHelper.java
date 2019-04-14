@@ -26,7 +26,7 @@ public class PingcoinDatabaseHelper extends SQLiteOpenHelper {
                 CoinContract.CoinEntry.TABLE_NAME + " (" +
                 CoinContract.CoinEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                 CoinContract.CoinEntry.COLUMN_FULL_NAME + " TEXT NOT NULL, " +
-                CoinContract.CoinEntry.COLUMN_FAMILY_NAME + " TEXT NOT NULL, " +
+                CoinContract.CoinEntry.COLUMN_SERIES + " TEXT NOT NULL, " +
                 CoinContract.CoinEntry.COLUMN_MATERIAL_CLASS + " TEXT NOT NULL, " +
                 CoinContract.CoinEntry.COLUMN_WEIGHT_CLASS + " TEXT NOT NULL, " +
                 CoinContract.CoinEntry.COLUMN_WEIGHT + " REAL, " +
@@ -132,7 +132,7 @@ public class PingcoinDatabaseHelper extends SQLiteOpenHelper {
 
         // Not tested
         addCoins(db,
-                "1 oz Gold Brittania",
+                "1 oz Gold Britania",
                 "Britannia",
                 "Gold",
                 "1 oz",
@@ -321,7 +321,7 @@ public class PingcoinDatabaseHelper extends SQLiteOpenHelper {
     private long addCoins(
             SQLiteDatabase db,
             String fullName,
-            String familyName,
+            String series,
             String materialClass,
             String weightClass,
             float weight,
@@ -340,7 +340,7 @@ public class PingcoinDatabaseHelper extends SQLiteOpenHelper {
         ContentValues cv = new ContentValues();
 
         cv.put(CoinContract.CoinEntry.COLUMN_FULL_NAME, fullName);
-        cv.put(CoinContract.CoinEntry.COLUMN_FAMILY_NAME, familyName);
+        cv.put(CoinContract.CoinEntry.COLUMN_SERIES, series);
         cv.put(CoinContract.CoinEntry.COLUMN_MATERIAL_CLASS, materialClass);
         cv.put(CoinContract.CoinEntry.COLUMN_WEIGHT_CLASS, weightClass);
         cv.put(CoinContract.CoinEntry.COLUMN_WEIGHT, weight);

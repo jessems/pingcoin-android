@@ -13,7 +13,7 @@ public final class CoinContract {
     public static class CoinEntry implements BaseColumns {
         public static final String TABLE_NAME = "coins";
         public static final String COLUMN_FULL_NAME = "fullName";
-        public static final String COLUMN_FAMILY_NAME = "familyName";
+        public static final String COLUMN_SERIES = "series";
         public static final String COLUMN_MATERIAL_CLASS = "materialClass";
         public static final String COLUMN_WEIGHT_CLASS = "weightClass";
         public static final String COLUMN_WEIGHT = "weight";

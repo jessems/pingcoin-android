@@ -2,6 +2,8 @@ package com.pingcoin.android.pingcoin;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
@@ -29,7 +31,36 @@ public class SelectCoin extends OverflowMenuActivity {
     private ActionBarDrawerToggle t;
     private NavigationView nv;
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_feedback:
+                Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
+                        "mailto","jessems@gmail.com", null));
+                intent.putExtra(Intent.EXTRA_SUBJECT, "Pingcoin app feedback");
+                startActivity(Intent.createChooser(intent, "Choose an Email client :"));
+                return true;
 
+            case R.id.action_about_ping_test:
+                // User chose the "Favorite" action, mark the current item
+                // as a favorite...
+                return true;
+
+            case R.id.action_submit_coin:
+                String url = "https://www.speakpipe.com/pingcoin";
+
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse(url));
+                startActivity(i);
+                return true;
+
+            default:
+                // If we got here, the user's action was not recognized.
+                // Invoke the superclass to handle it.
+                return super.onOptionsItemSelected(item);
+
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +75,7 @@ public class SelectCoin extends OverflowMenuActivity {
 
 
         actionBar.setTitle("Select a coin");
+
 
 
 

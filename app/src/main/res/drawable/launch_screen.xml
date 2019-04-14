@@ -6,9 +6,9 @@
 
     <item>
 
-        <bitmap
-            android:src="@drawable/c0d2"
-            android:gravity="center" />
+        <!--<bitmap-->
+            <!--android:src="@0d2"-->
+            <!--android:gravity="center" />-->
 
     </item>
 

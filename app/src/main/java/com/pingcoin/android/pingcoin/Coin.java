@@ -10,7 +10,7 @@ public class Coin {
 
     @PrimaryKey
     @NonNull
-    @ColumnInfo(name = "coin_id") // e.g. 1oz_south_african_gold_krugerrand
+    @ColumnInfo(name = "coin_id") // e.g. gold_south_african_krugerrand_1oz
     public String coinId;
 
     @ColumnInfo(name  = "popular_name") // e.g. Krugerrand
@@ -21,8 +21,8 @@ public class Coin {
 
     // TODO: implement hashmap for coin composition
 
-    @ColumnInfo(name = "family_name") // e.g. Krugerrand
-    public String familyName;
+    @ColumnInfo(name = "series") // e.g. Krugerrand
+    public String series;
 
     @ColumnInfo(name = "nationality")
     public String nationality;
@@ -68,6 +68,7 @@ public class Coin {
 
     public Coin(
             String popularName,
+            String series,
             float weightInOz,
             String materialClass,
             String coinId,
@@ -84,6 +85,7 @@ public class Coin {
             float c0d4b,
             float error) {
         this.popularName = popularName;
+        this.series = series;
         this.weightInOz = weightInOz;
         this.materialClass = materialClass;
         this.country = country;
