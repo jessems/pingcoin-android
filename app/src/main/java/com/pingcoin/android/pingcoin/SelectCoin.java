@@ -1,26 +1,25 @@
 package com.pingcoin.android.pingcoin;
 
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.NavigationView;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
-import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
+
+import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.storage.FirebaseStorage;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Nullable;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.widget.Toolbar;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class SelectCoin extends OverflowMenuActivity {
 
@@ -47,11 +46,8 @@ public class SelectCoin extends OverflowMenuActivity {
                 return true;
 
             case R.id.action_submit_coin:
-                String url = "https://www.speakpipe.com/pingcoin";
+                SubmitCoinDialog.display(getSupportFragmentManager());
 
-                Intent i = new Intent(Intent.ACTION_VIEW);
-                i.setData(Uri.parse(url));
-                startActivity(i);
                 return true;
 
             default:
@@ -65,6 +61,7 @@ public class SelectCoin extends OverflowMenuActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        FirebaseStorage storage = FirebaseStorage.getInstance();
         setContentView(R.layout.activity_select_coin);
 
 
@@ -80,16 +77,6 @@ public class SelectCoin extends OverflowMenuActivity {
 
 
 
-//        actionBar.setHomeButtonEnabled(true);
-
-
-
-
-//        dl = (DrawerLayout)findViewById(R.id.drawer_layout);
-//        t = new ActionBarDrawerToggle(this, dl, );
-
-//        dl.addDrawerListener(t);
-//        t.syncState();
 
 
 

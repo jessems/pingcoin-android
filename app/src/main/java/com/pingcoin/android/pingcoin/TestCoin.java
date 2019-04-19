@@ -1,6 +1,7 @@
 package com.pingcoin.android.pingcoin;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -12,13 +13,16 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.res.ResourcesCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
+
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+//import android.support.v4.content.ContextCompat;
+//import android.support.v4.content.res.ResourcesCompat;
+//import android.support.v7.app.ActionBar;
+//import android.support.v7.widget.RecyclerView;
+//import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -42,12 +46,17 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.res.ResourcesCompat;
+import androidx.recyclerview.widget.RecyclerView;
+
 import static android.graphics.Color.argb;
 import static com.pingcoin.android.pingcoin.VerdictCalculationUtils.*;
 
 // TODO: Close cursor.close()
 
-public class TestCoin extends OverflowMenuActivity {
+public class TestCoin extends AppCompatActivity {
 
     private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
     private static boolean finalVerdictIsBeingDisplayed;
@@ -71,17 +80,17 @@ public class TestCoin extends OverflowMenuActivity {
     private int menuResource;
 
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode) {
-            case REQUEST_RECORD_AUDIO_PERMISSION:
-                permissionToRecordAccepted = grantResults[0] == PackageManager.PERMISSION_GRANTED;
-                break;
-        }
-        if (!permissionToRecordAccepted) finish();
-
-    }
+//    @Override
+//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+//        switch (requestCode) {
+//            case REQUEST_RECORD_AUDIO_PERMISSION:
+//                permissionToRecordAccepted = grantResults[0] == PackageManager.PERMISSION_GRANTED;
+//                break;
+//        }
+//        if (!permissionToRecordAccepted) finish();
+//
+//    }
 
 
     private TextView mTextMessage;
@@ -116,16 +125,18 @@ public class TestCoin extends OverflowMenuActivity {
     public boolean secondaryBannerIsSlideInBanner;
     public long verdictExpirationTime;
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        setFinalVerdictIsBeingDisplayed(false);
-    }
+//    @Override
+//    protected void onResume() {
+//        super.onResume();
+//        setFinalVerdictIsBeingDisplayed(false);
+//    }
 
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-    }
+//    @Override
+//    protected void onSaveInstanceState(Bundle outState) {
+//        super.onSaveInstanceState(outState);
+//    }
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
