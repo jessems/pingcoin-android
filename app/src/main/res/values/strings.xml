@@ -20,6 +20,15 @@
     <string name="toolbar_about_ping_test">About the ping test</string>
     <string name="start_again">Start Again</string>
     <string name="zero_resonance_frequences_recognized_clean_toast">Was that a coin?</string>
+    <string name="step_1_text">Step 1: Record a ping</string>
+    <string name="step_2_title_text">Step 2: Take a picture</string>
+    <string name="take_picture_button_text">Take Picture</string>
+    <string name="step_3_text">Step 3: Provide your email (optional)</string>
+    <string name="submit_button_text">Submit</string>
+    <string name="step_2_subtitle_text">Please make sure the year of issuance (e.g. 1972) is clearly visible.</string>
+    <string name="step_3_subtitle_text">An email will be sent out as soon as the coin has been added to the database.</string>
+    <string name="step_1_subtitle_text">Please ping your coin several times.</string>
+    <string name="button_submit_text">Submit</string>
 
 
 </resources>

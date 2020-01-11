@@ -16,6 +16,6 @@ public interface CoinDao {
     @Query("DELETE FROM coin_table")
     void deleteAll();
 
-    @Query("SELECT * from coin_table ORDER BY material_class, popular_name")
+    @Query("SELECT * from coin_table ORDER BY material_class, country, popular_name")
     LiveData<List<Coin>> getAllCoins();
 }

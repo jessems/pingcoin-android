@@ -8,6 +8,8 @@ import android.view.MenuItem;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.storage.FirebaseStorage;
 
+import org.greenrobot.eventbus.Subscribe;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -76,12 +78,6 @@ public class SelectCoin extends OverflowMenuActivity {
 
 
 
-
-
-
-
-
-
         // Lookup the recyclerview in activity layout
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.rvCoins);
 
@@ -118,5 +114,6 @@ public class SelectCoin extends OverflowMenuActivity {
 
 
     }
+
 
 }

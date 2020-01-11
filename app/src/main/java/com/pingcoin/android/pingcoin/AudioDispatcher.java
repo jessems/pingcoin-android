@@ -24,7 +24,10 @@
 
 package com.pingcoin.android.pingcoin;
 
+import android.Manifest;
 import android.util.Log;
+
+import com.livinglifetechway.quickpermissions.annotations.WithPermissions;
 
 import java.io.IOException;
 import java.util.List;
@@ -242,6 +245,7 @@ public class AudioDispatcher implements Runnable {
         audioProcessor.processingFinished();
         LOG.fine("Remove an audioprocessor to the list of processors: " + audioProcessor.toString());
     }
+
 
     public void run() {
 

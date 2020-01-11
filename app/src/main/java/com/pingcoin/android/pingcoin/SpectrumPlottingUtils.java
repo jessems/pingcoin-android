@@ -144,6 +144,8 @@ public class SpectrumPlottingUtils {
 
     public static void plotNaturalFrequency(LineChart chart, String naturalFrequencyLabel, float naturalFrequencyValue, float naturalFrequencyError, int sampleRate, int windowSize) {
         Log.d("BLA", Float.toString(naturalFrequencyError));
+
+        // Set default error value
         naturalFrequencyError = naturalFrequencyError / 2f;
 
         // Initialize the limit line

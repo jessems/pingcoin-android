@@ -1,23 +1,18 @@
 package com.pingcoin.android.pingcoin;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
 //import android.support.v4.content.ContextCompat;
 //import android.support.v4.content.res.ResourcesCompat;
 //import android.support.v7.app.ActionBar;
@@ -38,25 +33,31 @@ import com.android.volley.VolleyLog;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.RecyclerView;
+import pub.devrel.easypermissions.AfterPermissionGranted;
+import pub.devrel.easypermissions.AppSettingsDialog;
+import pub.devrel.easypermissions.EasyPermissions;
 
 import static android.graphics.Color.argb;
 import static com.pingcoin.android.pingcoin.VerdictCalculationUtils.*;
 
 // TODO: Close cursor.close()
 
-public class TestCoin extends AppCompatActivity {
+public class TestCoin extends AppCompatActivity implements EasyPermissions.PermissionCallbacks {
 
     private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
     private static boolean finalVerdictIsBeingDisplayed;
@@ -79,18 +80,6 @@ public class TestCoin extends AppCompatActivity {
     AudioDispatcher dispatcher;
     private int menuResource;
 
-
-//    @Override
-//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-//        switch (requestCode) {
-//            case REQUEST_RECORD_AUDIO_PERMISSION:
-//                permissionToRecordAccepted = grantResults[0] == PackageManager.PERMISSION_GRANTED;
-//                break;
-//        }
-//        if (!permissionToRecordAccepted) finish();
-//
-//    }
 
 
     private TextView mTextMessage;
@@ -124,6 +113,7 @@ public class TestCoin extends AppCompatActivity {
 
     public boolean secondaryBannerIsSlideInBanner;
     public long verdictExpirationTime;
+    private DatabaseReference mDatabase;
 
 //    @Override
 //    protected void onResume() {
@@ -136,6 +126,13 @@ public class TestCoin extends AppCompatActivity {
 //        super.onSaveInstanceState(outState);
 //    }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        // Forward results to EasyPermissions
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+    }
 
 
     @Override
@@ -143,6 +140,25 @@ public class TestCoin extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test_coin);
+
+
+        checkRecordingPermissionsAndInitCoinTesting();
+
+
+    }
+
+    @AfterPermissionGranted(123)
+    private void checkRecordingPermissionsAndInitCoinTesting() {
+        String[] perms = {Manifest.permission.RECORD_AUDIO};
+        if (EasyPermissions.hasPermissions(this, perms)) {
+            initCoinTesting();
+        } else {
+            EasyPermissions.requestPermissions(this, "We need access to your phone's microphone to perform the ping test.",
+                    123, perms);
+        }
+    }
+
+    private void initCoinTesting() {
 
         // Prevent the screen from dimming
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -202,13 +218,13 @@ public class TestCoin extends AppCompatActivity {
         mContext = this;
         VolleyLog.DEBUG = true;
 
-        if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.RECORD_AUDIO}, 1);
-
-        }
+//        if (ContextCompat.checkSelfPermission(this,
+//                Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+//
+//            ActivityCompat.requestPermissions(this,
+//                    new String[]{Manifest.permission.RECORD_AUDIO}, 1);
+//
+//        }
 
 
         // Get coins from SQLite db
@@ -273,7 +289,9 @@ public class TestCoin extends AppCompatActivity {
         // The factory is a design method that returns an object for a method call.
         // In this case the fromDefaultMicrophone() method returns an AudioDispatcher object.
 
+
         this.dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(sampleRate, windowSize, windowSize * 75 / 100);
+
         this.dispatcher.addAudioProcessor(new HighPass(1000, sampleRate));
         // TODO: Simplify the pingProcessor (We don't need all it's functions.)
         this.dispatcher.addAudioProcessor(pingProcessor);
@@ -373,15 +391,11 @@ public class TestCoin extends AppCompatActivity {
 //                updateResonanceFrequencyToleranceBars(recognizedResonanceFrequencies, chart);
 
                 if(!finalVerdictIsBeingDisplayed) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            SpectrumPlottingUtils.resonanceFrequencyToleranceBar(chart, "c0d2", false);
-                            SpectrumPlottingUtils.resonanceFrequencyToleranceBar(chart, "c0d3", false);
-                            SpectrumPlottingUtils.resonanceFrequencyToleranceBar(chart, "c0d4", false);
-//                            updateResonanceFrequencyToleranceBars(recognizedResonanceFrequencies, chart);
-                            updateResonanceFrequencyIcons(recognizedResonanceFrequencies);
-                        }
+                    runOnUiThread(() -> {
+                        SpectrumPlottingUtils.resonanceFrequencyToleranceBar(chart, "c0d2", false);
+                        SpectrumPlottingUtils.resonanceFrequencyToleranceBar(chart, "c0d3", false);
+                        SpectrumPlottingUtils.resonanceFrequencyToleranceBar(chart, "c0d4", false);
+                        updateResonanceFrequencyIcons(recognizedResonanceFrequencies);
                     });
                 }
 
@@ -401,7 +415,7 @@ public class TestCoin extends AppCompatActivity {
                         case ZERO_RESONANCE_FREQUENCIES_RECOGNIZED_NOT_CLEAN:
                             if (verdictHasExpired()
                                     && !getFinalVerdictIsBeingDisplayed()
-                                    ) {
+                            ) {
                                 updateChart(chart, chartData, magnitudesList);
                                 updateDetectedPeaks(detectedPeaksBins, chart);
                                 updateResonanceFrequencyToleranceBars(recognizedResonanceFrequencies, chart);
@@ -410,7 +424,7 @@ public class TestCoin extends AppCompatActivity {
                         case ZERO_RESONANCE_FREQUENCIES_RECOGNIZED_CLEAN:
                             if (verdictHasExpired()
                                     && !getFinalVerdictIsBeingDisplayed()
-                                    ) {
+                            ) {
                                 updateChart(chart, chartData, magnitudesList);
                                 updateDetectedPeaks(detectedPeaksBins, chart);
                                 updateResonanceFrequencyToleranceBars(recognizedResonanceFrequencies, chart);
@@ -418,6 +432,7 @@ public class TestCoin extends AppCompatActivity {
                                 // If the ping is clean and some peaks are detected, it might be a coin (just not THIS coin)
                                 // If between 2 and 10 peaks are detected, freeze the graph as we do with a proper verdict.
                                 if (detectedPeaksBins.size() > 2 && detectedPeaksBins.size() < 10) {
+                                    sendPingInformationToFirebase(finalSelectedCoinId,detectedPeaksHz,recognizedResonanceFrequencies,verdict);
                                     updateVerdictBanner(verdict, spectralFeatures);
                                     setFinalVerdictIsBeingDisplayed(true);
                                     setStartAgainButtonVisibility(startAgainButton, View.VISIBLE);
@@ -430,7 +445,7 @@ public class TestCoin extends AppCompatActivity {
                         case ONE_RESONANCE_FREQUENCY_RECOGNIZED_NOT_CLEAN:
                             if (verdictHasExpired()
                                     && !getFinalVerdictIsBeingDisplayed()
-                                    ) {
+                            ) {
 
                                 updateChart(chart, chartData, magnitudesList);
                                 updateDetectedPeaks(detectedPeaksBins, chart);
@@ -440,7 +455,7 @@ public class TestCoin extends AppCompatActivity {
                         case ONE_RESONANCE_FREQUENCY_RECOGNIZED_CLEAN:
                             if (verdictHasExpired()
                                     && !getFinalVerdictIsBeingDisplayed()
-                                    ) {
+                            ) {
                                 updateChart(chart, chartData, magnitudesList);
 //                                updateVerdictBanner(verdict, spectralFeatures);
 
@@ -456,12 +471,12 @@ public class TestCoin extends AppCompatActivity {
                         case TWO_RESONANCE_FREQUENCIES_RECOGNIZED_NOT_CLEAN:
                             if (verdictHasExpired()
                                     && !getFinalVerdictIsBeingDisplayed()
-                                    ) {
+                            ) {
                                 updateChart(chart, chartData, magnitudesList);
 //                                updateVerdictBanner(verdict, spectralFeatures);
 
 //                                showToast(getString(R.string.zero_resonance_frequences_recognized_clean_toast));
-
+                                sendPingInformationToFirebase(finalSelectedCoinId,detectedPeaksHz,recognizedResonanceFrequencies,verdict);
                                 updateDetectedPeaks(detectedPeaksBins, chart);
                                 updateResonanceFrequencyToleranceBars(recognizedResonanceFrequencies, chart);
 
@@ -472,9 +487,10 @@ public class TestCoin extends AppCompatActivity {
                         case TWO_RESONANCE_FREQUENCIES_RECOGNIZED_CLEAN:
                             if (verdictHasExpired()
                                     && !getFinalVerdictIsBeingDisplayed()
-                                    ) {
+                            ) {
                                 updateChart(chart, chartData, magnitudesList);
                                 updateVerdictBanner(verdict, spectralFeatures);
+                                sendPingInformationToFirebase(finalSelectedCoinId,detectedPeaksHz,recognizedResonanceFrequencies,verdict);
                                 updateDetectedPeaks(detectedPeaksBins, chart);
                                 updateResonanceFrequencyToleranceBars(recognizedResonanceFrequencies, chart);
 
@@ -485,12 +501,12 @@ public class TestCoin extends AppCompatActivity {
                         case THREE_RESONANCE_FREQUENCIES_RECOGNIZED_NOT_CLEAN:
                             if (verdictHasExpired()
                                     && !getFinalVerdictIsBeingDisplayed()
-                                    ) {
+                            ) {
                                 updateChart(chart, chartData, magnitudesList);
 //                                updateVerdictBanner(verdict, spectralFeatures);
 
 //                                showToast(getString(R.string.zero_resonance_frequences_recognized_clean_toast));
-
+                                sendPingInformationToFirebase(finalSelectedCoinId,detectedPeaksHz,recognizedResonanceFrequencies,verdict);
                                 updateDetectedPeaks(detectedPeaksBins, chart);
                                 updateResonanceFrequencyIcons(recognizedResonanceFrequencies);
                                 updateResonanceFrequencyToleranceBars(recognizedResonanceFrequencies, chart);
@@ -503,8 +519,9 @@ public class TestCoin extends AppCompatActivity {
                         case THREE_RESONANCE_FREQUENCIES_RECOGNIZED_CLEAN:
                             if (verdictHasExpired()
                                     && !getFinalVerdictIsBeingDisplayed()
-                                    ) {
+                            ) {
                                 updateChart(chart, chartData, magnitudesList);
+                                sendPingInformationToFirebase(finalSelectedCoinId,detectedPeaksHz,recognizedResonanceFrequencies,verdict);
                                 updateVerdictBanner(verdict, spectralFeatures);
                                 updateDetectedPeaks(detectedPeaksBins, chart);
                                 updateResonanceFrequencyIcons(recognizedResonanceFrequencies);
@@ -522,7 +539,7 @@ public class TestCoin extends AppCompatActivity {
                 } // end of switch statement
 
                 // The process() method needs to return a boolean value. This happens here.
-                    return true;
+                return true;
             }
         });
 
@@ -538,9 +555,21 @@ public class TestCoin extends AppCompatActivity {
         mTextMessage = (TextView)
 
                 findViewById(R.id.message);
-
-
     }
+
+    private void sendPingInformationToFirebase(String finalSelectedCoinId1, LinkedList<Float> detectedPeaksHz, Map<String, Boolean> recognizedResonanceFrequencies, Verdict verdict) {
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+        String timestamp = getTimestamp();
+        // Save by coin id / timestamp
+        mDatabase.child("pings").child(finalSelectedCoinId1).child(timestamp).child("detectedPeaksHz").setValue(detectedPeaksHz);
+        mDatabase.child("pings").child(finalSelectedCoinId1).child(timestamp).child("recognizedResonanceFrequencies").setValue(recognizedResonanceFrequencies);
+        mDatabase.child("pings").child(finalSelectedCoinId1).child(timestamp).child("verdict").setValue(verdict.toString());
+    }
+
+    private String getTimestamp() {
+            return new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+    }
+
 
     private boolean getFinalVerdictIsBeingDisplayed() {
         return this.finalVerdictIsBeingDisplayed;
@@ -1029,6 +1058,27 @@ public class TestCoin extends AppCompatActivity {
             peakList.add(peak);
         }
         return peakList;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == AppSettingsDialog.DEFAULT_SETTINGS_REQ_CODE) {
+            initCoinTesting();
+        }
+    }
+
+    @Override
+    public void onPermissionsGranted(int requestCode, @NonNull List<String> perms) {
+
+    }
+
+    @Override
+    public void onPermissionsDenied(int requestCode, @NonNull List<String> perms) {
+        if (EasyPermissions.somePermissionPermanentlyDenied(this, perms)) {
+            new AppSettingsDialog.Builder(this).build().show();
+        }
     }
 
     class ResonanceFrequencyIconResourceHolder {

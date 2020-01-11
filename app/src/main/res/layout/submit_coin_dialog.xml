@@ -5,159 +5,237 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
     android:theme="@style/Theme.Pingcoin">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appbar"
+
+    <LinearLayout
+        android:id="@+id/layout_container"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:elevation="0dp">
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp">
 
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
+
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/appbar"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="@color/design_default_color_background"
-            android:paddingStart="6dp"
-            android:paddingEnd="16dp"
-            app:contentInsetStartWithNavigation="0dp"
-            app:navigationIcon="@drawable/ic_close_black">
-        </androidx.appcompat.widget.Toolbar>
-    </com.google.android.material.appbar.AppBarLayout>
+            android:layout_height="wrap_content"
+            app:elevation="0dp">
 
-    <androidx.appcompat.widget.LinearLayoutCompat
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:orientation="vertical">
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="@color/design_default_color_background"
+                android:paddingStart="6dp"
+                android:paddingEnd="16dp"
+                app:contentInsetStartWithNavigation="0dp"
+                app:navigationIcon="@drawable/ic_close_black">
+            </androidx.appcompat.widget.Toolbar>
 
-        <FrameLayout
+
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:theme="@style/Theme.Pingcoin"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+            android:orientation="vertical"
+            >
 
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/record_button"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+
+            <TextView
+                android:id="@+id/textView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Record"/>
+                android:text="@string/step_1_text"
+                android:textStyle="bold"/>
 
-
-        </FrameLayout>
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:theme="@style/Theme.Pingcoin"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/stop_button"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            <TextView
+                android:id="@+id/step_1_subtitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Stop"/>
+                android:text="@string/step_1_subtitle_text"/>
 
 
-        </FrameLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/colorBackground"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingTop="16dp"
+                android:paddingBottom="16dp">
 
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:theme="@style/Theme.Pingcoin"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/play_button"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/button_record"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_margin="8dp"
+                    android:layout_weight="1"
+                    android:insetLeft="0dp"
+                    android:insetTop="0dp"
+                    android:insetRight="0dp"
+                    android:insetBottom="0dp"
+                    app:icon="@drawable/ic_record"
+                    app:iconGravity="textStart"
+                    app:iconPadding="0dp"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/button_stop"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_margin="8dp"
+                    android:layout_weight="1"
+                    android:insetLeft="0dp"
+                    android:insetTop="0dp"
+                    android:insetRight="0dp"
+                    android:insetBottom="0dp"
+                    app:icon="@drawable/ic_stop"
+                    app:iconGravity="textStart"
+                    app:iconPadding="0dp"/>
+
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/button_play"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_margin="8dp"
+                    android:layout_weight="1"
+                    android:insetLeft="0dp"
+                    android:insetTop="0dp"
+                    android:insetRight="0dp"
+                    android:insetBottom="0dp"
+                    app:icon="@drawable/ic_play"
+                    app:iconGravity="textStart"
+                    app:iconPadding="0dp"/>
+
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/button_pause"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_margin="8dp"
+                    android:layout_weight="1"
+                    android:insetLeft="0dp"
+                    android:insetTop="0dp"
+                    android:insetRight="0dp"
+                    android:insetBottom="0dp"
+                    app:icon="@drawable/ic_pause"
+                    app:iconGravity="textStart"
+                    app:iconPadding="0dp"/>
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <SeekBar
+                    android:id="@+id/seekbar_audio"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"/>
+
+            </LinearLayout>
+
+
+            <TextView
+                android:id="@+id/section_2_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Play"/>
-        </FrameLayout>
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:theme="@style/Theme.Pingcoin"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+                android:text="@string/step_2_title_text"
+                android:textStyle="bold"/>
 
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/pause_button"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            <TextView
+                android:id="@+id/section_2_subtitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Pause"/>
+                android:text="@string/step_2_subtitle_text"/>
 
 
-        </FrameLayout>
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:theme="@style/Theme.Pingcoin"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/colorBackground"
+                android:gravity="center">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/take_picture_button"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/take_picture_button_text"/>
+
+                <ImageView
+                    android:id="@+id/coin_thumbnail"
+                    android:layout_width="150dp"
+                    android:layout_height="100dp"
+                    android:layout_marginLeft="8dp"/>
+
+            </LinearLayout>
 
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/reset_button"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            <TextView
+                android:id="@+id/email_section_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Reset"/>
+                android:text="@string/step_3_text"
+                android:textStyle="bold"/>
 
+            <EditText
+                android:id="@+id/emailField"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:autofillHints="email"
+                android:ems="10"
+                android:inputType="textEmailAddress"/>
 
-        </FrameLayout>
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:theme="@style/Theme.Pingcoin"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/upload_button"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            <TextView
+                android:id="@+id/section_3_subtitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Upload"/>
+                android:text="@string/step_3_subtitle_text"/>
 
-
-        </FrameLayout>
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:theme="@style/Theme.Pingcoin"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/take_picture_button"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Take Picture"/>
+                android:gravity="center">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/button_submit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/button_submit_text"/>
+
+            </LinearLayout>
 
 
-        </FrameLayout>
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:theme="@style/Theme.Pingcoin"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        </LinearLayout>
 
 
-            <ImageView
-                android:id="@+id/coin_thumbnail"
-                android:layout_width="200px"
-                android:layout_height="200px"
-                app:srcCompat="@android:drawable/ic_notification_clear_all"/>
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/layout_container_progressbar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="16dp">
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyle"
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
 
 
-        </FrameLayout>
-
-    </androidx.appcompat.widget.LinearLayoutCompat>
+    </FrameLayout>
 
 
 

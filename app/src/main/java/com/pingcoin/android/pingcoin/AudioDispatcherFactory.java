@@ -23,8 +23,11 @@
 
 package com.pingcoin.android.pingcoin;
 
+import android.Manifest;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
+
+import com.livinglifetechway.quickpermissions.annotations.WithPermissions;
 
 /**
  * The Factory creates {@link AudioDispatcher} objects from the
@@ -48,6 +51,8 @@ public class AudioDispatcherFactory {
      *            The size of the overlap (in samples).
      * @return A new AudioDispatcher
      */
+
+
     public static AudioDispatcher fromDefaultMicrophone(final int sampleRate,
                                                         final int audioBufferSize, final int bufferOverlap) {
         int minAudioBufferSize = AudioRecord.getMinBufferSize(sampleRate,
