@@ -10,6 +10,9 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.utils.MPPointD;
+import com.github.mikephil.charting.utils.Transformer;
+import com.github.mikephil.charting.utils.Utils;
 
 
 import org.apache.commons.math3.analysis.function.Exp;
@@ -130,10 +133,6 @@ public class SpectrumPlottingUtils {
 
         xAxis.setAxisLineColor(android.R.color.white);
         xAxis.setTextColor(Color.WHITE);
-//        xAxis.setTextColor(android.R.color.white);
-
-//        xAxis.setGranularityEnabled(true);
-//        xAxis.setGranularity((5000/samplingFrequency)*FFTSize);
 
         chart.getDescription().setEnabled(false);
         chart.getLegend().setEnabled(false);
@@ -142,84 +141,53 @@ public class SpectrumPlottingUtils {
 
     }
 
-    public static void plotNaturalFrequency(LineChart chart, String naturalFrequencyLabel, float naturalFrequencyValue, float naturalFrequencyError, int sampleRate, int windowSize) {
+    public static void plotExpectedNaturalFrequencyToleranceBar(LineChart chart, String naturalFrequencyLabel, float naturalFrequencyValue, float naturalFrequencyError, int sampleRate, int windowSize) {
         Log.d("BLA", Float.toString(naturalFrequencyError));
 
-        // Set default error value
+        // Set default error value (width of the tolerance bar)
         naturalFrequencyError = naturalFrequencyError / 2f;
 
         // Initialize the limit line
-        ExpectedFrequencyLine cxdx = new ExpectedFrequencyLine(0, "");
-        LimitLine cxdxBottomThreshold = new LimitLine(0);
-        LimitLine cxdxTopThreshold = new LimitLine(0);
+        ExpectedFrequencyLine cxdx;
+        ExpectedFrequencyLine cxdxBottomThreshold;
+        ExpectedFrequencyLine cxdxTopThreshold;
 
 
         XAxis bottomAxis = chart.getXAxis();
         float convertedXValue, convertedXValueBottomThreshold, convertedXValueTopThreshold;
         float lineWidth = 22f;
+        float convertedLinewidth;
 
         // Determine which natural frequency we're plotting
-        switch (naturalFrequencyLabel) {
-            case "c0d2":
-                convertedXValue = (naturalFrequencyValue / (sampleRate)) * windowSize;
-                convertedXValueBottomThreshold = convertedXValue * (1 - naturalFrequencyError / 2);
-                convertedXValueTopThreshold = convertedXValue * (1 + naturalFrequencyError / 2);
-                cxdx = new ExpectedFrequencyLine(convertedXValue, naturalFrequencyLabel);
-                lineWidth = convertedXValue * naturalFrequencyError;
-                cxdx.setLineWidth(lineWidth);
+        convertedXValue = (naturalFrequencyValue / (sampleRate)) * windowSize;
+        convertedXValueBottomThreshold = convertedXValue * (1 - naturalFrequencyError);
+        convertedXValueTopThreshold = convertedXValue * (1 + naturalFrequencyError);
+
+        cxdx = new ExpectedFrequencyLine(convertedXValue, naturalFrequencyLabel);
+        cxdxBottomThreshold = new ExpectedFrequencyLine(convertedXValueBottomThreshold, naturalFrequencyLabel);
+        cxdxTopThreshold = new ExpectedFrequencyLine(convertedXValueTopThreshold, naturalFrequencyLabel + " top");
+
+        // Translate lineWidth into Dp (because that's what setLineWidth() asks for
+        lineWidth = convertedXValue * naturalFrequencyError;
+        chart.getTransformer(YAxis.AxisDependency.LEFT).getPixelForValues(lineWidth, 0);
+        convertedLinewidth = Utils.convertPixelsToDp(lineWidth);
+
+        cxdx.setLineWidth(convertedLinewidth);
+//        cxdxBottomThreshold.setLineWidth(1);
+//        cxdxTopThreshold.setLineWidth(1);
+
+        Log.i(TAG, "Distance between threshold bottom and threshold top: " + Float.toString(convertedXValueTopThreshold - convertedXValueBottomThreshold));
+        Log.i(TAG, "Line width: " + Float.toString(lineWidth));
+
+        Log.i(TAG, "The " + naturalFrequencyLabel + " value loaded is: " + Float.toString(naturalFrequencyValue));
+        Log.i(TAG, "The " + naturalFrequencyLabel + " value calculated is: " + Float.toString(convertedXValue));
+        Log.i(TAG, "The " + naturalFrequencyLabel + " bottom threshold is : " + Float.toString(convertedXValueBottomThreshold));
+        Log.i(TAG, "The " + naturalFrequencyLabel + " top threshold is : " + Float.toString(convertedXValueTopThreshold));
 
 
-                Log.i(TAG, "The " + naturalFrequencyLabel + " value loaded is: " + Float.toString(naturalFrequencyValue));
-                Log.i(TAG, "The " + naturalFrequencyLabel + " value calculated is: " + Float.toString(convertedXValue));
-                Log.i(TAG, "The " + naturalFrequencyLabel + " bottom threshold is : " + Float.toString(convertedXValueBottomThreshold));
-                Log.i(TAG, "The " + naturalFrequencyLabel + " top threshold is : " + Float.toString(convertedXValueTopThreshold));
-
-                Log.i("WHAT WHAT", Float.toString(lineWidth));
-
-
-            case "c0d3":
-                convertedXValue = (naturalFrequencyValue / (sampleRate)) * windowSize;
-                convertedXValueBottomThreshold = convertedXValue * (1 - naturalFrequencyError);
-                convertedXValueTopThreshold = convertedXValue * (1 + naturalFrequencyError);
-                cxdx = new ExpectedFrequencyLine(convertedXValue, naturalFrequencyLabel);
-                lineWidth = convertedXValue * naturalFrequencyError;
-                cxdx.setLineWidth(lineWidth);
-
-
-                Log.i(TAG, "The " + naturalFrequencyLabel + " value loaded is: " + Float.toString(naturalFrequencyValue));
-                Log.i(TAG, "The " + naturalFrequencyLabel + " value calculated is: " + Float.toString(convertedXValue));
-                Log.i(TAG, "The " + naturalFrequencyLabel + " bottom threshold is : " + Float.toString(convertedXValueBottomThreshold));
-                Log.i(TAG, "The " + naturalFrequencyLabel + " top threshold is : " + Float.toString(convertedXValueTopThreshold));
-
-                Log.i("WHAT WHAT", Float.toString(lineWidth));
-
-
-            case "c0d4":
-                convertedXValue = (naturalFrequencyValue / (sampleRate)) * windowSize;
-                convertedXValueBottomThreshold = convertedXValue * (1 - naturalFrequencyError);
-                convertedXValueTopThreshold = convertedXValue * (1 + naturalFrequencyError);
-                cxdx = new ExpectedFrequencyLine(convertedXValue, naturalFrequencyLabel);
-                lineWidth = convertedXValue * naturalFrequencyError;
-                cxdx.setLineWidth(lineWidth);
-
-
-                Log.i("WHAT WHAT", Float.toString(lineWidth));
-
-                Log.i(TAG, "The " + naturalFrequencyLabel + " value loaded is: " + Float.toString(naturalFrequencyValue));
-                Log.i(TAG, "The " + naturalFrequencyLabel + " value calculated is: " + Float.toString(convertedXValue));
-                Log.i(TAG, "The " + naturalFrequencyLabel + " bottom threshold is : " + Float.toString(convertedXValueBottomThreshold));
-                Log.i(TAG, "The " + naturalFrequencyLabel + " top threshold is : " + Float.toString(convertedXValueTopThreshold));
-
-
-            default:
-                break;
-        }
-
-//        cxdx.setLineWidth(22f);
         cxdx.setLineColor(argb(40, 240, 240, 240));
-        cxdxBottomThreshold.setLineColor(argb(40, 240, 240, 240));
-        cxdxTopThreshold.setLineColor(argb(40, 240, 240, 240));
-//        cxdx.enableDashedLine(10f, 10f, 0f);
+        cxdxBottomThreshold.setLineColor(argb(100, 0, 0, 240));
+        cxdxTopThreshold.setLineColor(argb(100, 0, 0, 240));
         cxdx.setLabelPosition(LimitLine.LimitLabelPosition.LEFT_TOP);
         cxdx.setTextSize(10f);
         cxdx.setTextColor(Color.rgb(150, 150, 150));
@@ -227,10 +195,12 @@ public class SpectrumPlottingUtils {
         bottomAxis.setDrawLimitLinesBehindData(true);
 
         bottomAxis.addLimitLine(cxdx);
+//        bottomAxis.addLimitLine(cxdxBottomThreshold);
+//        bottomAxis.addLimitLine(cxdxTopThreshold);
 
     }
 
-    public static void resonanceFrequencyToleranceBar(LineChart chart, String frequencyLabel, boolean detected) {
+    public static void setExpectedNaturalFrequencyToleranceBarColor(LineChart chart, String frequencyLabel, boolean detected) {
         XAxis bottomAxis = chart.getXAxis();
         List<LimitLine> existingLimitLines = bottomAxis.getLimitLines();
         int detectedColor = Color.argb(80, 0, 153, 51);
@@ -246,17 +216,6 @@ public class SpectrumPlottingUtils {
                 }
             }
         }
-
-//        for (LimitLine limitline : existingLimitLines) {
-//            if (limitline.getLabel() == frequencyLabel) {
-//                if (detected) {
-//                    limitline.setLineColor(detectedColor);
-//                } else {
-//                    limitline.setLineColor(notDetectedColor);
-//                }
-//            }
-//        }
-
 
         chart.invalidate();
 

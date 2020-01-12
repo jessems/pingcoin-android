@@ -260,9 +260,9 @@ public class TestCoin extends AppCompatActivity implements EasyPermissions.Permi
 
 
         // Expected peaks plotting
-        SpectrumPlottingUtils.plotNaturalFrequency(chart, "c0d2", naturalFrequencyC0D2, naturalFrequencyError, sampleRate, windowSize);
-        SpectrumPlottingUtils.plotNaturalFrequency(chart, "c0d3", naturalFrequencyC0D3, naturalFrequencyError, sampleRate, windowSize);
-        SpectrumPlottingUtils.plotNaturalFrequency(chart, "c0d4", naturalFrequencyC0D4, naturalFrequencyError, sampleRate, windowSize);
+        SpectrumPlottingUtils.plotExpectedNaturalFrequencyToleranceBar(chart, "c0d2", naturalFrequencyC0D2, naturalFrequencyError, sampleRate, windowSize);
+        SpectrumPlottingUtils.plotExpectedNaturalFrequencyToleranceBar(chart, "c0d3", naturalFrequencyC0D3, naturalFrequencyError, sampleRate, windowSize);
+        SpectrumPlottingUtils.plotExpectedNaturalFrequencyToleranceBar(chart, "c0d4", naturalFrequencyC0D4, naturalFrequencyError, sampleRate, windowSize);
 
 
         chart.invalidate();
@@ -392,9 +392,9 @@ public class TestCoin extends AppCompatActivity implements EasyPermissions.Permi
 
                 if(!finalVerdictIsBeingDisplayed) {
                     runOnUiThread(() -> {
-                        SpectrumPlottingUtils.resonanceFrequencyToleranceBar(chart, "c0d2", false);
-                        SpectrumPlottingUtils.resonanceFrequencyToleranceBar(chart, "c0d3", false);
-                        SpectrumPlottingUtils.resonanceFrequencyToleranceBar(chart, "c0d4", false);
+                        SpectrumPlottingUtils.setExpectedNaturalFrequencyToleranceBarColor(chart, "c0d2", false);
+                        SpectrumPlottingUtils.setExpectedNaturalFrequencyToleranceBarColor(chart, "c0d3", false);
+                        SpectrumPlottingUtils.setExpectedNaturalFrequencyToleranceBarColor(chart, "c0d4", false);
                         updateResonanceFrequencyIcons(recognizedResonanceFrequencies);
                     });
                 }
@@ -1003,14 +1003,14 @@ public class TestCoin extends AppCompatActivity implements EasyPermissions.Permi
 
     public void updateResonanceFrequencyToleranceBars(Map<String, Boolean> recognizedResonanceFrequencies, final LineChart chart) {
         if (recognizedResonanceFrequencies.get("C0D2")) {
-            runOnUiThread(() -> SpectrumPlottingUtils.resonanceFrequencyToleranceBar(chart, "c0d2", true));
+            runOnUiThread(() -> SpectrumPlottingUtils.setExpectedNaturalFrequencyToleranceBarColor(chart, "c0d2", true));
         }
         if (recognizedResonanceFrequencies.get("C0D3")) {
-            runOnUiThread(() -> SpectrumPlottingUtils.resonanceFrequencyToleranceBar(chart, "c0d3", true));
+            runOnUiThread(() -> SpectrumPlottingUtils.setExpectedNaturalFrequencyToleranceBarColor(chart, "c0d3", true));
 
         }
         if (recognizedResonanceFrequencies.get("C0D4")) {
-            runOnUiThread(() -> SpectrumPlottingUtils.resonanceFrequencyToleranceBar(chart, "c0d4", true));
+            runOnUiThread(() -> SpectrumPlottingUtils.setExpectedNaturalFrequencyToleranceBarColor(chart, "c0d4", true));
         }
     }
 
