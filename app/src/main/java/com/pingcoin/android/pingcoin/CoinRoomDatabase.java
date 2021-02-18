@@ -12,7 +12,7 @@ import android.os.AsyncTask;
 import androidx.annotation.NonNull;
 import android.util.Log;
 
-@Database(entities = {Coin.class}, version = 1)
+@Database(entities = {Coin.class}, version = 2)
 public abstract class CoinRoomDatabase extends RoomDatabase {
 
     public abstract CoinDao coinDao();
@@ -82,16 +82,13 @@ public abstract class CoinRoomDatabase extends RoomDatabase {
                     "gold_south_african_krugerrand_1oz",
                     "South Africa",
                     "South African",
-                    4792,
-                    0,
-                    8652,
-                    10856,
-                    0,
-                    0,
-                    0,
-                    18629,
-                    0,
-                    0.02f
+                    4862.6f,
+                    0.04f,
+                    10925.9f,
+                    0.03f,
+                    18596.6f,
+                    0.03f
+
             ));
             mDao.insert(new Coin(
                     "Maple Leaf",
@@ -101,16 +98,12 @@ public abstract class CoinRoomDatabase extends RoomDatabase {
                     "gold_canadian_maple_leaf_1oz",
                     "Canada",
                     "Canadian",
-                    4655,
-                    0,
-                    7881,
-                    10988,
-                    0,
-                    0,
-                    0,
-                    19010,
-                    0,
-                    0.02f
+                    4759.7f,
+                    0.14f,
+                    10839.77f,
+                    0.04f,
+                    18593.9f,
+                    0.04f
             ));
             mDao.insert(new Coin(
                     "Eagle",
@@ -120,16 +113,12 @@ public abstract class CoinRoomDatabase extends RoomDatabase {
                     "gold_american_eagle_1oz",
                     "USA",
                     "American",
-                    4506,
-                    0,
-                    0,
-                    10385,
-                    0,
-                    0,
-                    0,
-                    18079,
-                    0,
-                    0.02f
+                    4517.3f,
+                    0.04f,
+                    10453.76f,
+                    0.04f,
+                    18081.5f,
+                    0.04f
             ));
             mDao.insert(new Coin(
                     "Eagle",
@@ -139,16 +128,13 @@ public abstract class CoinRoomDatabase extends RoomDatabase {
                     "silver_american_eagle_1oz",
                     "U.S.A.",
                     "American",
-                    3757,
-                    0,
-                    0,
-                    8695,
-                    0,
-                    0,
-                    0,
-                    15147,
-                    0,
-                    0.0317f
+                    3740.2f,
+                    0.04f,
+                    8643.2f,
+                    0.04f,
+                    15056.2f,
+                    0.04f
+
             ));
             mDao.insert(new Coin(
                     "Buffalo",
@@ -158,16 +144,12 @@ public abstract class CoinRoomDatabase extends RoomDatabase {
                     "silver_american_buffalo_1oz",
                     "U.S.A.",
                     "American",
-                    4233,
-                    4402,
-                    7526,
-                    9890,
-                    0,
-                    16224,
-                    16392,
-                    16984,
-                    0,
-                    0.02f
+                    4354.5f,
+                    0.08f,
+                    9896f,
+                    0.04f,
+                    16914.0f,
+                    0.04f
             ));
 
             mDao.insert(new Coin(
@@ -178,16 +160,12 @@ public abstract class CoinRoomDatabase extends RoomDatabase {
                     "silver_australian_lunar_rooster_1oz",
                     "Australia",
                     "Australian",
-                    2460,
-                    0,
-                    3730,
-                    5753,
-                    0,
-                    0,
-                    0,
-                    10228,
-                    0,
-                    0.02f
+                    2407f,
+                    0.04f,
+                    5745f,
+                    0.04f,
+                    10239f,
+                    0.04f
             ));
 
             mDao.insert(new Coin(
@@ -198,37 +176,14 @@ public abstract class CoinRoomDatabase extends RoomDatabase {
                     "silver_canadian_maple_leaf_1oz",
                     "Canada",
                     "Canadian",
-                    4667,
-                    0,
-                    7881,
-                    10920,
-                    0,
-                    0,
-                    0,
-                    18891,
-                    0,
-                    0.043f
+                    4716.6f,
+                    0.062f,
+                    10913.5f,
+                    0.02f,
+                    18890.4f,
+                    0.026f
             ));
 
-//            mDao.insert(new Coin(
-//                    "Britania",
-//                    "Britania",
-//                    1,
-//                    "Gold",
-//                    "gold_british_britania_1oz",
-//                    "United Kingdom",
-//                    "British",
-//                    4824,
-//                    4824,
-//                    0,
-//                    10988,
-//                    10988,
-//                    0,
-//                    0,
-//                    18841,
-//                    18841,
-//                    0.02f
-//            ));
 
             mDao.insert(new Coin(
                     "Kangaroo",
@@ -238,15 +193,11 @@ public abstract class CoinRoomDatabase extends RoomDatabase {
                     "gold_australian_kangaroo_1oz",
                     "Australia",
                     "Australian",
-                    3557,
-                    4824,
-                    0,
-                    8370,
-                    8370,
-                    0,
-                    0,
-                    14872,
-                    14872,
+                    3615.0f,
+                    0.0579f,
+                    8465.0f,
+                    0.02f,
+                    14807.0f,
                     0.02f
             ));
 
@@ -259,16 +210,12 @@ public abstract class CoinRoomDatabase extends RoomDatabase {
                     "silver_chinese_panda_1oz",
                     "China",
                     "Chinese",
-                    3848,
-                    0,
-                    0,
-                    8978,
-                    0,
-                    0,
-                    0,
-                    15597,
-                    0,
-                    0.02f
+                    3848.0f,
+                    0.04f,
+                    8978f,
+                    0.04f,
+                    15597f,
+                    0.04f
             ));
 
             mDao.insert(new Coin(
@@ -279,15 +226,11 @@ public abstract class CoinRoomDatabase extends RoomDatabase {
                     "silver_australian_kookaburra_1oz",
                     "Australia",
                     "Australian",
-                    3628,
-                    3864,
-                    0,
-                    8630,
-                    8630,
-                    0,
-                    0,
-                    15053,
-                    15053,
+                    3740.0f,
+                    0.07f,
+                    8631.7f,
+                    0.02f,
+                    15051.0f,
                     0.02f
             ));
 
@@ -299,16 +242,13 @@ public abstract class CoinRoomDatabase extends RoomDatabase {
                     "silver_austrian_philharmonic_1oz",
                     "Austria",
                     "Austrian",
-                    5248,
-                    0,
-                    0,
-                    11993,
-                    0,
-                    0,
-                    0,
-                    20480,
-                    0,
-                    0.025f
+                    5283.1f,
+                    0.0515f,
+                    11980.8f,
+                    0.02f,
+                    20479.3f,
+                    0.02f
+
             ));
             mDao.insert(new Coin(
                     "Cook Islands",
@@ -318,16 +258,12 @@ public abstract class CoinRoomDatabase extends RoomDatabase {
                     "silver_cook_islands_bounty_1oz",
                     "Cook Islands",
                     "Cook Island",
-                    4802,
-                    0,
-                    0,
-                    10384,
-                    0,
-                    0,
-                    0,
-                    17830,
-                    0,
-                    0.02f
+                    4802f,
+                    0.04f,
+                    10384f,
+                    0.04f,
+                    17830f,
+                    0.04f
             ));
             mDao.insert(new Coin(
                     "Corona (100)",
@@ -337,16 +273,12 @@ public abstract class CoinRoomDatabase extends RoomDatabase {
                     "gold_austrian_100_corona",
                     "Austria",
                     "Austria",
-                    2938,
-                    0,
-                    0,
-                    6909,
-                    0,
-                    0,
-                    0,
-                    12039,
-                    0,
-                    0.02f
+                    2938f,
+                    0.04f,
+                    6909f,
+                    0.04f,
+                    12039f,
+                    0.04f
             ));
             mDao.insert(new Coin(
                     "Krugerrand",
@@ -356,16 +288,12 @@ public abstract class CoinRoomDatabase extends RoomDatabase {
                     "silver_south_african_krugerrand_1oz",
                     "South Africa",
                     "South African",
-                    4569,
-                    0,
-                    0,
-                    10364,
-                    0,
-                    0,
-                    0,
-                    18060,
-                    0,
-                    0.03f
+                    4862.6f,
+                    0.127f,
+                    10353f,
+                    0.04f,
+                    18027f,
+                    0.04f
             ));
             mDao.insert(new Coin(
                     "Panda",
@@ -375,16 +303,12 @@ public abstract class CoinRoomDatabase extends RoomDatabase {
                     "gold_chinese_panda_1oz",
                     "China",
                     "Chinese",
-                    3170,
-                    0,
-                    0,
-                    8205,
-                    0,
-                    0,
-                    0,
-                    14633,
-                    0,
-                    0.02f
+                    3766f,
+                    0.04f,
+                    8564f,
+                    0.04f,
+                    14852f,
+                    0.04f
             ));
 
             mDao.insert(new Coin(
@@ -395,16 +319,12 @@ public abstract class CoinRoomDatabase extends RoomDatabase {
                     "silver_somalian_elephant_1oz",
                     "Somalia",
                     "Somalian",
-                    4593,
-                    0,
-                    0,
-                    10219,
-                    0,
-                    0,
-                    0,
-                    17499,
-                    0,
-                    0.02f
+                    4593f,
+                    0.04f,
+                    10219f,
+                    0.04f,
+                    17499f,
+                    0.04f
             ));
 
             mDao.insert(new Coin(
@@ -415,16 +335,12 @@ public abstract class CoinRoomDatabase extends RoomDatabase {
                     "silver_great_britain_britannia_1oz",
                     "Great Britain",
                     "British",
-                    4470,
-                    0,
-                    0,
-                    10379,
-                    0,
-                    0,
-                    0,
-                    17956,
-                    0,
-                    0.039f
+                    4531.3f,
+                    0.066f,
+                    10405.3f,
+                    0.04f,
+                    17984.0f,
+                    0.04f
             ));
 
             mDao.insert(new Coin(
@@ -435,36 +351,28 @@ public abstract class CoinRoomDatabase extends RoomDatabase {
                     "silver_british_lunar_1oz",
                     "Great Britain",
                     "British",
-                    4466,
-                    0,
-                    0,
-                    10364,
-                    0,
-                    0,
-                    0,
-                    17954,
-                    0,
-                    0.03f
+                    4466f,
+                    0.069f,
+                    10364f,
+                    0.04f,
+                    17954f,
+                    0.04f
             ));
 
             mDao.insert(new Coin(
-                    "Morgan Dollar (user contributed)",
+                    "Morgan Dollar (beta)",
                     "Dollar",
                     1,
                     "Silver",
                     "silver_morgan_dollar",
                     "U.S.A.",
                     "American",
-                    4353,
-                    0,
-                    0,
-                    10100,
-                    0,
-                    0,
-                    0,
-                    17544,
-                    0,
-                    0.03f
+                    4432.3f,
+                    0.098f,
+                    10204f,
+                    0.095f,
+                    17605.8f,
+                    0.085f
             ));
 
             mDao.insert(new Coin(
@@ -475,16 +383,12 @@ public abstract class CoinRoomDatabase extends RoomDatabase {
                     "silver_american_peace_dollar",
                     "U.S.A.",
                     "U.S.A.",
-                    4345,
-                    0,
-                    0,
-                    10054,
-                    0,
-                    0,
-                    0,
-                    17500,
-                    0,
-                    0.03f
+                    4345.0f,
+                    0.05f,
+                    10054.0f,
+                    0.05f,
+                    17500.0f,
+                    0.05f
             ));
 
             mDao.insert(new Coin(
@@ -495,16 +399,12 @@ public abstract class CoinRoomDatabase extends RoomDatabase {
                     "gold_iranian_azadi_1",
                     "Iran",
                     "Iranian",
-                    5198,
-                    0,
-                    0,
-                    11724,
-                    0,
-                    0,
-                    0,
-                    20300,
-                    0,
-                    0.02f
+                    5198.5f,
+                    0.04f,
+                    11724.5f,
+                    0.04f,
+                    20300f,
+                    0.04f
             ));
 
             mDao.insert(new Coin(
@@ -515,57 +415,41 @@ public abstract class CoinRoomDatabase extends RoomDatabase {
                     "silver_australian_koala_1oz",
                     "Australia",
                     "Australian",
-                    3729,
-                    0,
-                    0,
-                    8643,
-                    0,
-                    0,
-                    0,
-                    15160,
-                    0,
-                    0.02f
+                    3675.5f,
+                    0.082f,
+                    8643f,
+                    0.04f,
+                    15160f,
+                    0.04f
             ));
 
             mDao.insert(new Coin(
-                    "Australian Kangaroo",
+                    "Australian Kangaroo (beta)",
                     "Kangaroo",
                     1,
                     "Silver",
                     "silver_australian_kangaroo_1oz",
                     "Australia",
                     "Australian",
-                    3600,
-                    0,
-                    0,
-                    8565,
-                    0,
-                    0,
-                    0,
-                    15017,
-                    0,
-                    0.02f
+                    3673.2f,
+                    0.132f,
+                    8651.6f,
+                    0.04f,
+                    15230.9f,
+                    0.04f
             ));
 
-            mDao.insert(new Coin(
-                    "Tuvalo (user contributed)",
-                    "Marvel",
-                    1,
-                    "Silver",
-                    "silver_tuvalu_coin_1oz",
-                    "Tuvalo",
-                    "Tuvalo",
-                    3729,
-                    0,
-                    0,
-                    8643,
-                    0,
-                    0,
-                    0,
-                    15160,
-                    0,
-                    0.02f
-            ));
+            // TODO: This coin is not in the recording folder. I need to re-add it somehow.
+//            mDao.insert(new Coin(
+//                    "Tuvalo (user contributed)",
+//                    "Marvel",
+//                    1,
+//                    "Silver",
+//                    "silver_tuvalu_coin_1oz",
+//                    "Tuvalo",
+//                    "Tuvalo",
+//
+//            ));
 
             mDao.insert(new Coin(
                     "5 Kronor (user contributed)",
@@ -575,16 +459,12 @@ public abstract class CoinRoomDatabase extends RoomDatabase {
                     "silver_swedish_5_kronor",
                     "Sweden",
                     "Swedish",
-                    5064,
-                    0,
-                    0,
-                    11794,
-                    0,
-                    0,
-                    0,
-                    20394,
-                    0,
-                    0.02f
+                    5064f,
+                    0.04f,
+                    11794f,
+                    0.04f,
+                    20394f,
+                    0.04f
             ));
 
             mDao.insert(new Coin(
@@ -595,16 +475,13 @@ public abstract class CoinRoomDatabase extends RoomDatabase {
                     "gold_british_sovereign_king_edward_vii",
                     "Great Britain",
                     "British",
-                    5651,
-                    0,
-                    0,
-                    12756,
-                    0,
-                    0,
-                    0,
-                    21715,
-                    0,
-                    0.02f
+                    5651.3f,
+                    0.04f,
+                    12756f,
+                    0.04f,
+                    21715f,
+                    0.04f
+
             ));
             mDao.insert(new Coin(
                     "APMEX Gold Round (user contributed)",
@@ -614,16 +491,12 @@ public abstract class CoinRoomDatabase extends RoomDatabase {
                     "gold_apmex_round_1_4oz",
                     "APMEX",
                     "APMEX",
-                    4162,
-                    0,
-                    0,
-                    9727,
-                    0,
-                    0,
-                    0,
-                    16949,
-                    0,
-                    0.02f
+                    4278f,
+                    0.153f,
+                    9727f,
+                    0.04f,
+                    16949f,
+                    0.04f
             ));
             mDao.insert(new Coin(
                     "Libertad (user contributed)",
@@ -633,16 +506,12 @@ public abstract class CoinRoomDatabase extends RoomDatabase {
                     "silver_mexican_libertad_1oz",
                     "Mexico",
                     "Mexican",
-                    3858,
-                    0,
-                    0,
-                    9069,
-                    0,
-                    0,
-                    0,
-                    15862,
-                    0,
-                    0.02f
+                    3858f,
+                    0.04f,
+                    9069f,
+                    0.04f,
+                    15862f,
+                    0.04f
             ));
             mDao.insert(new Coin(
                     "Double Eagle Saint-Gaudens",
@@ -652,16 +521,12 @@ public abstract class CoinRoomDatabase extends RoomDatabase {
                     "gold_american_double_eagle_saint_gaudens_1907_1933_1oz",
                     "U.S.A.",
                     "American",
-                    4091,
-                    0,
-                    0,
-                    9488,
-                    0,
-                    0,
-                    0,
-                    16513,
-                    0,
-                    0.02f
+                    4091f,
+                    0.05f,
+                    9488f,
+                    0.05f,
+                    16513f,
+                    0.05f
             ));
             mDao.insert(new Coin(
                     "Half Dollar (Franklin) (user c.)",
@@ -671,16 +536,12 @@ public abstract class CoinRoomDatabase extends RoomDatabase {
                     "silver_franklin_half_dollar",
                     "U.S.A.",
                     "American",
-                    4888,
-                    0,
-                    0,
-                    11422,
-                    0,
-                    0,
-                    0,
-                    19911,
-                    0,
-                    0.03f
+                    4980f,
+                    0.145f,
+                    11422f,
+                    0.05f,
+                    19911f,
+            0.05f
             ));
             mDao.insert(new Coin(
                     "Half Dollar (Walking Liberty) (user c.)",
@@ -690,16 +551,12 @@ public abstract class CoinRoomDatabase extends RoomDatabase {
                     "silver_american_walking_liberty_half_dollar",
                     "U.S.A.",
                     "American",
-                    5009,
-                    5055,
-                    0,
-                    11394,
-                    0,
-                    0,
-                    0,
-                    19755,
-                    0,
-                    0.03f
+                    5032f,
+                    0.04f,
+                    11394f,
+                    0.05f,
+                    19755f,
+                    0.05f
             ));
             mDao.insert(new Coin(
                     "Washington Quarter (user c.)",
@@ -709,35 +566,27 @@ public abstract class CoinRoomDatabase extends RoomDatabase {
                     "silver_american_washington_quarter",
                     "U.S.A.",
                     "American",
-                    6083,
-                    6315,
-                    0,
-                    14609,
-                    0,
-                    0,
-                    0,
-                    21947,
-                    0,
-                    0.03f
+                    6199f,
+                    0.159f,
+                    14609f,
+                    0.05f,
+                    21947f,
+                    0.05f
             ));
             mDao.insert(new Coin(
                     "Kangaroo (user c.)",
-                    "Washington Quarter",
+                    "Kangaroo",
                     0.5f,
                     "Gold",
                     "gold_australian_kangaroo_1_2oz",
                     "Australia",
                     "Australian",
-                    4874,
-                    4926,
-                    0,
-                    11522,
-                    0,
-                    0,
-                    0,
-                    20162,
-                    0,
-                    0.03f
+                    3615f,
+                    0.058f,
+                    8465.5f,
+                    0.04f,
+                    14807f,
+                    0.04f
             ));
             mDao.insert(new Coin(
                     "500 Lira (user contributed)",
@@ -747,16 +596,12 @@ public abstract class CoinRoomDatabase extends RoomDatabase {
                     "silver_italian_500_lira",
                     "Italy",
                     "Italian",
-                    5324,
-                    5481,
-                    0,
-                    12367,
-                    0,
-                    0,
-                    0,
-                    21453,
-                    0,
-                    0.04f
+                    5402.5f,
+                    0.082f,
+                    12367f,
+                    0.05f,
+                    21453f,
+                    0.05f
             ));
             mDao.insert(new Coin(
                     "Mexican 1/2 oz Libertad (user c.)",
@@ -766,18 +611,28 @@ public abstract class CoinRoomDatabase extends RoomDatabase {
                     "gold_mexican_libertad_1_2oz",
                     "Mexico",
                     "Mexican",
-                    2766,
-                    0,
-                    0,
-                    6724,
-                    0,
-                    0,
-                    0,
-                    12074,
-                    0,
+                    2766f,
+                    0.04f,
+                    6724f,
+                    0.04f,
+                    12074f,
                     0.04f
             ));
-
+            mDao.insert(new Coin(
+                    "APMEX Fine Silver Round 1 oz",
+                    "APMEX Silver Round",
+                    1f,
+                    "Silver",
+                    "silver_apmex_round_1oz",
+                    "APMEX",
+                    "APMEX",
+                    4398f,
+                    0.03f,
+                    10035f,
+                    0.03f,
+                    17290f,
+                    0.03f
+            ));
 
 
 

@@ -152,10 +152,9 @@ public class PingProcessor implements AudioProcessor {
 
         //log10 of the normalized value
         //adding 75 makes sure the value is above zero, a bit ugly though...
-        for(int i = 1;i<magnitudes.length;i++){
+        for(int i = 0;i<magnitudes.length;i++){
             logMagnitudes[i] = (float) (10 * Math.log10(magnitudes[i]/maxMagnitude)) + 75;
             magnitudes[i] = (float) (magnitudes[i]/maxMagnitude);
-
         }
     }
 

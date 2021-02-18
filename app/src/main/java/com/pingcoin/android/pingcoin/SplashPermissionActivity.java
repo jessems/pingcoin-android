@@ -14,12 +14,23 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 /**
  * This {@link Activity} functions as a base class for a splash screen. This
@@ -113,6 +124,8 @@ abstract public class SplashPermissionActivity extends Activity {
 
     abstract public Class getNextActivityClass();
 
+    private FirebaseAuth mAuth;
+
     /**
      * Get the list of required permissions by searching the manifest. If you
      * don't think the default behavior is working, then you could try
@@ -164,6 +177,10 @@ abstract public class SplashPermissionActivity extends Activity {
         textView.setText("Waiting for permissions...");
         mainLayout.addView(textView, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
 
+
+        // Initialize Firebase Auth
+        mAuth = FirebaseAuth.getInstance();
+
         /** Set the background color. */
         int off = 128;
         int rest = 256 - off;
@@ -188,6 +205,38 @@ abstract public class SplashPermissionActivity extends Activity {
         } else {
             startNextActivity();
         }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        // Check if user is signed in (non-null) and update UI accordingly.
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+//        updateUI(currentUser);
+
+        if(currentUser == null) {
+            mAuth.signInAnonymously()
+                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            if (task.isSuccessful()) {
+                                // Sign in success, update UI with the signed-in user's information
+                                Log.d("Splash", "signInAnonymously:success");
+                                FirebaseUser user = mAuth.getCurrentUser();
+//                            updateUI(user);
+                            } else {
+                                // If sign in fails, display a message to the user.
+                                Log.w("Splash", "signInAnonymously:failure", task.getException());
+                                Toast.makeText(SplashPermissionActivity.this, "Something went wrong.",
+                                        Toast.LENGTH_SHORT).show();
+//                            updateUI(null);
+                            }
+
+                            // ...
+                        }
+                    });
+        }
+
     }
 
     /**
@@ -247,7 +296,7 @@ abstract public class SplashPermissionActivity extends Activity {
         if (ungrantedPermissions.length == 0) {
             startNextActivity();
         } else {
-            requestPermissions(ungrantedPermissions, PERMISSIONS_REQUEST);
+            ActivityCompat.requestPermissions(SplashPermissionActivity.this, ungrantedPermissions, PERMISSIONS_REQUEST);
         }
     }
 

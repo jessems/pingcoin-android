@@ -55,7 +55,7 @@ public class HighPass extends IIRFilter{
     protected void calcCoeff()
     {
         float fracFreq = getFrequency()/getSampleRate();
-        float x = (float)Math.exp(-2 * Math.PI * fracFreq);
+        float x = (float)Math.exp(-4 * Math.PI * fracFreq);
         a = new float[] { (1+x)/2, -(1+x)/2 };
         b = new float[] { x };
     }

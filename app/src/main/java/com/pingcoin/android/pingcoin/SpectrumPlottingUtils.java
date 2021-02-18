@@ -159,6 +159,7 @@ public class SpectrumPlottingUtils {
         float convertedLinewidth;
 
         // Determine which natural frequency we're plotting
+        // TODO: The threshold width is still not 100% accurate, especially for C0D4. There seems to be 1 pixel discrepancy.
         convertedXValue = (naturalFrequencyValue / (sampleRate)) * windowSize;
         convertedXValueBottomThreshold = convertedXValue * (1 - naturalFrequencyError);
         convertedXValueTopThreshold = convertedXValue * (1 + naturalFrequencyError);
@@ -409,16 +410,21 @@ public class SpectrumPlottingUtils {
         double gm = MeanCalculator.geometricMean(doubleArray);
         double am = MeanCalculator.arithmeticMean(doubleArray);
         final double spectralFlatness = convertToDesiredDecimals(gm / am, 2);
+        final double inverseSpectralFlatness = 1/spectralFlatness;
         final double spectralCentroid = convertToDesiredDecimals(MeanCalculator.spectralCentroid(doubleArray), 2);
         final double spectralMedian = convertToDesiredDecimals(MeanCalculator.spectralMedian(doubleArray), 2);
-        Log.i("Spectral Flatness: ", Double.toString(spectralFlatness));
-        Log.i("Spectral Median: ", Double.toString(spectralMedian));
+        final double spectralBandwidth = convertToDesiredDecimals(MeanCalculator.spectralBandwidth(doubleArray), 2);
+//        Log.i("Spectral Flatness: ", Double.toString(spectralFlatness));
+//        Log.i("ISpectral Flatness: ", Double.toString(inverseSpectralFlatness));
+//        Log.i("Spectral Median: ", Double.toString(spectralMedian));
 
         // Convert features to 2 decimals
 
         spectralFeatures.put("spectralCentroid", spectralCentroid);
         spectralFeatures.put("spectralFlatness", spectralFlatness);
+        spectralFeatures.put("inverseSpectralFlatness", inverseSpectralFlatness);
         spectralFeatures.put("spectralMedian", spectralMedian);
+        spectralFeatures.put("spectralBandwidth", spectralBandwidth);
 
         return spectralFeatures;
 

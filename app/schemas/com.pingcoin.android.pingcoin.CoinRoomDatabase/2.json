@@ -1,0 +1,136 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 2,
+    "identityHash": "65d2324b938a549b7be597462dc0ff31",
+    "entities": [
+      {
+        "tableName": "coin_table",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`coin_id` TEXT NOT NULL, `popular_name` TEXT, `material_class` TEXT, `series` TEXT, `nationality` TEXT, `country` TEXT, `weight` REAL NOT NULL, `weight_in_oz` REAL NOT NULL, `c0d2` REAL NOT NULL, `c0d2Error` REAL NOT NULL, `c1d0` REAL NOT NULL, `c1d0Error` REAL NOT NULL, `c0d3` REAL NOT NULL, `c0d3Error` REAL NOT NULL, `c0d4` REAL NOT NULL, `c0d4Error` REAL NOT NULL, `c1d1` REAL NOT NULL, `c1d1Error` REAL NOT NULL, PRIMARY KEY(`coin_id`))",
+        "fields": [
+          {
+            "fieldPath": "coinId",
+            "columnName": "coin_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "popularName",
+            "columnName": "popular_name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "materialClass",
+            "columnName": "material_class",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "series",
+            "columnName": "series",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "nationality",
+            "columnName": "nationality",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "country",
+            "columnName": "country",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "weight",
+            "columnName": "weight",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "weightInOz",
+            "columnName": "weight_in_oz",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "c0d2",
+            "columnName": "c0d2",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "c0d2Error",
+            "columnName": "c0d2Error",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "c1d0",
+            "columnName": "c1d0",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "c1d0Error",
+            "columnName": "c1d0Error",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "c0d3",
+            "columnName": "c0d3",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "c0d3Error",
+            "columnName": "c0d3Error",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "c0d4",
+            "columnName": "c0d4",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "c0d4Error",
+            "columnName": "c0d4Error",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "c1d1",
+            "columnName": "c1d1",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "c1d1Error",
+            "columnName": "c1d1Error",
+            "affinity": "REAL",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "coin_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"65d2324b938a549b7be597462dc0ff31\")"
+    ]
+  }
+}

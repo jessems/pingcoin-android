@@ -36,35 +36,35 @@ public class Coin {
     @ColumnInfo(name = "weight_in_oz")
     public float weightInOz;
 
-    @ColumnInfo(name = "c0d2a")
-    public float c0d2a;
+    @ColumnInfo(name = "c0d2")
+    public float c0d2;
 
-    @ColumnInfo(name = "c0d2b")
-    public float c0d2b;
+    @ColumnInfo(name = "c0d2Error")
+    public float c0d2Error;
 
     @ColumnInfo(name = "c1d0") // There is no a, b for c1d0 because this resonance doesn't split
     public float c1d0;
 
-    @ColumnInfo(name = "c0d3a")
-    public float c0d3a;
+    @ColumnInfo(name = "c1d0Error")
+    public float c1d0Error;
 
-    @ColumnInfo(name = "c0d3b")
-    public float c0d3b;
+    @ColumnInfo(name = "c0d3")
+    public float c0d3;
 
-    @ColumnInfo(name = "c0d4a")
-    public float c0d4a;
+    @ColumnInfo(name = "c0d3Error")
+    public float c0d3Error;
 
-    @ColumnInfo(name = "c0d4b")
-    public float c0d4b;
+    @ColumnInfo(name = "c0d4")
+    public float c0d4;
 
-    @ColumnInfo(name = "c1d1a")
-    public float c1d1a;
+    @ColumnInfo(name = "c0d4Error")
+    public float c0d4Error;
 
-    @ColumnInfo(name = "c1d1b")
-    public float c1d1b;
+    @ColumnInfo(name = "c1d1")
+    public float c1d1;
 
-    @ColumnInfo(name = "error")
-    public float error;
+    @ColumnInfo(name = "c1d1Error")
+    public float c1d1Error;
 
     public Coin(
             String popularName,
@@ -74,16 +74,13 @@ public class Coin {
             String coinId,
             String country,
             String nationality,
-            float c0d2a,
-            float c0d2b,
-            float c1d0,
-            float c0d3a,
-            float c0d3b,
-            float c1d1a,
-            float c1d1b,
-            float c0d4a,
-            float c0d4b,
-            float error) {
+            float c0d2,
+            float c0d2Error,
+            float c0d3,
+            float c0d3Error,
+            float c0d4,
+            float c0d4Error
+            ) {
         this.popularName = popularName;
         this.series = series;
         this.weightInOz = weightInOz;
@@ -91,16 +88,12 @@ public class Coin {
         this.country = country;
         this.nationality = nationality;
         this.coinId = coinId;
-        this.c0d2a = c0d2a;
-        this.c0d2b = c0d2b;
-        this.c1d0 = c1d0;
-        this.c0d3a = c0d3a;
-        this.c0d3b = c0d3b;
-        this.c1d1a = c1d1a;
-        this.c1d1b = c1d1b;
-        this.c0d4a = c0d4a;
-        this.c0d4b = c0d4b;
-        this.error = error;
+        this.c0d2 = c0d2;
+        this.c0d2Error = c0d2Error;
+        this.c0d3 = c0d3;
+        this.c0d3Error = c0d3Error;
+        this.c0d4 = c0d4;
+        this.c0d4Error = c0d4Error;
 
     }
 
@@ -108,20 +101,28 @@ public class Coin {
         return this.coinId;
     }
 
-    public float getC0D2a() {
-        return this.c0d2a;
+    public float getC0D2() {
+        return this.c0d2;
     }
 
-    public float getC0D3a() {
-        return this.c0d3a;
+    public float getC0D2Error() {
+        return this.c0d2Error;
     }
 
-    public float getC0D4a() {
-        return this.c0d4a;
+    public float getC0D3() {
+        return this.c0d3;
     }
 
-    public float getError() {
-        return this.error;
+    public float getC0D3Error() {
+        return this.c0d3Error;
+    }
+
+    public float getC0D4() {
+        return this.c0d4;
+    }
+
+    public float getC0D4Error() {
+        return this.c0d4Error;
     }
 
     public String getPopularName(){

@@ -20,13 +20,18 @@ public final class CoinContract {
         public static final String COLUMN_DIAMETER = "diameter";
         public static final String COLUMN_C0D2A = "c0d2a";
         public static final String COLUMN_C0D2B = "c0d2b";
+        public static final String COLUMN_C0D2_ERROR = "c0d2Error";
         public static final String COLUMN_C1D0 = "c1d0";
+        public static final String COLUMN_C1D0_ERROR = "c1d0Error";
         public static final String COLUMN_C0D3A = "c0d3a";
         public static final String COLUMN_C0D3B = "c0d3b";
+        public static final String COLUMN_C0D3_ERROR = "c0d3Error";
         public static final String COLUMN_C0D4A = "c0d4a";
         public static final String COLUMN_C0D4B = "c0d4b";
+        public static final String COLUMN_C0D4_ERROR = "c0d4Error";
         public static final String COLUMN_C1D1A = "c1d1a";
         public static final String COLUMN_C1D1B = "c1d1b";
+        public static final String COLUMN_C1D1_ERROR = "c1d1Error";
         public static final String COLUMN_CD_ERROR = "cdError";
     }
 }

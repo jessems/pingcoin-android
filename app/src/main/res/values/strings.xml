@@ -17,7 +17,7 @@
     <string name="toolbar_sign_out">Sign out</string>
     <string name="toolbar_feedback">Feedback</string>
     <string name="toolbar_submit_coin">Submit a coin</string>
-    <string name="toolbar_about_ping_test">About the ping test</string>
+    <string name="toolbar_about_ping_test">How Pingcoin works</string>
     <string name="start_again">Start Again</string>
     <string name="zero_resonance_frequences_recognized_clean_toast">Was that a coin?</string>
     <string name="step_1_text">Step 1: Record a ping</string>

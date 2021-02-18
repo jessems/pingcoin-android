@@ -33,6 +33,11 @@ import com.android.volley.VolleyLog;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -93,7 +98,9 @@ public class TestCoin extends AppCompatActivity implements EasyPermissions.Permi
     static Long naturalFrequencyC0D2 = null;
     static Long naturalFrequencyC0D3 = null;
     static Long naturalFrequencyC0D4 = null;
-    static float naturalFrequencyError = 0;
+    static float naturalFrequencyC0D2Error = 0;
+    static float naturalFrequencyC0D3Error = 0;
+    static float naturalFrequencyC0D4Error = 0;
 
     final int sampleRate = 44100;
     final int windowSize = 4096;
@@ -114,6 +121,8 @@ public class TestCoin extends AppCompatActivity implements EasyPermissions.Permi
     public boolean secondaryBannerIsSlideInBanner;
     public long verdictExpirationTime;
     private DatabaseReference mDatabase;
+    private FirebaseAuth mAuth;
+    private FirebaseUser currentUser;
 
 //    @Override
 //    protected void onResume() {
@@ -141,11 +150,43 @@ public class TestCoin extends AppCompatActivity implements EasyPermissions.Permi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test_coin);
 
-
+        // Initialize Firebase Auth
+        mAuth = FirebaseAuth.getInstance();
+        this.currentUser = mAuth.getCurrentUser();
         checkRecordingPermissionsAndInitCoinTesting();
 
 
     }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        mAuth = FirebaseAuth.getInstance();
+
+        if (mAuth.getCurrentUser() == null) {
+            mAuth.signInAnonymously()
+                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            if (task.isSuccessful()) {
+                                // Sign in success, update UI with the signed-in user's information
+                                Log.d("SelectCoin", "signInAnonymously:success");
+                                FirebaseUser user = mAuth.getCurrentUser();
+//                                updateUI(user);
+                            } else {
+                                // If sign in fails, display a message to the user.
+                                Log.w("SelectCoin", "signInAnonymously:failure", task.getException());
+                                Toast.makeText(TestCoin.this, "Authentication failed.",
+                                        Toast.LENGTH_SHORT).show();
+//                                updateUI(null);
+                            }
+
+                            // ...
+                        }
+                    });
+        }
+    }
+
 
     @AfterPermissionGranted(123)
     private void checkRecordingPermissionsAndInitCoinTesting() {
@@ -167,10 +208,13 @@ public class TestCoin extends AppCompatActivity implements EasyPermissions.Permi
         String selectedCoinId = "";
         float selectedCoinWeightInOz = 0;
         String selectedCoinMaterialClass = "";
-        float selectedCoinC0D2a = 0;
-        float selectedCoinC0D3a = 0;
-        float selectedCoinC0D4a = 0;
-        float selectedCoinError = 0;
+        float selectedCoinC0D2 = 0;
+        float selectedCoinC0D2Error = 0;
+        float selectedCoinC0D3 = 0;
+        float selectedCoinC0D3Error = 0;
+        float selectedCoinC0D4 = 0;
+        float selectedCoinC0D4Error = 0;
+
         finalVerdictIsBeingDisplayed = false;
 
         // Set up the intent for the coinTesting activity
@@ -181,10 +225,12 @@ public class TestCoin extends AppCompatActivity implements EasyPermissions.Permi
             selectedCoinId = extras.getString("id");
             selectedCoinWeightInOz = extras.getFloat("WeightInOz");
             selectedCoinMaterialClass = extras.getString("MaterialClass");
-            selectedCoinC0D2a = extras.getFloat("C0D2a");
-            selectedCoinC0D3a = extras.getFloat("C0D3a");
-            selectedCoinC0D4a = extras.getFloat("C0D4a");
-            selectedCoinError = extras.getFloat("Error");
+            selectedCoinC0D2 = extras.getFloat("C0D2");
+            selectedCoinC0D3 = extras.getFloat("C0D3");
+            selectedCoinC0D4 = extras.getFloat("C0D4");
+            selectedCoinC0D2Error = extras.getFloat("C0D2Error");
+            selectedCoinC0D3Error = extras.getFloat("C0D3Error");
+            selectedCoinC0D4Error = extras.getFloat("C0D4Error");
         }
 
         Toolbar toolbar = findViewById(R.id.test_coin_toolbar);
@@ -245,10 +291,12 @@ public class TestCoin extends AppCompatActivity implements EasyPermissions.Permi
         }
 
 
-        naturalFrequencyC0D2 = (long) selectedCoinC0D2a;
-        naturalFrequencyC0D3 = (long) selectedCoinC0D3a;
-        naturalFrequencyC0D4 = (long) selectedCoinC0D4a;
-        naturalFrequencyError = selectedCoinError;
+        naturalFrequencyC0D2 = (long) selectedCoinC0D2;
+        naturalFrequencyC0D3 = (long) selectedCoinC0D3;
+        naturalFrequencyC0D4 = (long) selectedCoinC0D4;
+        naturalFrequencyC0D2Error = selectedCoinC0D2Error;
+        naturalFrequencyC0D3Error = selectedCoinC0D3Error;
+        naturalFrequencyC0D4Error = selectedCoinC0D4Error;
 
 
         final LineChart chart = findViewById(R.id.chart);
@@ -260,9 +308,9 @@ public class TestCoin extends AppCompatActivity implements EasyPermissions.Permi
 
 
         // Expected peaks plotting
-        SpectrumPlottingUtils.plotExpectedNaturalFrequencyToleranceBar(chart, "c0d2", naturalFrequencyC0D2, naturalFrequencyError, sampleRate, windowSize);
-        SpectrumPlottingUtils.plotExpectedNaturalFrequencyToleranceBar(chart, "c0d3", naturalFrequencyC0D3, naturalFrequencyError, sampleRate, windowSize);
-        SpectrumPlottingUtils.plotExpectedNaturalFrequencyToleranceBar(chart, "c0d4", naturalFrequencyC0D4, naturalFrequencyError, sampleRate, windowSize);
+        SpectrumPlottingUtils.plotExpectedNaturalFrequencyToleranceBar(chart, "c0d2", naturalFrequencyC0D2, naturalFrequencyC0D2Error, sampleRate, windowSize);
+        SpectrumPlottingUtils.plotExpectedNaturalFrequencyToleranceBar(chart, "c0d3", naturalFrequencyC0D3, naturalFrequencyC0D3Error, sampleRate, windowSize);
+        SpectrumPlottingUtils.plotExpectedNaturalFrequencyToleranceBar(chart, "c0d4", naturalFrequencyC0D4, naturalFrequencyC0D4Error, sampleRate, windowSize);
 
 
         chart.invalidate();
@@ -292,7 +340,7 @@ public class TestCoin extends AppCompatActivity implements EasyPermissions.Permi
 
         this.dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(sampleRate, windowSize, windowSize * 75 / 100);
 
-        this.dispatcher.addAudioProcessor(new HighPass(1000, sampleRate));
+        this.dispatcher.addAudioProcessor(new HighPass(2000, sampleRate));
         // TODO: Simplify the pingProcessor (We don't need all it's functions.)
         this.dispatcher.addAudioProcessor(pingProcessor);
 
@@ -317,229 +365,265 @@ public class TestCoin extends AppCompatActivity implements EasyPermissions.Permi
 
             // The process method for the main (anonymous) AudioProcessor object.
             public boolean process(AudioEvent audioEvent) {
+                if (pingProcessor != null) {
 
-                // Set up the variables
-                boolean pingIsClean = false;
+                    // Set up the variables
+                    boolean pingIsClean = false;
 
-                final float[] currentMagnitudes = pingProcessor.getMagnitudes();
-                final double[] currentMagnitudesAsDoubles = convertFloatsToDoubles(currentMagnitudes);
-                final float[] currentLogMagnitudes = pingProcessor.getLogMagnitudes();
-                final float[] currentFrequencyEstimates = pingProcessor.getFrequencyEstimates();
-                final float[] noiseFloor;
+                    final float[] currentMagnitudes = pingProcessor.getMagnitudes();
 
 
-                // Create an empty list of SpectralPeak objects to fill in the peaks later
-                List<SpectralPeak> peakList = new ArrayList<>();
+                    final double[] currentMagnitudesAsDoubles = convertFloatsToDoubles(currentMagnitudes);
+                    final float[] currentLogMagnitudes = pingProcessor.getLogMagnitudes();
+                    final float[] currentFrequencyEstimates = pingProcessor.getFrequencyEstimates();
+                    final float[] noiseFloor;
 
 
-                // FEATURE DETECTION
-                // Collect the spectral features in a map
-                final Map<String, Double> spectralFeatures = SpectrumPlottingUtils.getSpectralFeatures(currentMagnitudes);
+                    // Create an empty list of SpectralPeak objects to fill in the peaks later
+                    List<SpectralPeak> peakList = new ArrayList<>();
 
 
-                // PEAK DETECTION
-                // Set the peak detection algorithm
-                LinkedList<Integer> detectedPeaksBins = new LinkedList<>();
-                LinkedList<Float> detectedPeaksHz = new LinkedList<>();
-                String peakDetectionAlgorithm = "GENERAL_PEAK_PICKING_METHOD";
-
-                // Initialize the peak detection algorithm based on the one that was selected
-                switch (peakDetectionAlgorithm) {
-                    case "GENERAL_PEAK_PICKING_METHOD":
-                        detectedPeaksBins = Peaks.findPeaks(currentMagnitudesAsDoubles, 5, 0.10, 0.05, true);
-
-                        if (detectedPeaksBins.size() < 100) {
-                            // Create a parallel LinkedList of peaks in Hz for use later.
-                            detectedPeaksHz = convertBinsToHz(detectedPeaksBins, currentFrequencyEstimates);
-                            convertToListOfSpectralPeaks(detectedPeaksBins, peakList, currentMagnitudes);
-                        } else {
-                            // do this
-                        }
-
-                }
+                    // FEATURE DETECTION
+                    // Collect the spectral features in a map
+                    final Map<String, Double> spectralFeatures = SpectrumPlottingUtils.getSpectralFeatures(currentMagnitudes);
 
 
-                // Compare to expected frequencies
+                    // PEAK DETECTION
+                    // Set the peak detection algorithm
+                    LinkedList<Integer> detectedPeaksBins = new LinkedList<>();
+                    LinkedList<Float> detectedPeaksHz = new LinkedList<>();
+                    String peakDetectionAlgorithm = "GENERAL_PEAK_PICKING_METHOD";
 
-                // Reset expected frequency colors:
+                    // Initialize the peak detection algorithm based on the one that was selected
+                    switch (peakDetectionAlgorithm) {
+                        case "GENERAL_PEAK_PICKING_METHOD":
+                            int cutoff = (int) Math.round((2000.0 / (sampleRate / 2)) * currentMagnitudesAsDoubles.length);
+                            for (int i = 0; i < currentMagnitudesAsDoubles.length - 1; i++) {
+                                if (i < cutoff) {
+                                    currentMagnitudesAsDoubles[i] = 0;
+                                }
+                            }
+                            detectedPeaksBins = Peaks.findPeaks(currentMagnitudesAsDoubles, 5, 0.10);
+
+                            if (detectedPeaksBins.size() < 100) {
+                                // Create a parallel LinkedList of peaks in Hz for use later.
+                                detectedPeaksHz = convertBinsToHz(detectedPeaksBins, currentFrequencyEstimates);
+                                convertToListOfSpectralPeaks(detectedPeaksBins, peakList, currentMagnitudes);
+                            } else {
+                                // do this
+                            }
+
+                    }
 
 
-                final ImageView c0d2 = findViewById(R.id.imageView_c0d2);
-                final ImageView c0d3 = findViewById(R.id.imageView_c0d3);
-                final ImageView c0d4 = findViewById(R.id.imageView_c0d4);
+                    // Compare to expected frequencies
+
+                    // Reset expected frequency colors:
 
 
-                Map<String, Float> expectedResonanceFrequencies = new HashMap();
-                expectedResonanceFrequencies.put("C0D2", (float) TestCoin.naturalFrequencyC0D2);
-                expectedResonanceFrequencies.put("C0D3", (float) TestCoin.naturalFrequencyC0D3);
-                expectedResonanceFrequencies.put("C0D4", (float) TestCoin.naturalFrequencyC0D4);
-                expectedResonanceFrequencies.put("tolerance", (float) TestCoin.naturalFrequencyError);
+                    final ImageView c0d2 = findViewById(R.id.imageView_c0d2);
+                    final ImageView c0d3 = findViewById(R.id.imageView_c0d3);
+                    final ImageView c0d4 = findViewById(R.id.imageView_c0d4);
 
 
-                // RESONANCE FREQUENCY RECOGNITION
-                // Returns a map with recognized frequencies
-                final Map<String, Boolean> recognizedResonanceFrequencies =
-                        getRecognizedResonanceFrequencies(detectedPeaksHz, expectedResonanceFrequencies);
+                    Map<String, Float> expectedResonanceFrequencies = new HashMap();
+                    expectedResonanceFrequencies.put("C0D2", (float) TestCoin.naturalFrequencyC0D2);
+                    expectedResonanceFrequencies.put("C0D3", (float) TestCoin.naturalFrequencyC0D3);
+                    expectedResonanceFrequencies.put("C0D4", (float) TestCoin.naturalFrequencyC0D4);
+                    expectedResonanceFrequencies.put("C0D2Error", (float) TestCoin.naturalFrequencyC0D2Error);
+                    expectedResonanceFrequencies.put("C0D3Error", (float) TestCoin.naturalFrequencyC0D3Error);
+                    expectedResonanceFrequencies.put("C0D4Error", (float) TestCoin.naturalFrequencyC0D4Error);
 
-                // Returns a verdict based the frequencies that were recognized
-                final Verdict verdict =
-                        getVerdict(recognizedResonanceFrequencies, spectralFeatures, featureThresholds);
 
-                final List<Entry> magnitudesList = SpectrumPlottingUtils.floatArrayToList(currentMagnitudes);
+                    // RESONANCE FREQUENCY RECOGNITION
+                    // Returns a map with recognized frequencies
+                    final Map<String, Boolean> recognizedResonanceFrequencies =
+                            getRecognizedResonanceFrequencies(detectedPeaksHz, expectedResonanceFrequencies);
 
-                // TODO: We should only change the color on the UI thread
+                    // Returns a verdict based the frequencies that were recognized
+                    final Verdict verdict =
+                            getVerdict(recognizedResonanceFrequencies, spectralFeatures, featureThresholds);
+
+                    final List<Entry> magnitudesList = SpectrumPlottingUtils.floatArrayToList(currentMagnitudes);
+
+                    // TODO: We should only change the color on the UI thread
 //                updateResonanceFrequencyToleranceBars(recognizedResonanceFrequencies, chart);
 
-                if(!finalVerdictIsBeingDisplayed) {
-                    runOnUiThread(() -> {
-                        SpectrumPlottingUtils.setExpectedNaturalFrequencyToleranceBarColor(chart, "c0d2", false);
-                        SpectrumPlottingUtils.setExpectedNaturalFrequencyToleranceBarColor(chart, "c0d3", false);
-                        SpectrumPlottingUtils.setExpectedNaturalFrequencyToleranceBarColor(chart, "c0d4", false);
-                        updateResonanceFrequencyIcons(recognizedResonanceFrequencies);
-                    });
-                }
+                    if (!finalVerdictIsBeingDisplayed) {
+                        runOnUiThread(() -> {
+                            SpectrumPlottingUtils.setExpectedNaturalFrequencyToleranceBarColor(chart, "c0d2", false);
+                            SpectrumPlottingUtils.setExpectedNaturalFrequencyToleranceBarColor(chart, "c0d3", false);
+                            SpectrumPlottingUtils.setExpectedNaturalFrequencyToleranceBarColor(chart, "c0d4", false);
+                            updateResonanceFrequencyIcons(recognizedResonanceFrequencies);
+                        });
+                    }
 
 
-                if (!audioProcessorThread.isInterrupted() && !finalVerdictIsBeingDisplayed) {
+                    if (!audioProcessorThread.isInterrupted() && !finalVerdictIsBeingDisplayed) {
 
-                    final LineData chartData = new LineData();
+                        final LineData chartData = new LineData();
 
-                    Map<String, ImageView> resonanceFrequencyIconImageViews = new HashMap<>();
-                    resonanceFrequencyIconImageViews.put("c0d2", c0d2);
-                    resonanceFrequencyIconImageViews.put("c0d3", c0d3);
-                    resonanceFrequencyIconImageViews.put("c0d4", c0d4);
+                        Map<String, ImageView> resonanceFrequencyIconImageViews = new HashMap<>();
+                        resonanceFrequencyIconImageViews.put("c0d2", c0d2);
+                        resonanceFrequencyIconImageViews.put("c0d3", c0d3);
+                        resonanceFrequencyIconImageViews.put("c0d4", c0d4);
 
 
-                    // Continue to update the graph after every block as long as NOT all 3 peaks are detected
-                    switch (verdict) {
-                        case ZERO_RESONANCE_FREQUENCIES_RECOGNIZED_NOT_CLEAN:
-                            if (verdictHasExpired()
-                                    && !getFinalVerdictIsBeingDisplayed()
-                            ) {
-                                updateChart(chart, chartData, magnitudesList);
-                                updateDetectedPeaks(detectedPeaksBins, chart);
-                                updateResonanceFrequencyToleranceBars(recognizedResonanceFrequencies, chart);
-                                break;
-                            }
-                        case ZERO_RESONANCE_FREQUENCIES_RECOGNIZED_CLEAN:
-                            if (verdictHasExpired()
-                                    && !getFinalVerdictIsBeingDisplayed()
-                            ) {
-                                updateChart(chart, chartData, magnitudesList);
-                                updateDetectedPeaks(detectedPeaksBins, chart);
-                                updateResonanceFrequencyToleranceBars(recognizedResonanceFrequencies, chart);
+                        // Continue to update the graph after every block as long as NOT all 3 peaks are detected
+                        switch (verdict) {
+                            case ZERO_RESONANCE_FREQUENCIES_RECOGNIZED_NOT_CLEAN:
+                                if (verdictHasExpired()
+                                        && !getFinalVerdictIsBeingDisplayed()
+                                ) {
+                                    updateChart(chart, chartData, magnitudesList);
+                                    updateDetectedPeaks(detectedPeaksBins, chart);
+                                    updateResonanceFrequencyToleranceBars(recognizedResonanceFrequencies, chart);
+                                    break;
+                                }
+                            case ZERO_RESONANCE_FREQUENCIES_RECOGNIZED_CLEAN:
+                                if (verdictHasExpired()
+                                        && !getFinalVerdictIsBeingDisplayed()
+                                ) {
+//                                updateChart(chart, chartData, magnitudesList);
+//                                updateDetectedPeaks(detectedPeaksBins, chart);
+//                                updateResonanceFrequencyToleranceBars(recognizedResonanceFrequencies, chart);
+//
+//                                // If the ping is clean and some peaks are detected, it might be a coin (just not THIS coin)
+//                                // If between 2 and 10 peaks are detected, freeze the graph as we do with a proper verdict.
+//                                if (detectedPeaksBins.size() > 2 && detectedPeaksBins.size() < 10) {
+//                                    sendPingInformationToFirebase(finalSelectedCoinId,detectedPeaksHz,recognizedResonanceFrequencies,verdict);
+//                                    updateVerdictBanner(verdict, spectralFeatures);
+//                                    setFinalVerdictIsBeingDisplayed(true);
+//                                    setStartAgainButtonVisibility(startAgainButton, View.VISIBLE);
+//                                } else {
+////                                    showToast(getString(R.string.zero_resonance_frequences_recognized_clean_toast));
+//                                }
+//                                break;
 
-                                // If the ping is clean and some peaks are detected, it might be a coin (just not THIS coin)
-                                // If between 2 and 10 peaks are detected, freeze the graph as we do with a proper verdict.
-                                if (detectedPeaksBins.size() > 2 && detectedPeaksBins.size() < 10) {
-                                    sendPingInformationToFirebase(finalSelectedCoinId,detectedPeaksHz,recognizedResonanceFrequencies,verdict);
+
+                                    updateChart(chart, chartData, magnitudesList);
                                     updateVerdictBanner(verdict, spectralFeatures);
+                                    sendPingInformationToFirebase(finalSelectedCoinId, detectedPeaksHz, recognizedResonanceFrequencies, verdict);
+                                    updateDetectedPeaks(detectedPeaksBins, chart);
+                                    updateResonanceFrequencyToleranceBars(recognizedResonanceFrequencies, chart);
+
                                     setFinalVerdictIsBeingDisplayed(true);
                                     setStartAgainButtonVisibility(startAgainButton, View.VISIBLE);
-                                } else {
-//                                    showToast(getString(R.string.zero_resonance_frequences_recognized_clean_toast));
+                                    break;
+
                                 }
-                                break;
+                            case ONE_RESONANCE_FREQUENCY_RECOGNIZED_NOT_CLEAN:
+                                if (verdictHasExpired()
+                                        && !getFinalVerdictIsBeingDisplayed()
+                                ) {
 
-                            }
-                        case ONE_RESONANCE_FREQUENCY_RECOGNIZED_NOT_CLEAN:
-                            if (verdictHasExpired()
-                                    && !getFinalVerdictIsBeingDisplayed()
-                            ) {
+                                    updateChart(chart, chartData, magnitudesList);
+                                    updateDetectedPeaks(detectedPeaksBins, chart);
+                                    updateResonanceFrequencyToleranceBars(recognizedResonanceFrequencies, chart);
+                                    break;
+                                }
+                            case ONE_RESONANCE_FREQUENCY_RECOGNIZED_CLEAN:
+                                if (verdictHasExpired()
+                                        && !getFinalVerdictIsBeingDisplayed()
+                                ) {
+//                                updateChart(chart, chartData, magnitudesList);
+////                                updateVerdictBanner(verdict, spectralFeatures);
+//
+////                                showToast(getString(R.string.zero_resonance_frequences_recognized_clean_toast));
+//
+//                                updateDetectedPeaks(detectedPeaksBins, chart);
+//                                updateResonanceFrequencyToleranceBars(recognizedResonanceFrequencies, chart);
+//
+////                                setFinalVerdictIsBeingDisplayed(true);
+////                                setStartAgainButtonVisibility(startAgainButton, View.VISIBLE);
+//                                break;
 
-                                updateChart(chart, chartData, magnitudesList);
-                                updateDetectedPeaks(detectedPeaksBins, chart);
-                                updateResonanceFrequencyToleranceBars(recognizedResonanceFrequencies, chart);
-                                break;
-                            }
-                        case ONE_RESONANCE_FREQUENCY_RECOGNIZED_CLEAN:
-                            if (verdictHasExpired()
-                                    && !getFinalVerdictIsBeingDisplayed()
-                            ) {
-                                updateChart(chart, chartData, magnitudesList);
+
+                                    updateChart(chart, chartData, magnitudesList);
+                                    updateVerdictBanner(verdict, spectralFeatures);
+                                    sendPingInformationToFirebase(finalSelectedCoinId, detectedPeaksHz, recognizedResonanceFrequencies, verdict);
+                                    updateDetectedPeaks(detectedPeaksBins, chart);
+                                    updateResonanceFrequencyToleranceBars(recognizedResonanceFrequencies, chart);
+
+                                    setFinalVerdictIsBeingDisplayed(true);
+                                    setStartAgainButtonVisibility(startAgainButton, View.VISIBLE);
+                                    break;
+                                }
+                            case TWO_RESONANCE_FREQUENCIES_RECOGNIZED_NOT_CLEAN:
+                                if (verdictHasExpired()
+                                        && !getFinalVerdictIsBeingDisplayed()
+                                ) {
+                                    updateChart(chart, chartData, magnitudesList);
 //                                updateVerdictBanner(verdict, spectralFeatures);
 
 //                                showToast(getString(R.string.zero_resonance_frequences_recognized_clean_toast));
-
-                                updateDetectedPeaks(detectedPeaksBins, chart);
-                                updateResonanceFrequencyToleranceBars(recognizedResonanceFrequencies, chart);
+                                    sendPingInformationToFirebase(finalSelectedCoinId, detectedPeaksHz, recognizedResonanceFrequencies, verdict);
+                                    updateDetectedPeaks(detectedPeaksBins, chart);
+                                    updateResonanceFrequencyToleranceBars(recognizedResonanceFrequencies, chart);
 
 //                                setFinalVerdictIsBeingDisplayed(true);
 //                                setStartAgainButtonVisibility(startAgainButton, View.VISIBLE);
-                                break;
-                            }
-                        case TWO_RESONANCE_FREQUENCIES_RECOGNIZED_NOT_CLEAN:
-                            if (verdictHasExpired()
-                                    && !getFinalVerdictIsBeingDisplayed()
-                            ) {
-                                updateChart(chart, chartData, magnitudesList);
+                                    break;
+                                }
+                            case TWO_RESONANCE_FREQUENCIES_RECOGNIZED_CLEAN:
+                                if (verdictHasExpired()
+                                        && !getFinalVerdictIsBeingDisplayed()
+                                ) {
+                                    updateChart(chart, chartData, magnitudesList);
+                                    updateVerdictBanner(verdict, spectralFeatures);
+                                    sendPingInformationToFirebase(finalSelectedCoinId, detectedPeaksHz, recognizedResonanceFrequencies, verdict);
+                                    updateDetectedPeaks(detectedPeaksBins, chart);
+                                    updateResonanceFrequencyToleranceBars(recognizedResonanceFrequencies, chart);
+
+                                    setFinalVerdictIsBeingDisplayed(true);
+                                    setStartAgainButtonVisibility(startAgainButton, View.VISIBLE);
+                                    break;
+                                }
+                            case THREE_RESONANCE_FREQUENCIES_RECOGNIZED_NOT_CLEAN:
+                                if (verdictHasExpired()
+                                        && !getFinalVerdictIsBeingDisplayed()
+                                ) {
+                                    updateChart(chart, chartData, magnitudesList);
 //                                updateVerdictBanner(verdict, spectralFeatures);
 
 //                                showToast(getString(R.string.zero_resonance_frequences_recognized_clean_toast));
-                                sendPingInformationToFirebase(finalSelectedCoinId,detectedPeaksHz,recognizedResonanceFrequencies,verdict);
-                                updateDetectedPeaks(detectedPeaksBins, chart);
-                                updateResonanceFrequencyToleranceBars(recognizedResonanceFrequencies, chart);
-
-//                                setFinalVerdictIsBeingDisplayed(true);
-//                                setStartAgainButtonVisibility(startAgainButton, View.VISIBLE);
-                                break;
-                            }
-                        case TWO_RESONANCE_FREQUENCIES_RECOGNIZED_CLEAN:
-                            if (verdictHasExpired()
-                                    && !getFinalVerdictIsBeingDisplayed()
-                            ) {
-                                updateChart(chart, chartData, magnitudesList);
-                                updateVerdictBanner(verdict, spectralFeatures);
-                                sendPingInformationToFirebase(finalSelectedCoinId,detectedPeaksHz,recognizedResonanceFrequencies,verdict);
-                                updateDetectedPeaks(detectedPeaksBins, chart);
-                                updateResonanceFrequencyToleranceBars(recognizedResonanceFrequencies, chart);
-
-                                setFinalVerdictIsBeingDisplayed(true);
-                                setStartAgainButtonVisibility(startAgainButton, View.VISIBLE);
-                                break;
-                            }
-                        case THREE_RESONANCE_FREQUENCIES_RECOGNIZED_NOT_CLEAN:
-                            if (verdictHasExpired()
-                                    && !getFinalVerdictIsBeingDisplayed()
-                            ) {
-                                updateChart(chart, chartData, magnitudesList);
-//                                updateVerdictBanner(verdict, spectralFeatures);
-
-//                                showToast(getString(R.string.zero_resonance_frequences_recognized_clean_toast));
-                                sendPingInformationToFirebase(finalSelectedCoinId,detectedPeaksHz,recognizedResonanceFrequencies,verdict);
-                                updateDetectedPeaks(detectedPeaksBins, chart);
-                                updateResonanceFrequencyIcons(recognizedResonanceFrequencies);
-                                updateResonanceFrequencyToleranceBars(recognizedResonanceFrequencies, chart);
+                                    sendPingInformationToFirebase(finalSelectedCoinId, detectedPeaksHz, recognizedResonanceFrequencies, verdict);
+                                    updateDetectedPeaks(detectedPeaksBins, chart);
+                                    updateResonanceFrequencyIcons(recognizedResonanceFrequencies);
+                                    updateResonanceFrequencyToleranceBars(recognizedResonanceFrequencies, chart);
 
 //                                setFinalVerdictIsBeingDisplayed(true);
 //                                setStartAgainButtonVisibility(startAgainButton, View.VISIBLE);
 
-                                break;
-                            }
-                        case THREE_RESONANCE_FREQUENCIES_RECOGNIZED_CLEAN:
-                            if (verdictHasExpired()
-                                    && !getFinalVerdictIsBeingDisplayed()
-                            ) {
-                                updateChart(chart, chartData, magnitudesList);
-                                sendPingInformationToFirebase(finalSelectedCoinId,detectedPeaksHz,recognizedResonanceFrequencies,verdict);
-                                updateVerdictBanner(verdict, spectralFeatures);
-                                updateDetectedPeaks(detectedPeaksBins, chart);
-                                updateResonanceFrequencyIcons(recognizedResonanceFrequencies);
-                                updateResonanceFrequencyToleranceBars(recognizedResonanceFrequencies, chart);
+                                    break;
+                                }
+                            case THREE_RESONANCE_FREQUENCIES_RECOGNIZED_CLEAN:
+                                if (verdictHasExpired()
+                                        && !getFinalVerdictIsBeingDisplayed()
+                                ) {
+                                    updateChart(chart, chartData, magnitudesList);
+                                    sendPingInformationToFirebase(finalSelectedCoinId, detectedPeaksHz, recognizedResonanceFrequencies, verdict);
+                                    updateVerdictBanner(verdict, spectralFeatures);
+                                    updateDetectedPeaks(detectedPeaksBins, chart);
+                                    updateResonanceFrequencyIcons(recognizedResonanceFrequencies);
+                                    updateResonanceFrequencyToleranceBars(recognizedResonanceFrequencies, chart);
 
-                                setFinalVerdictIsBeingDisplayed(true);
-                                setStartAgainButtonVisibility(startAgainButton, View.VISIBLE);
+                                    setFinalVerdictIsBeingDisplayed(true);
+                                    setStartAgainButtonVisibility(startAgainButton, View.VISIBLE);
 
-                                displayAuthenticCoinDialog(finalSelectedCoinId, finalSelectedCoinPopularName, spectralFeatures);
+                                    displayAuthenticCoinDialog(finalSelectedCoinId, finalSelectedCoinPopularName, spectralFeatures);
 //                                SpectrumPlottingUtils.drawDetectedPeaks(detectedPeaksBins, chart);
 
-                            }
-                            break;
-                    }
-                } // end of switch statement
+                                }
+                                break;
+                        }
+                    } // end of switch statement
 
-                // The process() method needs to return a boolean value. This happens here.
-                return true;
+                    // The process() method needs to return a boolean value. This happens here.
+                    return true;
+                } else {
+                    return true;
+                }
             }
         });
 
@@ -564,6 +648,7 @@ public class TestCoin extends AppCompatActivity implements EasyPermissions.Permi
         mDatabase.child("pings").child(finalSelectedCoinId1).child(timestamp).child("detectedPeaksHz").setValue(detectedPeaksHz);
         mDatabase.child("pings").child(finalSelectedCoinId1).child(timestamp).child("recognizedResonanceFrequencies").setValue(recognizedResonanceFrequencies);
         mDatabase.child("pings").child(finalSelectedCoinId1).child(timestamp).child("verdict").setValue(verdict.toString());
+        mDatabase.child("pings").child(finalSelectedCoinId1).child(timestamp).child("userAnonymousId").setValue(this.currentUser.getUid());
     }
 
     private String getTimestamp() {

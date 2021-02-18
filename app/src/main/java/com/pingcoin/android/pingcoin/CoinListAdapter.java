@@ -131,10 +131,12 @@ public class CoinListAdapter extends RecyclerView.Adapter<CoinListAdapter.CoinVi
                     intent.putExtra("id", current.getId());
                     intent.putExtra("WeightInOz", current.getWeightInOz());
                     intent.putExtra("MaterialClass", current.getMaterialClass());
-                    intent.putExtra("C0D2a", current.getC0D2a());
-                    intent.putExtra("C0D3a", current.getC0D3a());
-                    intent.putExtra("C0D4a", current.getC0D4a());
-                    intent.putExtra("Error", current.getError());
+                    intent.putExtra("C0D2", current.getC0D2());
+                    intent.putExtra("C0D3", current.getC0D3());
+                    intent.putExtra("C0D4", current.getC0D4());
+                    intent.putExtra("C0D2Error", current.getC0D2Error());
+                    intent.putExtra("C0D3Error", current.getC0D3Error());
+                    intent.putExtra("C0D4Error", current.getC0D4Error());
 
                     context.startActivity(intent);
                 }

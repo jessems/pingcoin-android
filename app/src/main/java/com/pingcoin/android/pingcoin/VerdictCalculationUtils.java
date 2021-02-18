@@ -17,14 +17,14 @@ class VerdictCalculationUtils {
         Map<String, Boolean> recognizedResonanceFrequencies = new HashMap();
 
 
-        if(detectedPeaksHz.size() < 10) {
+        if(detectedPeaksHz.size() < 50) {
             for (float realPeakvalue : detectedPeaksHz) {
                 float peak = realPeakvalue;
-                if ((peak > ((float) resonanceFrequencies.get("C0D2") * (1 - resonanceFrequencies.get("tolerance")))) && (peak < ((float) resonanceFrequencies.get("C0D2") * (1 + resonanceFrequencies.get("tolerance"))))) {
+                if ((peak > ((float) resonanceFrequencies.get("C0D2") * (1 - resonanceFrequencies.get("C0D2Error")))) && (peak < ((float) resonanceFrequencies.get("C0D2") * (1 + resonanceFrequencies.get("C0D2Error"))))) {
                     C0D2Detected = true;
-                } else if ((peak > ((float) resonanceFrequencies.get("C0D3") * (1 - resonanceFrequencies.get("tolerance")))) && (peak < ((float) resonanceFrequencies.get("C0D3") * (1 + resonanceFrequencies.get("tolerance"))))) {
+                } else if ((peak > ((float) resonanceFrequencies.get("C0D3") * (1 - resonanceFrequencies.get("C0D3Error")))) && (peak < ((float) resonanceFrequencies.get("C0D3") * (1 + resonanceFrequencies.get("C0D3Error"))))) {
                     C0D3Detected = true;
-                } else if ((peak > ((float) resonanceFrequencies.get("C0D4") * (1 - resonanceFrequencies.get("tolerance")))) && (peak < ((float) resonanceFrequencies.get("C0D4") * (1 + resonanceFrequencies.get("tolerance"))))) {
+                } else if ((peak > ((float) resonanceFrequencies.get("C0D4") * (1 - resonanceFrequencies.get("C0D4Error")))) && (peak < ((float) resonanceFrequencies.get("C0D4") * (1 + resonanceFrequencies.get("C0D4Error"))))) {
                     C0D4Detected = true;
                 }
             }
@@ -50,10 +50,27 @@ class VerdictCalculationUtils {
                         booleanToInt(detectedPeaks.get("C0D4"));
 
 
-        if(spectralFeatures.get("spectralCentroid") > featureThresholds.get("spectralCentroidThreshold") &&
-                spectralFeatures.get("spectralFlatness") < featureThresholds.get("spectralFlatnessThreshold") &&
-                spectralFeatures.get("spectralMedian") < featureThresholds.get("spectralMedianThreshold")) {
+//        if(spectralFeatures.get("spectralCentroid") > featureThresholds.get("spectralCentroidThreshold") &&
+//                spectralFeatures.get("spectralFlatness") < featureThresholds.get("spectralFlatnessThreshold") &&
+//                spectralFeatures.get("spectralMedian") < featureThresholds.get("spectralMedianThreshold")) {
+//            pingIsClean = true;
+//        }
+
+//        if(spectralFeatures.get("inverseSpectralFlatness") > 3) {
+//            Log.i(TAG, "spectral flatness" + Double.toString(spectralFeatures.get("inverseSpectralFlatness")));
+//        }
+        if(spectralFeatures.get("inverseSpectralFlatness") > 2.5 && spectralFeatures.get("spectralBandwidth") < 50 && spectralFeatures.get("spectralCentroid") > 300) {
+            Log.i(TAG, "spectral bandwidth: " + Double.toString(spectralFeatures.get("spectralBandwidth")));
+            Log.i(TAG, "spectral flatness: " + Double.toString(spectralFeatures.get("inverseSpectralFlatness")));
+            Log.i(TAG, "spectral centroid: " + Double.toString(spectralFeatures.get("spectralCentroid")));
+        }
+
+
+        if(spectralFeatures.get("inverseSpectralFlatness") > 2 && spectralFeatures.get("spectralBandwidth") < 6 && spectralFeatures.get("spectralCentroid") > 500) {
             pingIsClean = true;
+            Log.i(TAG, "spectral bandwidth: " + Double.toString(spectralFeatures.get("spectralBandwidth")));
+            Log.i(TAG, "spectral flatness: " + Double.toString(spectralFeatures.get("inverseSpectralFlatness")));
+            Log.i(TAG, "spectral centroid: " + Double.toString(spectralFeatures.get("spectralCentroid")));
         }
 
         if (amountOfFrequenciesDetected == 0 && !pingIsClean) {

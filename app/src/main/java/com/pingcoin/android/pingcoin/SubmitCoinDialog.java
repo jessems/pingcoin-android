@@ -32,7 +32,12 @@ import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
@@ -135,7 +140,8 @@ public class SubmitCoinDialog extends DialogFragment implements EasyPermissions.
     private boolean coinPictureUploaded = false;
     private ProgressBar mProgressbar;
     private View mProgressbarLinearLayout;
-//    MediaPlayer mp;
+    private FirebaseAuth mAuth;
+    private FirebaseUser currentUser;
 
 
     public static SubmitCoinDialog display(FragmentManager fragmentManager) {
@@ -167,8 +173,12 @@ public class SubmitCoinDialog extends DialogFragment implements EasyPermissions.
         storage = FirebaseStorage.getInstance();
         storageRef = storage.getReference();
 
+        mAuth = FirebaseAuth.getInstance();
+        this.currentUser = mAuth.getCurrentUser();
+
 
     }
+
 
     private void bindViews() {
         View view = getView();
@@ -355,6 +365,7 @@ public class SubmitCoinDialog extends DialogFragment implements EasyPermissions.
         if (null != coinRecording && null != coinPicture && coinRecording.exists() && coinPicture.exists()) {
             uploadRecording(coinRecording, timestamp);
             uploadPicture(coinPicture, timestamp);
+            mDatabase.child("submitted_coins").child(timestamp).child("uid").setValue(mAuth.getCurrentUser().getUid());
         } else {
             Log.i(TAG, "Coin recording / picture might not exist.");
         }
@@ -524,6 +535,7 @@ public class SubmitCoinDialog extends DialogFragment implements EasyPermissions.
             dialog.getWindow().setLayout(width, height);
             dialog.getWindow().setWindowAnimations(R.style.AppTheme_Slide);
         }
+
 
     }
 

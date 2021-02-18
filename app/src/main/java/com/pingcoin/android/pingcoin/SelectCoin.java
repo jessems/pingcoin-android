@@ -3,9 +3,18 @@ package com.pingcoin.android.pingcoin;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
+import android.content.Context;
+import android.content.ActivityNotFoundException;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.storage.FirebaseStorage;
 
 import org.greenrobot.eventbus.Subscribe;
@@ -13,6 +22,7 @@ import org.greenrobot.eventbus.Subscribe;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -31,20 +41,20 @@ public class SelectCoin extends OverflowMenuActivity {
     private DrawerLayout dl;
     private ActionBarDrawerToggle t;
     private NavigationView nv;
+    private FirebaseAuth mAuth;
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_feedback:
                 Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
-                        "mailto","jessems@gmail.com", null));
+                        "mailto","jessems+pingcoin@gmail.com", null));
                 intent.putExtra(Intent.EXTRA_SUBJECT, "Pingcoin app feedback");
                 startActivity(Intent.createChooser(intent, "Choose an Email client :"));
                 return true;
 
             case R.id.action_about_ping_test:
-                // User chose the "Favorite" action, mark the current item
-                // as a favorite...
+                watchYoutubeVideo(this, "b4LbRGKTNiE");
                 return true;
 
             case R.id.action_submit_coin:
@@ -61,9 +71,40 @@ public class SelectCoin extends OverflowMenuActivity {
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        mAuth = FirebaseAuth.getInstance();
+
+        if (mAuth.getCurrentUser() == null) {
+            mAuth.signInAnonymously()
+                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            if (task.isSuccessful()) {
+                                // Sign in success, update UI with the signed-in user's information
+                                Log.d("SelectCoin", "signInAnonymously:success");
+                                FirebaseUser user = mAuth.getCurrentUser();
+//                                updateUI(user);
+                            } else {
+                                // If sign in fails, display a message to the user.
+                                Log.w("SelectCoin", "signInAnonymously:failure", task.getException());
+                                Toast.makeText(SelectCoin.this, "Authentication failed.",
+                                        Toast.LENGTH_SHORT).show();
+//                                updateUI(null);
+                            }
+
+                            // ...
+                        }
+                    });
+        }
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         FirebaseStorage storage = FirebaseStorage.getInstance();
+
+
         setContentView(R.layout.activity_select_coin);
 
 
@@ -113,6 +154,20 @@ public class SelectCoin extends OverflowMenuActivity {
         });
 
 
+    }
+
+
+
+
+    public static void watchYoutubeVideo(Context context, String id){
+        Intent appIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + id));
+        Intent webIntent = new Intent(Intent.ACTION_VIEW,
+                Uri.parse("http://www.youtube.com/watch?v=" + id));
+        try {
+            context.startActivity(appIntent);
+        } catch (ActivityNotFoundException ex) {
+            context.startActivity(webIntent);
+        }
     }
 
 
