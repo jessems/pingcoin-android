@@ -7,8 +7,8 @@ android {
         applicationId "com.pingcoin.android.pingcoin"
         minSdkVersion 22
         targetSdkVersion 29
-        versionCode 33
-        versionName "0.1.33"
+        versionCode 34
+        versionName "0.1.34"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled true

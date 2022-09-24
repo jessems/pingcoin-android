@@ -1,5 +1,6 @@
 package com.pingcoin.android.pingcoin;
 
+import android.Manifest;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -32,6 +33,8 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import pub.devrel.easypermissions.AfterPermissionGranted;
+import pub.devrel.easypermissions.EasyPermissions;
 
 public class SelectCoin extends OverflowMenuActivity {
 
@@ -42,6 +45,7 @@ public class SelectCoin extends OverflowMenuActivity {
     private ActionBarDrawerToggle t;
     private NavigationView nv;
     private FirebaseAuth mAuth;
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

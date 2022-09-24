@@ -1,9 +1,13 @@
 package com.pingcoin.android.pingcoin;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import androidx.recyclerview.widget.RecyclerView;
+import pub.devrel.easypermissions.AfterPermissionGranted;
+import pub.devrel.easypermissions.EasyPermissions;
+
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -68,6 +72,7 @@ public class CoinListAdapter extends RecyclerView.Adapter<CoinListAdapter.CoinVi
         }
 
     }
+
 
     @Override
     public void onBindViewHolder(CoinViewHolder holder, final int position) {

@@ -199,6 +199,8 @@ public class TestCoin extends AppCompatActivity implements EasyPermissions.Permi
         }
     }
 
+
+
     private void initCoinTesting() {
 
         // Prevent the screen from dimming
@@ -1143,15 +1145,6 @@ public class TestCoin extends AppCompatActivity implements EasyPermissions.Permi
             peakList.add(peak);
         }
         return peakList;
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == AppSettingsDialog.DEFAULT_SETTINGS_REQ_CODE) {
-            initCoinTesting();
-        }
     }
 
     @Override
