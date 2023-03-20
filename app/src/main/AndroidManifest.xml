@@ -38,7 +38,9 @@
             android:name=".SelectCoin"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.Pingcoin">
+            android:theme="@style/Theme.Pingcoin"
+            android:exported="true"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
