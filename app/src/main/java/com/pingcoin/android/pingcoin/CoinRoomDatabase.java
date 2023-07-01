@@ -633,6 +633,21 @@ public abstract class CoinRoomDatabase extends RoomDatabase {
                     17290f,
                     0.03f
             ));
+            mDao.insert(new Coin(
+                    "American Buffalo",
+                    "Buffalo",
+                    1,
+                    "Gold",
+                    "gold_american_buffalo_1oz",
+                    "USA",
+                    "American",
+                    3386.75f,
+                    0.067f,
+                    7870.75f,
+                    0.04f,
+                    13808.75f,
+                    0.04f
+            ));
 
 
 
