@@ -4,24 +4,21 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.icu.text.AlphabeticIndex;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
-import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -32,11 +29,7 @@ import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
-import com.google.firebase.analytics.FirebaseAnalytics;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -45,7 +38,6 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-import com.livinglifetechway.quickpermissions.annotations.WithPermissions;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -55,8 +47,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
@@ -71,10 +61,10 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicReference;
 
 
@@ -86,7 +76,7 @@ public class SubmitCoinDialog extends DialogFragment implements EasyPermissions.
     private static final int REQUEST_TAKE_PHOTO = 1;
     private static final String DIALOG_TITLE = "Submit a coin";
     private static final int REQUEST_RECORD_AUDIO_PERMISSION = 123;
-    private static final int REQUEST_CAMERA_AND_STORAGE_PERMISSION = 321;
+    private static final int REQUEST_CAMERA_PERMISSION = 321;
 
     private Bitmap mImageBitmap;
     private Toolbar toolbar;
@@ -103,6 +93,8 @@ public class SubmitCoinDialog extends DialogFragment implements EasyPermissions.
 
     private boolean isUserSeeking;
     private MediaPlayerHolder mMediaPlayerHolder;
+
+    private RandomAccessFile outputFile;
 
 
     private Button mTakePictureButton;
@@ -320,20 +312,6 @@ public class SubmitCoinDialog extends DialogFragment implements EasyPermissions.
         Log.d(TAG, "ResetPlayback() message sent to EventBus");
     }
 
-    private void createFileAndStartRecording() {
-        try {
-            this.coinRecording = createFile(FileType.RECORDING);
-            if (this.coinRecording == null) {
-                showErrorDialog("Error while creating file. File is null.");
-            } else {
-                // Start your recording here
-            }
-        } catch (IOException e) {
-            Log.e(TAG, "Failed to create file", e);
-            showErrorDialog("Failed to create file");
-        }
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
@@ -343,10 +321,6 @@ public class SubmitCoinDialog extends DialogFragment implements EasyPermissions.
         // Initialize playback controller
 
         this.timestamp = getTimestamp();
-        pathName = new File(Environment.getExternalStorageDirectory() + "/" + APP_RECORDING_DIRECTORY);
-
-        // Request permissions and create file
-        requestPermissionsAndCreateFile();
 
         toolbar = view.findViewById(R.id.toolbar);
         if (toolbar == null) {
@@ -354,7 +328,6 @@ public class SubmitCoinDialog extends DialogFragment implements EasyPermissions.
             // handle error here
         }
 
-        // TODO: Add check if device has a camera or not with hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)
         return view;
     }
 
@@ -413,12 +386,28 @@ public class SubmitCoinDialog extends DialogFragment implements EasyPermissions.
         StorageMetadata metadata = new StorageMetadata.Builder().setContentType("audio/wav").setCustomMetadata("coinName", "e.g. Krugerrand").build();
 
         UploadTask uploadTask = coinRecordingRef.putFile(fileURI);
+        Handler handler = new Handler();
+
+        // This Runnable will be executed if upload takes more than 10 seconds
+        Runnable runnable = () -> {
+            uploadTask.cancel();
+            Toast.makeText(getContext(), "Upload timed out. Please try again.", Toast.LENGTH_SHORT).show();
+        };
+
+        // Start the 10 seconds timer
+        handler.postDelayed(runnable, 10000);
 
         uploadTask.addOnFailureListener(exception -> {
+            // Remove the Runnable from the Handler queue as it's no longer needed
+            handler.removeCallbacks(runnable);
+
             // Log the exception and inform the user
             Log.e("Upload", "Failure!", exception);
             Toast.makeText(getContext(), "Upload failed. Please try again.", Toast.LENGTH_SHORT).show();
         }).addOnSuccessListener(taskSnapshot -> {
+            // Remove the Runnable from the Handler queue as it's no longer needed
+            handler.removeCallbacks(runnable);
+
             Log.i("Upload", "Coin recording upload success!");
             coinRecordingRef.updateMetadata(metadata);
             coinRecordingRef.getDownloadUrl().addOnSuccessListener(url -> {
@@ -430,6 +419,7 @@ public class SubmitCoinDialog extends DialogFragment implements EasyPermissions.
             updateUploadProgressBar();
         });
     }
+
 
 
     private void updateUploadProgressBar() {
@@ -445,11 +435,27 @@ public class SubmitCoinDialog extends DialogFragment implements EasyPermissions.
         StorageMetadata metadata = new StorageMetadata.Builder().setContentType("image/jpg").setCustomMetadata("coinName", "e.g. Krugerrand").build();
 
         UploadTask uploadTask = coinPictureRef.putFile(fileURI);
+        Handler handler = new Handler();
 
-        // Register observers to listen for when the download is done or if it fails
+        // This Runnable will be executed if upload takes more than 10 seconds
+        Runnable runnable = () -> {
+            uploadTask.cancel();
+            showErrorDialog("Upload timed out. Please try again.");
+        };
+
+        // Start the 10 seconds timer
+        handler.postDelayed(runnable, 10000);
+
         uploadTask.addOnFailureListener(exception -> {
+            // Remove the Runnable from the Handler queue as it's no longer needed
+            handler.removeCallbacks(runnable);
+
             Log.e("Upload", "Failure!", exception);  // Log exception message
+            showErrorDialog("Upload failed. Please try again.");
         }).addOnSuccessListener(taskSnapshot -> {
+            // Remove the Runnable from the Handler queue as it's no longer needed
+            handler.removeCallbacks(runnable);
+
             Log.i("Upload", "Coin picture upload success!");
             coinPictureRef.updateMetadata(metadata);
             coinPictureRef.getDownloadUrl().addOnSuccessListener(url -> {
@@ -462,6 +468,7 @@ public class SubmitCoinDialog extends DialogFragment implements EasyPermissions.
             });
         });
     }
+
 
 
     @Override
@@ -567,114 +574,71 @@ public class SubmitCoinDialog extends DialogFragment implements EasyPermissions.
     // TODO: Come up with better CONST values instead of 321
     @AfterPermissionGranted(REQUEST_RECORD_AUDIO_PERMISSION)
     private void record() {
-        String[] perms = {Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE};
+        String[] perms = {Manifest.permission.RECORD_AUDIO};
         if (EasyPermissions.hasPermissions(getContext(), perms)) {
-            if (!isExternalStorageWritable()) {
-                showErrorDialog("Cannot write to external storage. Please check your storage permissions and try again.");
-                return;
-            }
-
             try {
                 dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(RECORDER_SAMPLERATE, bufferSize, 0);
             } catch (Exception e) {
-                showErrorDialog("Failed to initialize audio dispatcher. Please try again.");
+                showErrorDialog("Couldn't start recording. Please try again later.");
+                Log.e(TAG, "Failed to initialize audio dispatcher.", e);
                 return;
             }
 
             EventBus.getDefault().post(new MediaStateChangeEvent.StateChanged(RecordingState.Recording));
 
-            if (null != mMediaPlayerHolder) {
+            if (mMediaPlayerHolder != null) {
                 mMediaPlayerHolder.release();
                 Log.i(TAG, "mPlayerAdapter released.");
             }
 
-            if (null != this.coinRecording && this.coinRecording.exists()) {
-                Log.i(TAG, this.coinRecording.getAbsolutePath() + " exists: " + this.coinRecording.exists());
-                boolean isDeleted = this.coinRecording.delete();
-
-                if (isDeleted) {
-                    Log.i(TAG, "File deleted!");
-                } else {
-                    Log.i(TAG, "File deletion failed!");
-                    showErrorDialog("Failed to delete recording.");
-                    return;
-                }
-                Log.i(TAG, this.coinRecording.getAbsolutePath() + " exists: " + this.coinRecording.exists());
-            } else {
-                Log.d(TAG, "The coin recording doesn't exist, no need to delete.");
-            }
-
-            if (pathName.exists()) {
-                Log.d(TAG, "Directory already exists");
-            } else if (pathName.mkdirs()) {
-                Log.d(TAG, "Directory is created");
-            } else {
+            File pathName = getActivity().getFilesDir();
+            if (!pathName.exists() && !pathName.mkdirs()) {
+                showErrorDialog("Couldn't start recording due to a storage issue. Please try again later.");
                 Log.d(TAG, "Directory creation failed");
-                showErrorDialog("Failed to create directory for recording.");
                 return;
             }
 
-            // Rescan available files
-            MediaScannerConnection.scanFile(getActivity(), new String[]{Environment.getExternalStorageDirectory().toString()}, null, null);
-
             try {
-                // Create the new file
-                this.coinRecording = createFile(FileType.RECORDING);
-                if (this.coinRecording == null) {
-                    showErrorDialog("Error: File is null. Please try again.");
-                    return;
-                }
+                SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault());
+                String timeStamp = formatter.format(new Date());
+                this.coinRecording = new File(pathName, timeStamp + ".wav");
+                this.coinRecording.createNewFile();
             } catch (IOException ex) {
-                // Error occurred while creating the File
+                showErrorDialog("Couldn't start recording due to a storage issue. Please try again later.");
                 Log.e(TAG, "Error occurred while creating the File", ex);
-                showErrorDialog("Error occurred while creating the File. Please try again.");
                 return;
             }
 
-            final RandomAccessFile[] outputFile = new RandomAccessFile[1];
             try {
-                outputFile[0] = new RandomAccessFile(this.coinRecording, "rw");
+                outputFile = new RandomAccessFile(this.coinRecording, "rw");
                 Log.i(TAG, "New random access file created: " + this.coinRecording.getAbsolutePath());
                 TarsosDSPAudioFormat outputFormat = new TarsosDSPAudioFormat(RECORDER_SAMPLERATE, 16, 1, true, false);
-                WriterProcessor writer = new WriterProcessor(outputFormat, outputFile[0]);
+                WriterProcessor writer = new WriterProcessor(outputFormat, outputFile);
                 dispatcher.addAudioProcessor(writer);
 
                 recordingThread = new Thread(() -> {
                     try {
                         dispatcher.run();
                     } catch (Exception e) {
+                        showErrorDialog("An error occurred during recording. Please try again.");
                         Log.e(TAG, "Error occurred during recording", e);
-                        getActivity().runOnUiThread(() -> Toast.makeText(getContext(), "An error occurred during recording, please try again", Toast.LENGTH_SHORT).show());
-                    } finally {
-                        if (dispatcher != null && !dispatcher.isStopped()) {
-                            dispatcher.stop();
-                            Log.i(TAG, "Recording thread has been stopped");
-                            if (outputFile[0] != null) {
-                                try {
-                                    outputFile[0].close();
-                                } catch (IOException e) {
-                                    Log.e(TAG, "Error occurred while closing the file", e);
-                                }
-                            }
-                        }
                     }
                 }, "AudioDispatcherThread");
                 recordingThread.start();
                 Log.i(TAG, "Recording thread has started");
                 Toast.makeText(getContext(), "Recording has started!", Toast.LENGTH_SHORT).show();
             } catch (FileNotFoundException e) {
-                e.printStackTrace();
-                showErrorDialog("Error occurred while accessing the file for recording. Please try again.");
+                showErrorDialog("Couldn't start recording due to a storage issue. Please try again later.");
+                Log.e(TAG, "Error occurred while accessing the file for recording.", e);
             } catch (IOException e) {
-                e.printStackTrace();
-                showErrorDialog("Error occurred while closing the file. Please try again.");
+                showErrorDialog("An error occurred. Please try again.");
+                Log.e(TAG, "Error occurred.", e);
             }
-
         } else {
-            EasyPermissions.requestPermissions(this, "We need access to your phone's microphone and storage to record, save and send a recording.", REQUEST_RECORD_AUDIO_PERMISSION, perms);
+            EasyPermissions.requestPermissions(this, "We need access to your phone's microphone to record.", REQUEST_RECORD_AUDIO_PERMISSION, perms);
         }
-
     }
+
 
     private void showErrorDialog(String errorMessage) {
         new AlertDialog.Builder(getContext()).setTitle("Error").setMessage(errorMessage).setPositiveButton(android.R.string.ok, (dialog, which) -> dialog.dismiss()).show();
@@ -684,18 +648,17 @@ public class SubmitCoinDialog extends DialogFragment implements EasyPermissions.
     private void stopRecord() {
         EventBus.getDefault().post(new MediaStateChangeEvent.StateChanged(RecordingState.Recorded));
 
-        if (null == dispatcher) {
-            Log.d(TAG, "Dispatcher is null");
-            return;
-        }
-
-        if (dispatcher.isStopped()) {
-            Log.d(TAG, "Dispatcher is already stopped");
-            return;
-        }
-
         dispatcher.stop();
         recordingThread = null;
+
+        // Close the RandomAccessFile
+        if (outputFile != null) {
+            try {
+                outputFile.close();
+            } catch (IOException e) {
+                Log.e(TAG, "Error closing RandomAccessFile", e);
+            }
+        }
 
         if (this.coinRecording == null || this.coinRecording.getAbsolutePath() == null) {
             Log.d(TAG, "The coinRecording is null or the path is invalid");
@@ -782,13 +745,21 @@ public class SubmitCoinDialog extends DialogFragment implements EasyPermissions.
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        if (requestCode == REQUEST_CAMERA_AND_STORAGE_PERMISSION) {
+        if (requestCode == REQUEST_RECORD_AUDIO_PERMISSION) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission granted, create the file
-                createFileAndStartRecording();
+                // Permission granted, start recording
+                record();
             } else {
                 // Permission denied, show an error or something
-                showErrorDialog("Permission to access storage was denied");
+                showErrorDialog("Permission to access microphone was denied");
+            }
+        } else if (requestCode == REQUEST_CAMERA_PERMISSION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission granted, take picture
+                dispatchTakePictureIntent();
+            } else {
+                // Permission denied, show an error or something
+                showErrorDialog("Permission to access storage and camera was denied");
             }
         } else {
             // Forward results to EasyPermissions for other permission requests
@@ -796,22 +767,13 @@ public class SubmitCoinDialog extends DialogFragment implements EasyPermissions.
         }
     }
 
-    private void requestPermissionsAndCreateFile() {
-        String[] perms = {Manifest.permission.WRITE_EXTERNAL_STORAGE};
-        if (!EasyPermissions.hasPermissions(getContext(), perms)) {
-            EasyPermissions.requestPermissions(this, "We need permission to write to your storage to store a temporary recording you make of your coin's ping before it can be sent to our servers.", REQUEST_CAMERA_AND_STORAGE_PERMISSION, perms);
-        } else {
-            createFileAndStartRecording();
-        }
-    }
 
-
-    @AfterPermissionGranted(REQUEST_CAMERA_AND_STORAGE_PERMISSION)
+    @AfterPermissionGranted(REQUEST_CAMERA_PERMISSION)
     private void dispatchTakePictureIntent() {
 
-        String[] perms = {Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
+        String[] perms = {Manifest.permission.CAMERA};
         if (!EasyPermissions.hasPermissions(getContext(), perms)) {
-            EasyPermissions.requestPermissions(this, "We need permission to write to your storage to store a temporary picture you take of your coin before it can be sent to our servers.", REQUEST_CAMERA_AND_STORAGE_PERMISSION, perms);
+            EasyPermissions.requestPermissions(this, "We need permission to use your camera so you can take a picture of your coin.", REQUEST_CAMERA_PERMISSION, perms);
             return;
         }
 
@@ -822,31 +784,35 @@ public class SubmitCoinDialog extends DialogFragment implements EasyPermissions.
             return;
         }
 
-        // Create the File where the photo should go
-        File photoFile = null;
+        File pathName = getActivity().getFilesDir();
+        if (!pathName.exists() && !pathName.mkdirs()) {
+            showErrorDialog("Couldn't start due to a storage issue. Please try again later.");
+            Log.d(TAG, "Directory creation failed");
+            return;
+        }
+
         try {
-            photoFile = createFile(FileType.PICTURE);
-            if (photoFile == null) {
-                showErrorDialog("Error: File is null. Please try again.");
-            }
-            this.coinPicture = photoFile;
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault());
+            String timeStamp = formatter.format(new Date());
+            this.coinPicture = new File(pathName, timeStamp + ".jpg");
+            this.coinPicture.createNewFile();
         } catch (IOException ex) {
-            // Error occurred while creating the File
+            showErrorDialog("Couldn't start due to a storage issue. Please try again later.");
             Log.e(TAG, "Error occurred while creating the File", ex);
-            showErrorDialog("Error occurred while creating the File. Please try again.");
             return;
         }
 
         // Continue only if the File was successfully created
-        if (photoFile == null) {
+        if (coinPicture == null) {
             showErrorDialog("Failed to create a new file for the photo. Please try again.");
             return;
         }
 
-        Uri photoURI = FileProvider.getUriForFile(getContext(), "com.pingcoin.android.pingcoin.fileprovider", photoFile);
+        Uri photoURI = FileProvider.getUriForFile(getContext(), "com.pingcoin.android.pingcoin.fileprovider", coinPicture);
         takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
         startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
     }
+
 
     private void requestCameraAndStoragePermission() {
         String[] perms = {Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
@@ -854,7 +820,7 @@ public class SubmitCoinDialog extends DialogFragment implements EasyPermissions.
             new AppSettingsDialog.Builder(this).build().show();
         } else {
             EasyPermissions.requestPermissions(
-                    new PermissionRequest.Builder(this, REQUEST_CAMERA_AND_STORAGE_PERMISSION, perms)
+                    new PermissionRequest.Builder(this, REQUEST_CAMERA_PERMISSION, perms)
                             .setRationale("We need permission to write to your storage to store a temporary picture you take of your coin before it can be sent to our servers.")
                             .build());
         }
@@ -864,29 +830,12 @@ public class SubmitCoinDialog extends DialogFragment implements EasyPermissions.
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == AppSettingsDialog.DEFAULT_SETTINGS_REQ_CODE) {
-            // Do something after user returned from app settings screen, like showing a Toast or SnackBar
-            String[] perms = {Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
-            if (EasyPermissions.hasPermissions(getContext(), perms)) {
-                Toast.makeText(getContext(), "Permission granted!", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(getContext(), "Permission not granted!", Toast.LENGTH_SHORT).show();
-            }
-        }
-
         if (requestCode != REQUEST_TAKE_PHOTO || resultCode != Activity.RESULT_OK) {
             return;
         }
 
-        if (currentPhotoPath == null) {
+        if (this.coinPicture == null || !this.coinPicture.exists()) {
             showErrorDialog("An error occurred while capturing the picture. Please try again.");
-            return;
-        }
-
-        this.coinPicture = new File(currentPhotoPath);
-
-        if (!this.coinPicture.exists()) {
-            showErrorDialog("Picture file does not exist. Please try again.");
             return;
         }
 
@@ -931,55 +880,7 @@ public class SubmitCoinDialog extends DialogFragment implements EasyPermissions.
         return new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
     }
 
-    private File createFile(FileType fileType) throws IOException {
-        String timestamp = getTimestamp();
-        String extensionPrefix;
-        String suffix;
-        File storageDir;
-        File file = null;
 
-        switch (fileType) {
-            case RECORDING:
-                extensionPrefix = "WAV";
-                suffix = ".wav";
-                storageDir = new File(Environment.getExternalStorageDirectory() + "/" + APP_RECORDING_DIRECTORY);
-                break;
-            case PICTURE:
-                extensionPrefix = "JPG";
-                suffix = ".jpg";
-                storageDir = getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid file type: " + fileType);
-        }
-
-        try {
-            file = concatenateFilenameElements(extensionPrefix, timestamp, suffix, storageDir);
-
-            if (fileType == FileType.RECORDING) {
-                this.coinRecording = file;
-            } else {
-                this.coinPicture = file;
-                this.currentPhotoPath = file.getAbsolutePath();
-            }
-        } catch (IOException e) {
-            Log.e(TAG, "File creation failed", e);
-            showErrorDialog("File creation failed. Please try again.");
-        }
-
-        return file;
-    }
-
-    private File concatenateFilenameElements(String extensionPrefix, String timestamp, String suffix, File storageDir) throws IOException {
-        if (extensionPrefix == null || suffix == null || timestamp == null || storageDir == null) {
-            throw new IllegalArgumentException("Arguments cannot be null");
-        }
-
-        String fileName = extensionPrefix + "_" + timestamp + "_";
-        return File.createTempFile(fileName,   /* prefix */
-                suffix,     /* suffix */
-                storageDir  /* directory */);
-    }
 
 
     @Override
